@@ -1,0 +1,114 @@
+.visibility {
+	display: none;
+}
+
+.form-enter {
+	width: 100%;
+	padding: 9rem 0 0 0;
+	&__container {
+		background: rgba(44, 164, 255, .1);	
+		width: 60.4rem;
+		max-height: 53.3rem;
+		margin: 0 auto;
+		border-radius: 2rem;
+	}	
+	&__content {
+		padding: 8rem 10.6rem;
+		display: flex;
+		flex-direction: column;
+	}
+	&__wrapper-title {
+		display: flex;
+		gap: 3.2rem;
+		justify-content: space-around;	
+	}
+	&__title {
+		display: flex;
+		font-size: 2rem;
+		line-height: 2.6rem;
+		padding: 1.6rem 0;	
+		justify-self: center;
+		color: rgba(0, 0, 0, .85);
+		margin: 0 auto 6rem auto;
+		cursor: pointer;
+	}
+	&__title_active {	
+		color: #1890FF;
+		display: inline;
+		border-bottom: .2rem solid #1890FF;
+		cursor: default;
+	}
+	&__input-container {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;	
+		max-width: 39.2rem;
+	}
+	&__input {
+		position: relative;
+		width: calc( 100% - 1.2rem );
+		height: 4.6rem;
+		border: 1px solid #D9D9D9;
+		border-radius: 2rem;
+		font-size: 1.6rem;
+		line-height: 2.24rem;
+		outline: none;
+		padding-left: 1.2rem;
+	}
+	&__input::-webkit-input-placeholder {		
+		color: rgba(0, 0, 0, .25);
+	}
+	&__wrapper-input {
+		position: relative;
+		margin: 0 0 2rem 0;
+	}
+	&__wrapper-input:after {
+		position: absolute;
+		z-index: 10;
+		content: '';	
+		top: 1.7em;
+		right: 1.6rem;
+		width: 1.6rem;
+		height: 1.4rem;
+		background-image: url('../../images/visible-pass.svg');
+	}
+	&__input_type_password {
+	-webkit-text-security: disc;
+	}
+	&__button {
+		background-color: #1890FF;
+		border-radius: 2rem;
+		color: #fff;
+		box-shadow: 0px .2rem 0px 0px rgba(0, 0, 0, .04);
+		border: none;
+		padding: 1.2rem 0;
+		margin: 2rem 0 1.2rem 0;
+		font-size: 1.6rem;
+		cursor: pointer;
+		font-weight: 700;
+		line-height: 2.24rem;
+	}
+	&__button_disabled {
+		cursor: default;
+		background-color: #F5F5F5;
+		color: rgba(0, 0, 0, .25);
+		line-height: 2.24rem;
+		border: 1px solid #D9D9D9;
+		box-shadow: 0px .2rem 0px 0px rgba(0, 0, 0, .0106);
+	}
+	&__acceptance {
+		color: #A1A1A1;
+		font-weight: 400;
+		font-size: 1.4rem;
+		line-height: 1.96rem;
+	}
+	&__acceptance-span {
+		text-decoration: underline;
+	}
+	&__password-recovery {
+		text-align: center;
+		color: #1890FF;
+		font-size: 1.6rem;
+		cursor: pointer;
+	}
+}
