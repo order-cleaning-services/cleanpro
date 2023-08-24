@@ -1,6 +1,11 @@
+import Input from "./components/input/Input"
+
 function App() {
   return (
-    <h1>CleaPro</h1>
+    <>
+      <Input placeholder='Email' />
+      <Input placeholder='Введите пароль' />
+    </>
   )
 }
 
