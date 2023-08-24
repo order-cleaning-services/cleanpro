@@ -44,3 +44,16 @@
   display: block;
   margin-right: 0.8rem;
 }
+
+.header__profile {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  text-decoration: none;
+  color: #000;
+}
+
+.header__profile-icon {
+  display: block;
+  margin-right: 0.8rem;
+}

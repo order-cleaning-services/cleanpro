@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Logo from '../Logo/Logo';
 import signin from '../../images/signin.svg';
+import profile from '../../images/profile.svg';
 import './Header.scss';
 
 const Header = ({ isLoggedIn }) => {
@@ -25,11 +26,11 @@ const Header = ({ isLoggedIn }) => {
           {isLoggedIn ? (
             <Link className="header__profile" to="profile">
               <img
-                src={signin}
+                src={profile}
                 className="header__profile-icon"
                 alt="Иконка профиля"
               />
-              Войти
+              Профиль
             </Link>
           ) : (
             <Link className="header__signin" to="signin">
