@@ -87,13 +87,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomUserCreate'
+              $ref: '#/components/schemas/CustomUserCreateWithoutPassword'
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomUserCreateWithoutPassword'
+                $ref: '#/components/schemas/CustomUserResponseOnCreate'
           description: 'Пользователь успешно создан'
         '400':
           $ref: '#/components/responses/ValidationError'
