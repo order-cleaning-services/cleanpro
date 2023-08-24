@@ -1,5 +1,46 @@
 .header {
-  display: flex;
   justify-content: space-between;
   padding: 4rem 10rem;
+}
+
+.header__menu {
+  display: flex;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.header__links {
+  display: flex;
+  align-items: center;
+  gap: 3.2rem;
+  list-style: none;
+}
+
+.header__link {
+  font-size: 2rem;
+  text-decoration: none;
+  color: #000;
+}
+
+.header__info {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+}
+
+.header__phone {
+  font-size: 1.4rem;
+}
+
+.header__signin {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  text-decoration: none;
+  color: #000;
+}
+
+.header__signin-icon {
+  display: block;
+  margin-right: 0.8rem;
 }
