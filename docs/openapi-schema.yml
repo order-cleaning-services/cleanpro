@@ -3,7 +3,7 @@ info:
   title: 'Cleanpro'
   version: ''
 paths:
-  /api/users/:
+  /users/:
     get:
       operationId: Список пользователей
       description: 'Доступно только для администратора'
@@ -38,13 +38,13 @@ paths:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/users/?page=4
+                    example: http://foodgram.example.org/users/?page=4
                     description: 'Ссылка на следующую страницу'
                   previous:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/api/users/?page=2
+                    example: http://foodgram.example.org/users/?page=2
                     description: 'Ссылка на предыдущую страницу'
                   results:
                     type: array
@@ -78,7 +78,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
       tags:
         - Пользователи
-  /api/users/generate_password/:
+  /users/generate_password/:
     post:
       operationId: Регистрация пользователя без пароля
       description: ''
@@ -99,7 +99,7 @@ paths:
           $ref: '#/components/responses/ValidationError'
       tags:
         - Пользователи
-  /api/users/{id}/:
+  /users/{id}/:
     get:
       operationId: Профиль пользователя
       description: 'Доступно только для администратора'
@@ -110,7 +110,7 @@ paths:
         - name: id
           in: path
           required: true
-          description: "Уникальный id этого пользователя"
+          description: 'Уникальный id этого пользователя'
           schema:
             type: string
       responses:
@@ -128,7 +128,7 @@ paths:
           $ref: '#/components/responses/PermissionDenied'
       tags:
         - Пользователи
-  /api/users/me/:
+  /users/me/:
     get:
       operationId: Текущий пользователь
       description: ''
@@ -146,7 +146,7 @@ paths:
           $ref: '#/components/responses/AuthenticationError'
       tags:
         - Пользователи
-  /api/users/set_password/:
+  /users/set_password/:
     post:
       operationId: Изменение пароля
       description: 'Изменение пароля текущего пользователя'
@@ -167,7 +167,7 @@ paths:
           $ref: '#/components/responses/AuthenticationError'
       tags:
         - Пользователи
-  /api/auth/token/login/:
+  /auth/token/login/:
     post:
       operationId: Получить токен авторизации
       description: Используется для авторизации по емейлу и паролю, чтобы далее использовать токен при запросах.
@@ -188,7 +188,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - Пользователи
-  /api/auth/token/logout/:
+  /auth/token/logout/:
     post:
       operationId: Удаление токена
       description: Удаляет токен текущего пользователя
@@ -220,40 +220,40 @@ components:
         id:
           type: integer
           readOnly: true
+          description: 'id пользователя'
           example: 1
         email:
           type: string
           format: email
-          maxLength: 250
-          description: "Адрес электронной почты"
+          maxLength: 255
+          description: 'Адрес электронной почты'
         first_name:
           type: string
           maxLength: 150
-          description: "Имя"
-          example: "Вася"
-        phone_number:
+          description: 'Имя'
+          example: 'Вася'
+        phone:
           type: string
-          pattern: "^[0-9]{10}$"
-          description: "Номер телефона"
-          example: "89118277312"
+          pattern: '^(?:\+7|8){10}$'
+          description: 'Номер телефона'
+          example: '89118277312'
         city:
           type: string
           maxLength: 150
-          description: "Город"
+          description: 'Город'
           example: 'Москва'
         street:
           type: string
           maxLength: 150
-          description: "Улица"
+          description: 'Улица'
           example: 'Ворошилова'
-        house_number:
+        house:
           type: integer
-          description: "Дом"
+          description: 'Дом'
           example: 31
         apartment:
           type: integer
-          maxLength: 150
-          description: "Квартира"
+          description: 'Квартира'
           example: 90
     CustomUserCreate:
       type: object
@@ -265,42 +265,42 @@ components:
         email:
           type: string
           format: email
-          maxLength: 250
-          description: "Адрес электронной почты"
+          maxLength: 255
+          description: 'Адрес электронной почты'
         first_name:
           type: string
           maxLength: 150
-          description: "Имя"
-          example: "Вася"
-        phone_number:
+          description: 'Имя'
+          example: 'Вася'
+        phone:
           type: string
-          pattern: "^[0-9]{10}$"
-          description: "Номер телефона"
-          example: "89118277312"
+          pattern: '^(?:\+7|8){10}$'
+          description: 'Номер телефона'
+          example: '89118277312'
         city:
           type: string
           maxLength: 150
-          description: "Город"
+          description: 'Город'
           example: 'Москва'
         street:
           type: string
           maxLength: 150
-          description: "Улица"
+          description: 'Улица'
           example: 'Ворошилова'
-        house_number:
+        house:
           type: integer
-          description: "Дом"
+          description: 'Дом'
           example: 31
         apartment:
           type: integer
-          maxLength: 150
-          description: "Квартира"
+          description: 'Квартира'
           example: 90
         password:
           type: string
-          maxLength: 150
-          description: "Пароль"
-          example: "Qwerty123"
+          pattern: ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,16}$
+          maxLength: 16
+          description: 'Пароль'
+          example: 'Qwerty_123'
       required:
         - email
         - password
@@ -314,66 +314,72 @@ components:
         email:
           type: string
           format: email
-          maxLength: 250
-          description: "Адрес электронной почты"
+          maxLength: 255
+          description: 'Адрес электронной почты'
         first_name:
           type: string
           maxLength: 150
-          description: "Имя"
-          example: "Вася"
-        phone_number:
+          description: 'Имя'
+          example: 'Вася'
+        phone:
           type: string
-          pattern: "^[0-9]{10}$"
-          description: "Номер телефона"
-          example: "89118277312"
+          pattern: '^(?:\+7|8){10}$'
+          description: 'Номер телефона'
+          example: '89118277312'
         city:
           type: string
           maxLength: 150
-          description: "Город"
+          description: 'Город'
           example: 'Москва'
         street:
           type: string
           maxLength: 150
-          description: "Улица"
+          description: 'Улица'
           example: 'Ворошилова'
-        house_number:
+        house:
           type: integer
-          description: "Дом"
+          description: 'Дом'
           example: 31
         apartment:
           type: integer
-          maxLength: 150
-          description: "Квартира"
+          description: 'Квартира'
           example: 90
       required:
         - email
         - first_name
-        - phone_number
+        - phone
         - city
         - street
-        - house_number
+        - house
     CustomUserResponseOnCreate:
       type: object
       properties:
         id:
           type: integer
           readOnly: true
+          description: 'id пользователя'
           example: 1
         email:
           type: string
           format: email
-          maxLength: 250
-          description: "Адрес электронной почты"
-          example: "vpupkin@yandex.ru"
-      required:
-        - email
+          maxLength: 255
+          description: 'Адрес электронной почты'
+          example: 'vpupkin@yandex.ru'
     SetPassword:
       type: object
       properties:
         new_password:
           type: string
+          pattern: ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,16}$
+          maxLength: 16
+          description: 'Новый пароль'
+          example: 'Qwerty_124'
         current_password:
           type: string
+          pattern: ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,16}$
+          maxLength: 16
+          description: 'Текущий пароль'
+          example: 'Qwerty_123'
       required:
         - new_password
         - current_password
@@ -382,13 +388,22 @@ components:
       properties:
         password:
           type: string
+          pattern: ^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,16}$
+          maxLength: 16
+          description: 'Текущий пароль'
+          example: 'Qwerty_123'
         email:
           type: string
+          format: email
+          maxLength: 255
+          description: 'Адрес электронной почты'
+          example: 'vpupkin@yandex.ru'
     TokenGetResponse:
       type: object
       properties:
         auth_token:
           type: string
+          description: 'Токен'
 
     ValidationError:
       description: Стандартные ошибки валидации DRF
@@ -406,7 +421,7 @@ components:
       properties:
         detail:
           description: 'Описание ошибки'
-          example: "Учетные данные не были предоставлены."
+          example: 'Учетные данные не были предоставлены.'
           type: string
 
     PermissionDenied:
@@ -415,7 +430,7 @@ components:
       properties:
         detail:
           description: 'Описание ошибки'
-          example: "У вас недостаточно прав для выполнения данного действия."
+          example: 'У вас недостаточно прав для выполнения данного действия.'
           type: string
     NotFound:
       description: Объект не найден
@@ -423,7 +438,7 @@ components:
       properties:
         detail:
           description: 'Описание ошибки'
-          example: "Страница не найдена."
+          example: 'Страница не найдена.'
           type: string
 
   responses:
