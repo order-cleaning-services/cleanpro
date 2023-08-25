@@ -1,3 +1,4 @@
+from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -39,17 +40,6 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class Roles(models.Model):
-    '''Модель ролей пользователей.'''
-
-    ADMIN = 'admin'
-    USER = 'user'
-    ROLE_CHOICES = (
-        (ADMIN, 'Администратор'),
-        (USER, 'Пользователь'),
-    )
-
-
 class User(AbstractUser):
     '''Модель пользователя.'''
 
@@ -64,6 +54,15 @@ class User(AbstractUser):
     house = models.PositiveSmallIntegerField('Дом', blank=True, null=True)
     apartment = models.PositiveSmallIntegerField(
         'Квартира', blank=True, null=True
+    )
+    role = models.CharField(
+        'Роль',
+        choices=(
+            (USER, 'Пользователь'),
+            (ADMIN, 'Администатор'),
+        ),
+        max_length=5,
+        default=USER,
     )
 
     objects = UserManager()
@@ -81,4 +80,4 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == Roles.ADMIN
+        return self.role == ADMIN

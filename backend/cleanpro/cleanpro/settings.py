@@ -132,3 +132,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+USER = 'user'
+
+ADMIN = 'admin'
