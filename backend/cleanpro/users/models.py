@@ -39,6 +39,17 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+class Roles(models.Model):
+    '''Модель ролей пользователей.'''
+
+    ADMIN = 'admin'
+    USER = 'user'
+    ROLE_CHOICES = (
+        (ADMIN, 'Администратор'),
+        (USER, 'Пользователь'),
+    )
+
+
 class User(AbstractUser):
     '''Модель пользователя.'''
 
@@ -67,3 +78,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    @property
+    def is_admin(self):
+        return self.role == Roles.ADMIN
