@@ -46,9 +46,7 @@ class User(AbstractUser):
     username = last_name = None
     email = models.EmailField('Адрес электронной почты', unique=True)
     password = models.CharField('Пароль')
-    phone = PhoneNumberField(
-        'Номер телефона', blank=True, unique=True, region='RU'
-    )
+    phone = PhoneNumberField('Номер телефона', blank=True, region='RU')
     city = models.CharField('Город', max_length=150, blank=True)
     street = models.CharField('Улица', max_length=150, blank=True)
     house = models.PositiveSmallIntegerField('Дом', blank=True, null=True)
