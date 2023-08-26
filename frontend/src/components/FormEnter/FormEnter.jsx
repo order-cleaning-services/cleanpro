@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import 'FormEnter.scss';
+
+import Input from '../Input/Input';
+import Button from '../Button/Button';
+
+import '../../../../styles/FormEnter.css';
 
 function FormEnter() {
 	const [activeRegistration, setActiveRegistration] = useState(true);
@@ -21,7 +25,7 @@ function FormEnter() {
 		setActiveTitle(false);
 	}
 
-	const handleRecovery = () => {
+	const handleClickRecovery = () => {
 		setActiveRegistration(false);
 		setActiveEnter(false);
 		setActiveRecovery(true);
@@ -29,7 +33,7 @@ function FormEnter() {
 	}
 
 	return (
-		<div className="form-enter">
+		<section className="form-enter">
 			<form action="" className="form-enter__container">
 				<div className="form-enter__content">
 					<div className={`form-enter__wrapper-title ${activeTitle ? 'visibility' : ''}`}>
@@ -46,22 +50,45 @@ function FormEnter() {
 					</div>
 					<p className={`form-enter__title ${activeRecovery ? '' : 'visibility'}`}>Забыли пароль?</p>
 					<div className="form-enter__input-container">
-						<input className="form-enter__input" type="email" placeholder="Email" />
+						<Input
+							inputType={'email'}
+							inputClassName={'input'}
+							inputPlaceHolder={"Email"}
+						/>
+
 						<div className={`form-enter__wrapper-input ${activeRecovery ? 'visibility' : ''}`}>
-							<input type="password" className="form-enter__input form-enter__input_type_password" placeholder="Введите пароль" required autoComplete='off' />
+
+							<Input
+								inputType={'password'}
+								inputClassName={'input input_type_password'}
+								inputPlaceHolder={"Введите пароль"}
+							/>
 						</div>
+						{/* <div className={`form-enter__wrapper-input ${activeRecovery ? 'visibility' : ''}`}>
+							<Input
+								inputType={'password'}
+								inputClassName={'input input_type_password'}
+								inputPlaceHolder={"Повторите пароль"}
+							/>
+						</div> */}
 					</div>
-
-					<button className={`form-enter__button form-enter__button_disabled ${activeRegistration ? '' : 'visibility'}`}>Зарегистрироваться</button>
-					<button className={`form-enter__button ${activeEnter ? '' : 'visibility'}`}>Войти</button>
-
-
-					<button className={`form-enter__button form-enter__button_disabled ${activeRecovery ? '' : 'visibility'}`}>Восстановить пароль</button>
-
-
+					<div className="form-enter__button-container">
+						<Button
+							buttonText={'Зарегистрироваться'}
+							buttonClassName={`button indent button_disabled ${activeRegistration ? '' : 'visibility'}`}
+						/>
+						<Button
+							buttonText={'Войти'}
+							buttonClassName={`button indent ${activeEnter ? '' : 'visibility'}`}
+						/>
+					</div>
+					<Button
+						buttonText={'Восстановить пароль'}
+						buttonClassName={`button button__recovery ${activeRecovery ? '' : 'visibility'}`}
+					/>
 					<p className={`form-enter__acceptance ${activeRegistration ? '' : 'visibility'}`}>Нажимая «Зарегистрироваться», я даю <span className="form-enter__acceptance-span">согласие на обработку персональных данных.</span></p>
 					<p
-						onClick={handleRecovery}
+						onClick={handleClickRecovery}
 						className={`form-enter__password-recovery ${activeEnter ? '' : 'visibility'}`}>Забыли пароль?</p>
 
 					<p
@@ -69,7 +96,7 @@ function FormEnter() {
 						className={`form-enter__password-recovery ${activeRecovery ? '' : 'visibility'}`}>Вспомнил пароль</p>
 				</div>
 			</form>
-		</div>
+		</section>
 	);
 }
 
