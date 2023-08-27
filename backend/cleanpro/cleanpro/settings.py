@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'djoser',
     'django_filters',
     'users',
+    'price.apps.PriceConfig',
 ]
 
 MIDDLEWARE = [
