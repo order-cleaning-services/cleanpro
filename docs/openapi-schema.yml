@@ -38,13 +38,13 @@ paths:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/users/?page=4
+                    example: http://сleanpro.example.org/users/?page=4
                     description: 'Ссылка на следующую страницу'
                   previous:
                     type: string
                     nullable: true
                     format: uri
-                    example: http://foodgram.example.org/users/?page=2
+                    example: http://сleanpro.example.org/users/?page=2
                     description: 'Ссылка на предыдущую страницу'
                   results:
                     type: array
@@ -66,13 +66,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomUserCreate'
+              $ref: '#/components/schemas/UserCreate'
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomUserResponseOnCreate'
+                $ref: '#/components/schemas/UserResponseOnCreate'
           description: 'Пользователь успешно создан'
         '400':
           $ref: '#/components/responses/ValidationError'
@@ -87,13 +87,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CustomUserCreateWithoutPassword'
+              $ref: '#/components/schemas/UserCreateWithoutPassword'
       responses:
         '201':
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomUserResponseOnCreate'
+                $ref: '#/components/schemas/UserResponseOnCreate'
           description: 'Пользователь успешно создан'
         '400':
           $ref: '#/components/responses/ValidationError'
@@ -210,6 +210,214 @@ paths:
           $ref: '#/components/responses/AuthenticationError'
       tags:
         - Пользователи
+  /orders/:
+    get:
+      operationId: Список заказов
+      description: 'Доступно только для администратора'
+      security:
+        - bearerAuth: []
+      x-role: admin
+      parameters:
+        - name: page
+          required: false
+          in: query
+          description: Номер страницы.
+          schema:
+            type: integer
+        - name: limit
+          required: false
+          in: query
+          description: Количество объектов на странице.
+          schema:
+            type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    example: 123
+                    description: 'Общее количество объектов в базе'
+                  next:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://сleanpro.example.org/orders/?page=4
+                    description: 'Ссылка на следующую страницу'
+                  previous:
+                    type: string
+                    nullable: true
+                    format: uri
+                    example: http://сleanpro.example.org/orders/?page=2
+                    description: 'Ссылка на предыдущую страницу'
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                    description: 'Список объектов текущей страницы'
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      tags:
+        - Заказы
+    post:
+      operationId: Создание заказа
+      description: 'Доступно только для авторизованных пользователей'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponseOnCreate'
+          description: 'Заказ успешно создан'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+      tags:
+        - Заказы
+  /orders/{id}/:
+    get:
+      operationId: Заказ
+      description: 'Доступно только для администратора'
+      security:
+        - bearerAuth: []
+      x-role: admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'Уникальный id заказа'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+          description: ''
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      tags:
+        - Заказы
+  /orders/{user_id}/:
+    get:
+      operationId: Заказы пользователя
+      description: 'Доступно для пользователя с user_id и администратора'
+      security:
+        - bearerAuth: []
+      x-role: admin
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: 'Уникальный id пользователя'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+          description: ''
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      tags:
+        - Заказы
+  /orders/change_status/{id}/{status}/:
+    patch:
+      operationId: Изменение статуса заказа
+      description: 'Доступно только для администратора'
+      security:
+        - bearerAuth: []
+      x-role: admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'Уникальный id заказа'
+          schema:
+            type: string
+        - name: status
+          in: path
+          required: true
+          description: 'Новый статус заказа'
+          schema:
+            type: string
+            enum:
+              - created
+              - accepted
+              - in_progress
+              - finished
+              - cancelled
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponseWithStatus'
+          description: ''
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      tags:
+        - Заказы
+  /orders/check_status/{id}/:
+    get:
+      operationId: Проверка статуса заказа
+      description: 'Доступно для автора заказа и администратора'
+      security:
+        - bearerAuth: []
+      x-role: admin
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 'Уникальный id заказа'
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponseWithStatus'
+          description: ''
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/AuthenticationError'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      tags:
+        - Заказы
 
 components:
   schemas:
@@ -255,7 +463,7 @@ components:
           type: integer
           description: 'Квартира'
           example: 90
-    CustomUserCreate:
+    UserCreate:
       type: object
       properties:
         id:
@@ -304,7 +512,7 @@ components:
       required:
         - email
         - password
-    CustomUserCreateWithoutPassword:
+    UserCreateWithoutPassword:
       type: object
       properties:
         id:
@@ -351,7 +559,7 @@ components:
         - city
         - street
         - house
-    CustomUserResponseOnCreate:
+    UserResponseOnCreate:
       type: object
       properties:
         id:
@@ -404,6 +612,186 @@ components:
         auth_token:
           type: string
           description: 'Токен'
+    Order:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 23
+          description: 'Название'
+          example: 'Генеральная уборка'
+        number: 
+          type: string
+          maxLength: 5
+          description: 'Номер заказа'
+          example: '01254'
+        user:
+          type: string
+          description: 'Email пользователя'
+          example: 'nast2nast2@yandex.ru'
+        order_status:
+          type: string
+          description: 'Статус заказа'
+          example: 'Создан'  
+        total_sum:
+          type: integer
+          description: 'Цена'
+          example: 5100
+        city:
+          type: string
+          maxLength: 150
+          description: 'Город'
+          example: 'Москва'
+        street:
+          type: string
+          maxLength: 150
+          description: 'Улица'
+          example: 'Ворошилова'
+        house:
+          type: integer
+          description: 'Дом'
+          example: 31
+        apartment:
+          type: integer
+          description: 'Квартира'
+          example: 90
+        creation_date:
+          type: string
+          description: 'Дата создания'
+          example: '25.08.2023'
+        cleaning_time:
+          type: string
+          description: 'Время начала уборки'
+          example: '15:00:00'
+    OrderCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 23
+          description: 'Название'
+          example: 'Генеральная уборка'
+        number: 
+          type: string
+          readOnly: True
+          maxLength: 5
+          description: 'Номер заказа'
+          example: '01254'
+        user:
+          type: string
+          readOnly: True
+          description: 'Email пользователя'
+          example: 'nast2nast2@yandex.ru'
+        order_status:
+          type: string
+          readOnly: True
+          description: 'Статус заказа'
+          example: 'Создан'  
+        total_sum:
+          type: integer
+          readOnly: True
+          description: 'Цена'
+          example: 5100
+        city:
+          type: string
+          maxLength: 150
+          description: 'Город'
+          example: 'Москва'
+        street:
+          type: string
+          maxLength: 150
+          description: 'Улица'
+          example: 'Ворошилова'
+        house:
+          type: integer
+          description: 'Дом'
+          example: 31
+        apartment:
+          type: integer
+          description: 'Квартира'
+          example: 90
+        creation_date:
+          type: string
+          readOnly: True
+          description: 'Дата создания'
+          example: '25.08.2023'
+        cleaning_time:
+          type: string
+          description: 'Время начала уборки'
+          example: '15:00:00'
+      required:
+        - title
+        - city
+        - street
+        - house
+        - cleaning_time
+    OrderResponseOnCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          description: 'id заказа'
+          example: 1
+        title:
+          type: string
+          maxLength: 23
+          description: 'Название'
+          example: 'Генеральная уборка'
+        number: 
+          type: string
+          maxLength: 5
+          description: 'Номер заказа'
+          example: '01254'
+        user:
+          type: string
+          description: 'Email пользователя'
+          example: 'nast2nast2@yandex.ru'
+        order_status:
+          type: string
+          description: 'Статус заказа'
+          example: 'Создан'  
+        total_sum:
+          type: integer
+          description: 'Цена'
+          example: 5100
+        city:
+          type: string
+          maxLength: 150
+          description: 'Город'
+          example: 'Москва'
+        street:
+          type: string
+          maxLength: 150
+          description: 'Улица'
+          example: 'Ворошилова'
+        house:
+          type: integer
+          description: 'Дом'
+          example: 31
+        apartment:
+          type: integer
+          description: 'Квартира'
+          example: 90
+        creation_date:
+          type: string
+          description: 'Дата создания'
+          example: '25.08.2023'
+        cleaning_time:
+          type: string
+          description: 'Время начала уборки'
+          example: '15:00:00'
+    OrderResponseWithStatus:
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          description: 'id заказа'
+          example: 1
+        order_status:
+          type: string
+          description: 'Статус заказа'
+          example: 'Создан'  
 
     ValidationError:
       description: Стандартные ошибки валидации DRF
@@ -423,7 +811,6 @@ components:
           description: 'Описание ошибки'
           example: 'Учетные данные не были предоставлены.'
           type: string
-
     PermissionDenied:
       description: Недостаточно прав
       type: object
@@ -448,29 +835,18 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ValidationError'
-    NestedValidationError:
-      description: 'Ошибки валидации в стандартном формате DRF, в том числе с внутренними элементами.'
-      content:
-        application/json:
-          schema:
-            oneOf:
-              - $ref: '#/components/schemas/NestedValidationError'
-              - $ref: '#/components/schemas/ValidationError'
-
     AuthenticationError:
       description: Пользователь не авторизован
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/AuthenticationError'
-
     PermissionDenied:
       description: Недостаточно прав
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/PermissionDenied'
-
     NotFound:
       description: Объект не найден
       content:
