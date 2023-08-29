@@ -23,9 +23,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'djoser',
+    'django_password_validators',
     'django_filters',
+    'phonenumber_field',
     'users',
     'price.apps.PriceConfig',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -86,6 +89,9 @@ AUTH_PASSWORD_VALIDATORS = [
         ),
     },
     {
+        'NAME': 'users.validators.MaximumLengthValidator',
+    },
+    {
         'NAME': (
             'django.contrib.auth.password_validation.CommonPasswordValidator'
         ),
@@ -94,6 +100,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': (
             'django.contrib.auth.password_validation.NumericPasswordValidator'
         ),
+    },
+    {
+        'NAME': 'django_password_validators.password_character_requirements.password_validation.PasswordCharacterValidator'
     },
 ]
 
@@ -117,6 +126,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
 
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+ACCOUNT_USERNAME_REQUIRED = False
+
+ACCOUNT_EMAIL_REQUIRED = True
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -125,3 +140,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+USER = 'user'
+
+ADMIN = 'admin'
