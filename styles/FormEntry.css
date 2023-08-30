@@ -8,11 +8,11 @@ html {
   max-width: 144.8rem;
 }
 
-.form-enter {
+.form-entry {
   font-family: "Nunito", serif;
   padding: 9rem 0 0 0;
 }
-.form-enter__container {
+.form-entry__container {
   background: #F2F2F2;
   width: 60.4rem;
   max-width: 100%;
@@ -20,16 +20,16 @@ html {
   border-radius: 2rem;
   margin: 0 auto;
 }
-.form-enter__content {
+.form-entry__content {
   padding: 8rem 10.6rem;
   display: flex;
   flex-direction: column;
 }
-.form-enter__wrapper-title {
+.form-entry__wrapper-title {
   display: flex;
   justify-content: space-around;
 }
-.form-enter__title {
+.form-entry__title {
   display: flex;
   font-size: 2rem;
   line-height: 2.6rem;
@@ -39,24 +39,24 @@ html {
   margin: 0 auto 6rem auto;
   cursor: pointer;
 }
-.form-enter__title_active {
+.form-entry__title_active {
   display: inline;
   border-bottom: 0.2rem solid #FFB22E;
   cursor: default;
 }
-.form-enter__input-container {
+.form-entry__input-container {
   display: flex;
   flex-direction: column;
   max-width: 39.2rem;
   padding: 0 0 2rem 0;
 }
-.form-enter__wrapper-input {
+.form-entry__wrapper-input {
   position: relative;
 }
-.form-enter__wrapper-input:not(:last-child) {
+.form-entry__wrapper-input:not(:last-child) {
   margin: 1.2rem 0 0 0;
 }
-.form-enter__wrapper-input::before {
+.form-entry__wrapper-input::before {
   content: "";
   position: absolute;
   z-index: 1;
@@ -66,23 +66,20 @@ html {
   width: 1.6rem;
   height: 1.4rem;
 }
-.form-enter__button-container {
+.form-entry__button-container {
   width: 100%;
 }
-.form-enter_position_indent {
-  margin: 2rem 0 0 0;
-}
-.form-enter__acceptance {
+.form-entry__acceptance {
   color: #A1A1A1;
   font-weight: 400;
   font-size: 1.4rem;
   line-height: 1.96rem;
   margin: 1.2rem 0 0 0;
 }
-.form-enter__acceptance-span {
+.form-entry__acceptance-span {
   text-decoration: underline;
 }
-.form-enter__password-recovery {
+.form-entry__password-recovery {
   text-align: center;
   color: #163B6C;
   font-size: 1.6rem;
@@ -92,8 +89,4 @@ html {
 
 .indent {
   margin: 2rem 0 0 0;
-}
-
-.visibility {
-  display: none;
 }

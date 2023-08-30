@@ -2,11 +2,11 @@ import React from 'react';
 
 import '../../../../styles/Button.css';
 
-function Button(props) {
+function Button({ buttonClassName, buttonText }) {
 
 	return (
 		<button 
-	className={props.buttonClassName}>{props.buttonText}
+	className={buttonClassName}>{buttonText}
 	</button>
 
 	);
