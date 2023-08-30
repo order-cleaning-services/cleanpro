@@ -21,7 +21,7 @@ class UserViewSet(UserViewSet):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated, ]
+    permission_classes = [permissions.AllowAny, ]
     queryset = Order.objects.all()
 
     def get_serializer_class(self):
@@ -84,7 +84,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer = RatingSerializer
 
         def get_queryset(self):
-            order = get_object_or_404(Order, pk=self.kwargs.get("order_id"))
+            order = get_object_or_404(Order, pk=self.kwargs.get('order_id'))
             return order.rating.all()
 
         def perform_create(self, serializer):

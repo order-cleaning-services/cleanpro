@@ -17,51 +17,10 @@ class Service_package(models.Model):
         verbose_name='Название',)
     price = models.IntegerField(
         default=0, verbose_name='Сумма',)
+    quantity = models.IntegerField(default=0,
+        verbose_name='Количество',)
 
-class Order(models.Model):
-    STATUS_CHOICES = (
-        ('created', 'Создан'),
-        ('accepted', 'Принят'),
-        ('finished', 'Завершен'),
-        ('cancelled', 'Отменен'),
-    )
-    title = models.CharField(default='maintenance',
-        verbose_name='Название',)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='orders',
-        verbose_name='Заказчик',
-    )
-    phone_number = PhoneField(blank=False,
-        null=False,  verbose_name='Телефон')
-    email = models.EmailField(
-        verbose_name='Адрес электронной почты',
-        max_length=254,
-        blank=False,
-        unique=False,
-    )
-    number = models.IntegerField(
-        verbose_name='Номер',)
-    total_sum = models.IntegerField(
-        default=0, verbose_name='Сумма',)
-    comment = models.TextField(
-        verbose_name='Комментарий',
-        blank=True,
-        null=True,
-        )
-    order_status = models.CharField(choices=STATUS_CHOICES,
-        default='created',
-        verbose_name='Статус',)
-    service_package = models.ForeignKey(
-        Service_package,
-        on_delete=models.CASCADE,
-        blank=False,
-        null=False,
-        related_name='orders',
-        verbose_name='Услуги',
-    )
-    pay_status = models.BooleanField(default=False)
+class Adress(models.Model):
     city = models.CharField(
         max_length=256, verbose_name='Город',
         blank=False,
@@ -86,6 +45,49 @@ class Order(models.Model):
         verbose_name='Подъезд',
         null=True,
         blank=True)
+
+class Order(models.Model):
+    STATUS_CHOICES = (
+        ('created', 'Создан'),
+        ('accepted', 'Принят'),
+        ('finished', 'Завершен'),
+        ('cancelled', 'Отменен'),
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='orders',
+        verbose_name='Заказчик',
+    )
+    order_number = models.IntegerField(
+        verbose_name='Номер',)
+    total_sum = models.IntegerField(
+        default=0, verbose_name='Сумма',)
+    comment = models.TextField(
+        verbose_name='Комментарий',
+        blank=True,
+        null=True,
+        )
+    order_status = models.CharField(choices=STATUS_CHOICES,
+        default='created',
+        verbose_name='Статус',)
+    service_package = models.ForeignKey(
+        Service_package,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name='orders',
+        verbose_name='Услуги',
+    )
+    pay_status = models.BooleanField(default=False)
+    adress = models.ForeignKey(
+        Adress,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+        related_name='orders',
+        verbose_name='Услуги',
+    )
     creation_date = models.DateField(
         'Дата создания', auto_now_add=True)
     creation_time = models.TimeField(
