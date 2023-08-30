@@ -1,6 +1,13 @@
+import Header from "./components/Header/Header"
+import Input from "./components/input/Input"
+
 function App() {
   return (
-    <h1>CleaPro</h1>
+    <>
+      <Header/>
+      <Input placeholder='Email' />
+      <Input placeholder='Введите пароль' />
+    </>
   )
 }
 
