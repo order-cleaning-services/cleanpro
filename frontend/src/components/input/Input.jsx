@@ -1,7 +1,12 @@
-import './Input.scss'
+import "./Input.scss"
 
-function Input({ placeholder }) {
-  return <input className="form-input" placeholder={placeholder} />
+function Input({ placeholder, size }) {
+  return (
+    <input
+      className={`form-input ${size === "small" ? "form-input-small" : ""}`}
+      placeholder={placeholder}
+    />
+  )
 }
 
 export default Input

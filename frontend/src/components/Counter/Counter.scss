@@ -1,0 +1,28 @@
+.counter__container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.3rem;
+
+  color: #242424;
+  font-size: 2rem;
+  line-height: 2.6rem;
+}
+
+.btn-decrement {
+  border-radius: 20px;
+  background-color: #eaeaea;
+  color: #9b9b9b;
+  border: none;
+  width: 4.6rem;
+  height: 4rem;
+}
+
+.btn-increment {
+  border-radius: 20px;
+  background-color: #81ace5;
+  color: #fff;
+  border: none;
+  width: 4.6rem;
+  height: 4rem;
+}

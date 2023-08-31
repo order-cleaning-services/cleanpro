@@ -1,0 +1,29 @@
+.service-card__container {
+  width: 24rem;
+  height: 15rem;
+  border: none;
+  border-radius: 20px;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+
+  p {
+    font-size: 1.6rem;
+    line-height: 2.24rem;
+    margin: 1.6rem 1.6rem 0;
+  }
+}
+
+.service-card__img {
+  display: flex;
+  justify-content: flex-end;
+  width: 24rem;
+  height: 7.5rem;
+
+  img {
+    width: 12rem;
+    height: 7.5rem;
+    border-radius: 0 0 20px 0;
+  }
+}

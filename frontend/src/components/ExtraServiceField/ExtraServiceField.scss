@@ -1,0 +1,23 @@
+.extra-service-field {
+  display: grid;
+  grid-template-columns: 25.9rem 25.9rem 11.8rem;
+  gap: 2.4rem;
+  align-items: center;
+  padding: 2.1rem 1.6rem;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #d9d9d9;
+  }
+}
+
+.extra-service-field__title {
+  font-size: 1.6rem;
+  line-height: 2.24rem;
+  color: #242424;
+}
+
+.extra-service-field__price {
+  font-size: 1.6rem;
+  line-height: 2.24rem;
+  color: #9b9b9b;
+}

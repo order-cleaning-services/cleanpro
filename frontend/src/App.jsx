@@ -1,12 +1,11 @@
+import Calculator from "./components/Calculator/Calculator"
 import Header from "./components/Header/Header"
-import Input from "./components/input/Input"
 
 function App() {
   return (
     <>
-      <Header/>
-      <Input placeholder='Email' />
-      <Input placeholder='Введите пароль' />
+      <Header />
+      <Calculator />
     </>
   )
 }
