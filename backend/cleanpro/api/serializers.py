@@ -9,7 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id',
-            'first_name'
+            'first_name',
             'email',
             'phone',
             'adress',
@@ -80,10 +80,10 @@ class OrderStatusSerializer(serializers.ModelSerializer):
         model = Order
         fields = 'order_status'
 
-class Service_packageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Service_package
-        fields = 'title', 'price'
+# class Service_packageSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Service_package
+#         fields = 'title', 'price'
 
 class AdressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -133,4 +133,4 @@ class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Rating
-        read_only_fields = 'order'
+        read_only_fields = ('order',)

@@ -115,7 +115,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
-    serializer = RatingSerializer
+    serializer_class = RatingSerializer
 
     def get_queryset(self):
         order = get_object_or_404(Order, pk=self.kwargs.get('order_id'))

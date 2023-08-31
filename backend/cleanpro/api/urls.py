@@ -6,7 +6,10 @@ from .views import UserViewSet, OrderViewSet, RatingViewSet
 router = routers.DefaultRouter()
 router.register('users', UserViewSet)
 router.register('orders', OrderViewSet)
-router.register('ratings', RatingViewSet)
+router.register(
+    r'^orders/(?P<order_id>\d+)/rating',
+    RatingViewSet,
+    basename='rating')
 
 urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
