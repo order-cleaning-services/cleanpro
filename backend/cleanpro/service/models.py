@@ -1,10 +1,10 @@
 from django.conf import settings
 from django.db import models
-from phone_field import PhoneField
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Service_package(models.Model):
+    '''Модель пакета услуг.'''
     CLEANING_TYPE = (
         ('maintenance', 'Поддерживающая уборка'),
         ('general', 'Генеральная уборка'),
@@ -13,14 +13,18 @@ class Service_package(models.Model):
         ('windows', 'Мытье окон'),
     )
     title = models.CharField(choices=CLEANING_TYPE,
-        default='maintenance',
+        default='maintenance', max_length=256,
         verbose_name='Название',)
     price = models.IntegerField(
         default=0, verbose_name='Сумма',)
     quantity = models.IntegerField(default=0,
         verbose_name='Количество',)
 
+    def __str__(self):
+        return self.title
+
 class Adress(models.Model):
+    '''Модель адреса.'''
     city = models.CharField(
         max_length=256, verbose_name='Город',
         blank=False,
@@ -47,6 +51,7 @@ class Adress(models.Model):
         blank=True)
 
 class Order(models.Model):
+    '''Модель заказа.'''
     STATUS_CHOICES = (
         ('created', 'Создан'),
         ('accepted', 'Принят'),
@@ -69,7 +74,7 @@ class Order(models.Model):
         null=True,
         )
     order_status = models.CharField(choices=STATUS_CHOICES,
-        default='created',
+        default='created', max_length=256,
         verbose_name='Статус',)
     service_package = models.ForeignKey(
         Service_package,
@@ -98,9 +103,10 @@ class Order(models.Model):
         'Время уборки')
 
     def __str__(self):
-        return self.title
+        return f"Заказ №: {self.order_number}"
 
 class Rating(models.Model):
+    '''Модель отзыва.'''
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,

@@ -15,6 +15,16 @@ class UserSerializer(serializers.ModelSerializer):
             'adress',
         )
 
+class Confirm_mailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(
+        max_length=254,
+        required=True
+    )
+
+    class Meta:
+        model = User
+        fields = ('email')
+
 class PostOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -22,7 +32,7 @@ class PostOrderSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'user', 'service_package',
             'total_sum', 'cleaning_date',
-            'cleaning_time', 'comment'
+            'cleaning_time', 'comment',
         )
         extra_fields = (
             'first_name',
@@ -50,13 +60,11 @@ class PostOrderSerializer(serializers.ModelSerializer):
                                            first_name=validated_data.get('first_name'),
                                            adress=adress)
         id = validated_data.get('id')
-        if len(int(id))<=5:
-            order_number = id
         service = get_object_or_404(Service_package,
                                     id=self.service_packege)
         order = Order.objects.create(user=user,
                                      total_sum=service.price,
-                                     order_number=order_number,
+                                     order_number=id,
                                      **validated_data)
         return order
     
@@ -83,9 +91,9 @@ class AdressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GetOrderSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_onle=True)
-    adress = AdressSerializer(read_onle=True)
-    service_package = Service_packageSerializer(read_onle=True)
+    user = UserSerializer(read_only=True)
+    adress = AdressSerializer(read_only=True)
+    service_package = Service_packageSerializer(read_only=True)
 
     class Meta:
         model = Order
