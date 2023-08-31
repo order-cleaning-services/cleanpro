@@ -1,14 +1,13 @@
 import Header from "./components/Header/Header"
-import Input from "./components/input/Input"
+import FormEntry from './components/FormEntry/FormEntry';
 
 function App() {
   return (
     <>
       <Header/>
-      <Input placeholder='Email' />
-      <Input placeholder='Введите пароль' />
+    	<FormEntry />
     </>
   )
-}
+
 
 export default App
