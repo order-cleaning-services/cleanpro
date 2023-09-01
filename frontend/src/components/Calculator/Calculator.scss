@@ -1,3 +1,5 @@
+@import "../../assets/styles/colors.scss";
+
 .calculator__container {
   height: fit-content;
   display: flex;
@@ -5,17 +7,8 @@
   justify-content: center;
   align-items: center;
   gap: 6rem;
-  background-color: #f2f2f2;
+  background-color: $background-color-secondary;
   padding: 7.2rem 10rem;
-
-  h2 {
-    font-size: 3.6rem;
-    font-weight: 400;
-    line-height: 4.32rem;
-    letter-spacing: -0.02em;
-    color: #242424;
-    text-align: center;
-  }
 }
 
 .calculator__wrapper {
@@ -37,11 +30,6 @@
   flex-direction: column;
   max-width: 75.2rem;
   gap: 2rem;
-
-  p {
-    font-size: 2rem;
-    line-height: 2.6rem;
-  }
 }
 
 .cleaning-type__tabs {
@@ -56,7 +44,7 @@
   flex-direction: column;
   gap: 2rem;
 
-  p {
+  h3 {
     font-size: 2rem;
     line-height: 2.6rem;
   }
@@ -89,19 +77,12 @@
 .amount__title {
   font-size: 2rem;
   line-height: 2.6rem;
-  color: #242424;
 }
 
 .extra-service {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-}
-
-.extra-service__title {
-  font-size: 2rem;
-  line-height: 2.6rem;
-  color: #242424;
 }
 
 .extra-service__container {
@@ -113,18 +94,14 @@
 .extra-service-fields__wrapper {
   width: 75.2rem;
   border-radius: 20px;
-  background-color: #fff;
+  background-color: $background-color-main;
   padding: 0 1.6rem;
 }
 
 .extra-service__btn {
-  border: 1px solid #d9d9d9;
+  border: 1px solid $border-color;
   border-radius: 20px;
-  background-color: #fff;
-  color: #242424;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 2.6rem;
+  background-color: $background-color-main;
   height: 5.6rem;
 }
 
@@ -137,9 +114,9 @@
 .calculator-form__total {
   width: 39.2rem;
   height: fit-content;
-  border: 1px solid #d9d9d9;
+  border: 1px solid $border-color;
   border-radius: 20px;
-  background-color: #fff;
+  background-color: $background-color-main;
   padding: 2rem;
 
   display: flex;
@@ -147,17 +124,10 @@
   gap: 1.8rem;
 }
 
-.calculator-form__title {
-  font-size: 2rem;
-  line-height: 2.6rem;
-  color: #242424;
-  font-weight: 700;
-}
-
 .total__wrapper {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #d9d9d9;
+  border-top: 1px solid $border-color;
   padding: 0.8rem;
 }
 
@@ -171,15 +141,7 @@
   font-size: 2.8rem;
   line-height: 3.64rem;
   letter-spacing: -0.02em;
-  color: #9b9b9b;
-}
-
-.pay__sum {
-  font-size: 4.8rem;
-  line-height: 5.76rem;
-  letter-spacing: -0.02em;
-  color: #242424;
-  font-weight: 600;
+  color: $text-color-secondary;
 }
 
 .clean-time {

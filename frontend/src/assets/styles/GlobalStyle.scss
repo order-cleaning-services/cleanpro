@@ -1,3 +1,5 @@
+@import "./colors.scss";
+
 @font-face {
   font-family: "NunitoReg";
   font-display: swap;
@@ -27,6 +29,7 @@ body {
   font-style: normal;
   font-weight: 400;
   margin: 0;
+  color: $text-color-main;
 }
 
 * {
@@ -57,6 +60,34 @@ pre {
 
 a {
   background-color: transparent;
+}
+
+p {
+  font-size: 1.6rem;
+}
+
+h1 {
+  font-size: 4.8rem;
+  font-weight: 400;
+  line-height: 5.76rem;
+  letter-spacing: -0.02em;
+  color: $text-color-tertiary;
+}
+
+h2 {
+  font-size: 3.6rem;
+  font-weight: 400;
+  line-height: 4.32rem;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+h3 {
+  font-size: 2.8rem;
+  font-weight: 400;
+  line-height: 3.64rem;
+  letter-spacing: -0.02em;
+  color: $text-color-tertiary;
 }
 
 abbr[title] {
@@ -217,4 +248,33 @@ template {
 
 [hidden] {
   display: none;
+}
+
+.text-s {
+  font-size: 1.4rem;
+  line-height: 19.6rem;
+}
+
+.text-m {
+  font-size: 1.6rem;
+  line-height: 2.24rem;
+}
+
+.text-l {
+  font-size: 2rem;
+  line-height: 2.6rem;
+}
+
+.text-grey {
+  color: $text-color-secondary;
+}
+
+.text-black {
+  color: $text-color-main;
+}
+
+.text-l-bold {
+  font-size: 2rem;
+  line-height: 2.6rem;
+  font-weight: 700;
 }

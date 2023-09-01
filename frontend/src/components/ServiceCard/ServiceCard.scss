@@ -1,6 +1,6 @@
 .service-card__container {
   width: 24rem;
-  height: 15rem;
+  height: 7.5rem;
   border: none;
   border-radius: 20px;
   background-color: #ffffff;
@@ -8,9 +8,11 @@
   justify-content: space-between;
   flex-direction: column;
 
+  &:has(img) {
+    height: 15rem;
+  }
+
   p {
-    font-size: 1.6rem;
-    line-height: 2.24rem;
     margin: 1.6rem 1.6rem 0;
   }
 }

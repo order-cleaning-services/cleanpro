@@ -8,15 +8,15 @@ import { useState } from "react"
 import ExtraServiceField from "../ExtraServiceField/ExtraServiceField"
 
 function Calculator() {
-  const [cleanType, setCleanType] = useState(serviceCards[0].type)
+  const [cleanType, setCleanType] = useState(serviceCards[0].id)
   const [extraIsOpen, setExtraIsOpen] = useState(false)
 
-  function handleActiveType(type) {
-    setCleanType(type)
+  function handleActiveType(id) {
+    setCleanType(id)
   }
 
-  function isActive(type) {
-    return cleanType === type
+  function isActive(id) {
+    return cleanType === id
   }
 
   return (
@@ -25,13 +25,13 @@ function Calculator() {
       <div className="calculator__wrapper">
         <div className="cleaning-type__container">
           <div className="cleaning-type__wrapper">
-            <p>Тип уборки</p>
+            <p className="text-l">Тип уборки</p>
             <div className="cleaning-type__tabs">
               {serviceCards.map((card) => (
                 <Tab
-                  key={card.type}
-                  onChangeType={() => handleActiveType(card.type)}
-                  isActive={isActive(card.type)}
+                  key={card.id}
+                  onChangeType={() => handleActiveType(card.id)}
+                  isActive={isActive(card.id)}
                 >
                   {card.title}
                 </Tab>
@@ -40,7 +40,7 @@ function Calculator() {
           </div>
           <div className="rooms-quantity">
             <div className="amount__container">
-              <p className="amount__title">Количество комнат</p>
+              <p className="text-l">Количество комнат</p>
               <Counter min={1} max={5} />
             </div>
             <div className="amount__container">
@@ -49,10 +49,10 @@ function Calculator() {
             </div>
           </div>
           <div className="include-service__container">
-            <p>Услуги, которые уже включены</p>
+            <p className="text-l">Услуги, которые уже включены</p>
             <div className="include-service__cards">
               {serviceCards
-                .filter((card) => card.type === cleanType)[0]
+                .filter((card) => card.id === cleanType)[0]
                 .cards.map((card) => (
                   <ServiceCard
                     key={card.content}
@@ -63,7 +63,7 @@ function Calculator() {
             </div>
           </div>
           <div className="extra-service">
-            <p className="extra-service__title">Дополнительные услуги</p>
+            <p className="text-l">Дополнительные услуги</p>
             <div className="extra-service__container">
               <div className="extra-service-fields__wrapper">
                 {extraServices.map(
@@ -80,7 +80,7 @@ function Calculator() {
               </div>
               <button
                 onClick={() => setExtraIsOpen((prev) => !prev)}
-                className="extra-service__btn"
+                className="extra-service__btn text-l-bold"
               >
                 {extraIsOpen ? "Свернуть" : "Посмотреть еще 4 опции"}
               </button>
@@ -89,13 +89,13 @@ function Calculator() {
         </div>
         <div className="calculator-form__wrapper">
           <div className="calculator-form__total">
-            <p className="calculator-form__title">
+            <p className="text-l-bold">
               Уборка квартиры с 1 жилой комнатой и 1 санузлом
             </p>
             <div className="total__wrapper">
               <div className="flex__wrapper">
-                <p className="pay__title">К оплате</p>
-                <span className="pay__sum">5 000 ₽</span>
+                <h3 className="text-grey">К оплате</h3>
+                <h1 className="text-black">5 000 ₽</h1>
               </div>
               <div className="flex__wrapper">
                 <p className="clean-time">Примерное время уборки</p>
@@ -114,7 +114,7 @@ function Calculator() {
               <Input size="small" placeholder="Квартира" />
               <Input size="small" placeholder="Подъезд" />
               <Input size="small" placeholder="Этаж" />
-              <Input size="small" placeholder="Дата" />
+              <Input size="small" type="date" placeholder="Дата" />
               <select required name="time" className="time-selection">
                 <option className="option-time" value="0" hidden>
                   Время
