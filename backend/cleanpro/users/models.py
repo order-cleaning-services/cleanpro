@@ -45,7 +45,7 @@ class User(AbstractUser):
 
     username = last_name = None
     email = models.EmailField('Адрес электронной почты', unique=True)
-    password = models.CharField('Пароль')
+    password = models.CharField('Пароль', max_length=16)
     phone = PhoneNumberField('Номер телефона', blank=True, region='RU')
     city = models.CharField('Город', max_length=150, blank=True)
     street = models.CharField('Улица', max_length=150, blank=True)

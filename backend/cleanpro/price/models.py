@@ -64,3 +64,43 @@ class Measure(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class CleanSet(models.Model):
+    """Модель наборов услуг."""
+    
+    title = models.CharField(
+        'Название наборов услуг.',
+        max_length=150,
+    )
+    price = models.ManyToManyField(
+        Price,
+        through='CleanSetPrice',
+        through_fields=('clean_set', 'price'),
+    )
+    
+    class Meta:
+        verbose_name = 'Набор услуг'
+        verbose_name_plural = 'Набор услуг'
+
+    def __str__(self):
+        return self.title
+
+
+class CleanSetPrice(models.Model):
+    """Модель перечня услуг в наборах услуг."""
+    
+    clean_set = models.ForeignKey(
+        CleanSet,
+        on_delete=models.CASCADE,
+    )
+    price = models.ForeignKey(
+        Price,
+        on_delete=models.CASCADE,
+    )
+
+# class OrderPrice():
+    
+#     price = models.ForeignKey(price)
+#     order = models models.ForeignKey(order)
+#     amount = models.IntegerField()
