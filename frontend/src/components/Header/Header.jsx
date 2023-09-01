@@ -12,7 +12,7 @@ const Header = ({ isLoggedIn }) => {
         <Logo />
         <ul className="header__links">
           <li>
-            <Link className="header__link " to="/profile">
+            <Link className="header__link " to="/">
               Уборка
             </Link>
           </li>

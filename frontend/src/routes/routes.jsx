@@ -7,26 +7,28 @@ import ProfilePage from '../components/pages/ProfilePage/ProfilePage.jsx'
 import SigninPage from '../components/pages/SigninPage/SigninPage.jsx'
 import Page404 from '../components/pages/Page404/Page404.jsx'
 
+import routes from '../constants/constants.jsx'
+
 const router = createBrowserRouter([
   {
-    path: '/',
+    path: routes.home,
     element: <App />,
     errorElement: <Page404 />,
     children: [
       {
-        path: '/',
+        path: routes.home,
         element: <MainPage />,
       },
       {
-        path: 'about',
+        path: routes.about,
         element: <AboutPage />,
       },
       {
-        path: 'profile',
+        path: routes.profile,
         element: <ProfilePage />,
       },
       {
-        path: 'signin',
+        path: routes.signin,
         element: <SigninPage />,
       },
     ],
