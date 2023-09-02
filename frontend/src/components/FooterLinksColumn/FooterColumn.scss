@@ -1,0 +1,15 @@
+.footer-links {
+  flex-basis: 18rem;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2rem;
+}
+
+.footer-links__heading {
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  color: rgba(0, 0, 0, 0.85);
+}
+
