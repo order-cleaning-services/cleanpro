@@ -1,4 +1,4 @@
-import FooterColumn from '../FooterLinksColumn/FooterColumn'
+import FooterColumn from '../FooterColumn/FooterColumn'
 import Logo from '../Logo/Logo'
 import './Footer.scss'
 

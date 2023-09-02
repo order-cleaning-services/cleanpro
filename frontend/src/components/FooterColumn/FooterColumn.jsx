@@ -1,11 +1,11 @@
-import FooterLinks from '../FooterLinks/FooterList'
+import FooterList from '../FooterList/FooterList'
 import './FooterColumn.scss'
 
 const FooterColumn = ({ heading, items }) => {
   return (
     <div className="footer-links">
       <h2 className="footer-links__heading">{heading}</h2>
-      <FooterLinks items={items} />
+      <FooterList items={items} />
     </div>
   )
 }
