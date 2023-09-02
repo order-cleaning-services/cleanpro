@@ -138,3 +138,7 @@ REST_FRAMEWORK = {
 USER = 'user'
 
 ADMIN = 'admin'
+
+DEFAULT_FROM_EMAIL = 'cleanpro@admin.com'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

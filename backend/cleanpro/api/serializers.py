@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from users.models import User
 from service.models import Order, Service_package, Rating, Adress
-
+from phonenumber_field.serializerfields import PhoneNumberField
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -23,50 +23,55 @@ class Confirm_mailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('email')
+        fields = ('email',)
+    
 
-class PostOrderSerializer(serializers.ModelSerializer):
-
+class Service_packageSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Order
-        fields = (
-            'id', 'user', 'service_package',
-            'total_sum', 'cleaning_date',
-            'cleaning_time', 'comment',
-        )
-        extra_fields = (
-            'first_name',
-            'email',
-            'phone',
-            'city',
-            'street',
-            'house',
-            'apartment',
-            'floor',
-            'entrance',
-        )
+        model = Service_package
+        fields = 'title', 'price'
 
-    def create(self, validated_data):
-        adress = Adress.objects.create(city=validated_data.get('city'),
-                                       street=validated_data.get('street'),
-                                       house=validated_data.get('house'),
-                                       apartment=validated_data.get('apartment'),
-                                       floor=validated_data.get('floor'))
-        if self.context.get('request'):
-            user = self.context.get('request').user
-            if user.is_anonymous:
-                user = User.objects.create(email=validated_data.get('email'),
-                                           phone=validated_data.get('phone'),
-                                           first_name=validated_data.get('first_name'),
-                                           adress=adress)
-        id = validated_data.get('id')
-        service = get_object_or_404(Service_package,
-                                    id=self.service_packege)
-        order = Order.objects.create(user=user,
+class PostOrderSerializer(serializers.Serializer):
+    city = serializers.CharField(
+        max_length=256,)
+    street = serializers.CharField(
+        max_length=256,)
+    house = serializers.IntegerField()
+    apartment = serializers.IntegerField(
+        required=False)
+    floor = serializers.IntegerField(required=False)
+    entrance = serializers.IntegerField(required=False)
+    first_name =  serializers.CharField(max_length=256, required=False)
+    email = serializers.EmailField()
+    phone = PhoneNumberField(required=False, region='RU')
+    service_package = serializers.PrimaryKeyRelatedField(queryset=Service_package.objects.all(),)
+    total_sum = serializers.IntegerField(
+        default=0)
+    cleaning_date = serializers.DateField()
+    cleaning_time = serializers.TimeField()
+    comment = serializers.CharField(required=False)
+
+
+
+    def create(self, data):
+        adress, created = Adress.objects.get_or_create(city=data['city'],
+                                       street=data['street'],
+                                       house=data['house'],
+                                       )
+        user, created = User.objects.get_or_create(email=data['email'])
+        user.first_name, = data['first_name'],
+        user.adress, = Adress.objects.get(id=adress.id),
+        user.phone, = data['phone'],
+        user.save()
+        service = data['service_package']
+        total_sum=service.price
+        order = Order.objects.create(user=user, service_package=service,
                                      total_sum=service.price,
-                                     order_number=id,
-                                     **validated_data)
-        return order
+                                     adress=user.adress,
+                                     cleaning_date=data['cleaning_date'],
+                                     cleaning_time=data['cleaning_time'],
+                                     )
+        return order, created
     
     def update(self, instance, validated_data):
         instance.save()
@@ -78,12 +83,25 @@ class OrderStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = 'order_status'
+        fields = ('order_status',)
 
-# class Service_packageSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Service_package
-#         fields = 'title', 'price'
+    def update(self, instance, validated_data):
+        instance.order_status = validated_data.get(
+            'order_status', instance.order_status)
+        instance.save()
+        return instance
+    
+class PaySerializer(serializers.ModelSerializer):
+    pay_status = serializers.BooleanField()
+
+    class Meta:
+        model = Order
+        fields = ('pay_status',)
+
+    def update(self, instance, validated_data):
+        instance.pay_status = True
+        instance.save()
+        return instance
 
 class AdressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -98,22 +116,21 @@ class GetOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            'user', 'service_package', 'adress',
-            'total_sum', 'cleaning_date',
-            'cleaning_time', 'comment'
+            "__all__"
         )
 
 class CommentSerializer(serializers.ModelSerializer):
+    comment = serializers.CharField()
     class Meta:
         model = Order
-        fields = 'comment'
+        fields = ('comment',)
 
     def update(self, instance, validated_data):
         instance.comment = validated_data.get(
             'comment', instance.comment)
+        instance.order_number = 1
         instance.save()
         return instance
-
 class DateTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order

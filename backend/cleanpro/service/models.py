@@ -3,25 +3,25 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-# class Service_package(models.Model):
-#     '''Модель пакета услуг.'''
-#     CLEANING_TYPE = (
-#         ('maintenance', 'Поддерживающая уборка'),
-#         ('general', 'Генеральная уборка'),
-#         ('repair', 'Уборка после ремонта'),
-#         ('holiday', 'Уборка после мероприятия'),
-#         ('windows', 'Мытье окон'),
-#     )
-#     title = models.CharField(choices=CLEANING_TYPE,
-#         default='maintenance', max_length=256,
-#         verbose_name='Название',)
-#     price = models.IntegerField(
-#         default=0, verbose_name='Сумма',)
-#     quantity = models.IntegerField(default=0,
-#         verbose_name='Количество',)
+class Service_package(models.Model):
+    '''Модель пакета услуг.'''
+    CLEANING_TYPE = (
+        ('maintenance', 'Поддерживающая уборка'),
+        ('general', 'Генеральная уборка'),
+        ('repair', 'Уборка после ремонта'),
+        ('holiday', 'Уборка после мероприятия'),
+        ('windows', 'Мытье окон'),
+    )
+    title = models.CharField(choices=CLEANING_TYPE,
+        default='maintenance', max_length=256,
+        verbose_name='Название',)
+    price = models.IntegerField(
+        default=0, verbose_name='Сумма',)
+    quantity = models.IntegerField(default=0,
+        verbose_name='Количество',)
 
-#     def __str__(self):
-#         return self.title
+    def __str__(self):
+        return self.title
 
 class Adress(models.Model):
     '''Модель адреса.'''
@@ -64,8 +64,6 @@ class Order(models.Model):
         related_name='orders',
         verbose_name='Заказчик',
     )
-    order_number = models.IntegerField(
-        verbose_name='Номер',)
     total_sum = models.IntegerField(
         default=0, verbose_name='Сумма',)
     comment = models.TextField(
@@ -103,7 +101,7 @@ class Order(models.Model):
         'Время уборки')
 
     def __str__(self):
-        return f"Заказ №: {self.order_number}"
+        return f"Заказ №: {self.id}"
 
 class Rating(models.Model):
     '''Модель отзыва.'''
@@ -134,4 +132,4 @@ class Rating(models.Model):
     )
 
     class Meta:
-        ordering = ['score']
+        ordering = ['-score']
