@@ -1,15 +1,8 @@
-import Footer from './components/Footer/Footer'
-import Header from './components/Header/Header'
-import Input from './components/input/Input'
+import { Outlet } from 'react-router-dom'
 
 function App() {
   return (
-    <>
-      <Header />
-      <Input placeholder="Email" />
-      <Input placeholder="Введите пароль" />
-      <Footer />
-    </>
+      <Outlet />
   )
 }
 
