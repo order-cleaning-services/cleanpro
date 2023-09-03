@@ -1,10 +1,8 @@
-import React, { useState } from 'react';
-
 import { useSelector, useDispatch } from 'react-redux';
 import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/slices/formEntrySlice';
 import Button from '../Button/Button';
 import Input from '../Input/Input';
-import '../../../../styles/FormEntry.css';;
+import '../../../../styles/FormEntry.css';
 
 function FormEntry() {
 
@@ -12,45 +10,45 @@ function FormEntry() {
 	const dispatch = useDispatch();
 
 	const handleEntry = () => dispatch(handleClickEntry());
-	const handleRecovery = () => dispatch(handleClickRecovery()); 
+	const handleRecovery = () => dispatch(handleClickRecovery());
 	const handleRegistration = () => dispatch(handleClickRegistration());
-	
+
 
 	return (
 		<section className="form-entry">
 			<form action="" className="form-entry__container">
 				<div className="form-entry__content">
 					{
-				viewForm === 'registration'
-					?
-					<div className="form-entry__wrapper-title">
-						<p
-							className="form-entry__title form-entry__title_active">
-							Регистрация
-						</p>
-						<p
-							onClick={handleEntry}
-							className="form-entry__title">
-							Вход
-						</p>
-					</div>
-					:
-					viewForm === 'entry'
-						?
-						<div className="form-entry__wrapper-title">
-							<p
-								onClick={handleRegistration}
-								className="form-entry__title ">
-								Регистрация
-							</p>
-							<p
-								className="form-entry__title form-entry__title_active">
-								Вход
-							</p>
-						</div>
-						:
-						<p className="form-entry__title">Забыли пароль?</p>
-			}
+						viewForm === 'registration'
+							?
+							<div className="form-entry__wrapper-title">
+								<p
+									className="form-entry__title form-entry__title_active">
+									Регистрация
+								</p>
+								<p
+									onClick={handleEntry}
+									className="form-entry__title">
+									Вход
+								</p>
+							</div>
+							:
+							viewForm === 'entry'
+								?
+								<div className="form-entry__wrapper-title">
+									<p
+										onClick={handleRegistration}
+										className="form-entry__title ">
+										Регистрация
+									</p>
+									<p
+										className="form-entry__title form-entry__title_active">
+										Вход
+									</p>
+								</div>
+								:
+								<p className="form-entry__title">Забыли пароль?</p>
+					}
 
 					<div className="form-entry__input-container">
 						<Input
@@ -58,7 +56,7 @@ function FormEntry() {
 							inputClassName="input"
 							inputType="email"
 							inputPlaceHolder="Email" />
-						{(viewForm === "registration" ||  viewForm === "entry") && (
+						{(viewForm === "registration" || viewForm === "entry") && (
 							<div className='form-enter__wrapper-input'>
 								<Input
 									key={`${viewForm}-password`}
@@ -106,7 +104,7 @@ function FormEntry() {
 									className="form-entry__password-recovery">Забыли пароль?</p>
 								:
 								<p
-								onClick={handleEntry}
+									onClick={handleEntry}
 									className="form-entry__password-recovery">Вспомнил пароль</p>
 					}
 				</div>

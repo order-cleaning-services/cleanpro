@@ -1,4 +1,6 @@
 .header {
+  max-width: 144rem;
+  margin: 0 auto;
   justify-content: space-between;
   padding: 4rem 10rem 5rem;
   box-shadow: 0px 4px 10px 0px rgba(5, 11, 59, 0.1);
