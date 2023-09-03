@@ -1,0 +1,26 @@
+.footer {
+  display: flex;
+  padding: 8rem 10rem;
+  gap: 3.2rem;
+}
+
+.footer__logo-wrapper {
+  margin-top: -10px;
+  flex-basis: 28.6rem;
+}
+
+.footer__title {
+  font-size: 2rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.footer__column-item {
+  text-decoration: none;
+  color: #163b6c;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 140%;
+}

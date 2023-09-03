@@ -1,0 +1,14 @@
+.footer-list{
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  gap: 2.4rem;
+}
+
+.footer-item {
+  text-decoration: none;
+  color: #163b6c;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 140%;
+}
