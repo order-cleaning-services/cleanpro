@@ -100,6 +100,9 @@ class Order(models.Model):
     cleaning_time = models.TimeField(
         'Время уборки')
 
+    class Meta:
+        ordering = ['-cleaning_date']
+
     def __str__(self):
         return f"Заказ №: {self.id}"
 

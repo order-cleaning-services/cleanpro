@@ -6,7 +6,7 @@ from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
-from api.serializers import UserSerializer
+from api.serializers import CustomUserSerializer
 from djoser.views import UserViewSet
 from rest_framework import viewsets, status
 from rest_framework import permissions
@@ -20,18 +20,32 @@ from .serializers import (PostOrderSerializer,
                           RatingSerializer,
                           OrderStatusSerializer,
                           Confirm_mailSerializer,
-                          PaySerializer)
+                          PaySerializer,
+                          CancellSerializer)
 
 
 class UserViewSet(UserViewSet):
-    serializer_class = UserSerializer
+    serializer_class = CustomUserSerializer
+
+    @action(
+        detail=True,
+        methods=['get', ],
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def orders(self, request, id):
+        queryset = Order.objects.filter(user=id)
+        page = self.paginate_queryset(queryset)
+        serializer = GetOrderSerializer(page, many=True,
+                                            context={'request': request})
+        return self.get_paginated_response(serializer.data)
+
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def confirm_mail(request):
     email = request.data.get('email')
     user = get_object_or_404(User, email=email)
-    serializer = Confirm_mailSerializer(data=request.data)
+    serializer = Confirm_mailSerializer(user, request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
     user.password = default_token_generator.make_token(user)
@@ -57,20 +71,25 @@ def order_create(request):
 class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny, ]
     queryset = Order.objects.all()
+    methods=['get', 'post', 'patch', 'delete'],
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return GetOrderSerializer
 
+    def perform_update(self, serializer):
+        serializer.save()
 
     @action(
         detail=True,
         methods=['patch', ],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
-    def pay(self, request, pk=None):
-        serializer = PaySerializer(data=request.data)
+    def pay(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
+        serializer = PaySerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
@@ -78,18 +97,21 @@ class OrderViewSet(viewsets.ModelViewSet):
         methods=['patch', ],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
-    def cancell(self, request, pk=None):
-        order = self.get_object()
-        order.order_status = 'cancelled'
-        return Response(request.data, status=status.HTTP_201_CREATED)
+    def cancell(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
+        serializer = CancellSerializer(order, request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
         methods=['patch', ],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
-    def comment(self, request, pk=None):
-        serializer = CommentSerializer(data=request.data)
+    def comment(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
+        serializer = CommentSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -99,9 +121,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         methods=['patch', ],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
-    def change_datetime(self, request, pk=None):
-        serializer = DateTimeSerializer(data=request.data)
+    def change_datetime(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
+        serializer = DateTimeSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     @action(
@@ -109,9 +133,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         methods=['patch', ],
         permission_classes=(permissions.IsAdminUser,)
     )
-    def change_status(self, request, pk=None):
-        serializer = OrderStatusSerializer(data=request.data)
+    def change_status(self, request, pk):
+        order = get_object_or_404(Order, id=pk)
+        serializer = OrderStatusSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -119,6 +145,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
+    methods=['get', 'post', 'patch', 'delete'],
 
 
     def perform_create(self, serializer):

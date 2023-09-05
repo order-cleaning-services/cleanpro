@@ -4,7 +4,7 @@ from users.models import User
 from service.models import Order, Service_package, Rating, Adress
 from phonenumber_field.serializerfields import PhoneNumberField
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
@@ -91,8 +91,20 @@ class OrderStatusSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
+class CancellSerializer(serializers.ModelSerializer):
+    order_status = 'cancelled'
+
+    class Meta:
+        model = Order
+        fields = ('order_status',)
+
+    def update(self, instance, validated_data):
+        instance.order_status = 'cancelled'
+        instance.save()
+        return instance
+
 class PaySerializer(serializers.ModelSerializer):
-    pay_status = serializers.BooleanField()
+    pay_status = True
 
     class Meta:
         model = Order
@@ -109,7 +121,7 @@ class AdressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class GetOrderSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True)
     adress = AdressSerializer(read_only=True)
     service_package = Service_packageSerializer(read_only=True)
 
@@ -126,11 +138,10 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('comment',)
 
     def update(self, instance, validated_data):
-        instance.comment = validated_data.get(
-            'comment', instance.comment)
-        instance.order_number = 1
+        instance.comment = validated_data.get('comment', instance.comment)
         instance.save()
         return instance
+    
 class DateTimeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
@@ -145,7 +156,7 @@ class DateTimeSerializer(serializers.ModelSerializer):
         return instance
     
 class RatingSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True)
 
     class Meta:
         fields = '__all__'
