@@ -25,6 +25,7 @@ from .serializers import (PostOrderSerializer,
 
 
 class UserViewSet(UserViewSet):
+    """Список пользователей."""
     serializer_class = CustomUserSerializer
 
     @action(
@@ -33,6 +34,7 @@ class UserViewSet(UserViewSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def orders(self, request, id):
+        """Список заказов пользователя."""
         queryset = Order.objects.filter(user=id)
         page = self.paginate_queryset(queryset)
         serializer = GetOrderSerializer(page, many=True,
@@ -43,6 +45,7 @@ class UserViewSet(UserViewSet):
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def confirm_mail(request):
+    """Подтвердить электронную почту."""
     email = request.data.get('email')
     user = get_object_or_404(User, email=email)
     serializer = Confirm_mailSerializer(user, request.data)
@@ -62,6 +65,7 @@ def confirm_mail(request):
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def order_create(request):
+    """Создать заказ."""
     serializer = PostOrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
@@ -69,6 +73,7 @@ def order_create(request):
 
 
 class OrderViewSet(viewsets.ModelViewSet):
+    """Список заказов."""
     permission_classes = [permissions.AllowAny, ]
     queryset = Order.objects.all()
     methods=['get', 'post', 'patch', 'delete'],
@@ -83,6 +88,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def pay(self, request, pk):
+        """Оплатить заказ."""
         order = get_object_or_404(Order, id=pk)
         serializer = PaySerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
@@ -95,6 +101,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def cancell(self, request, pk):
+        """Отменить заказ."""
         order = get_object_or_404(Order, id=pk)
         serializer = CancellSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
@@ -107,6 +114,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def comment(self, request, pk):
+        """Добавить комментарий к заказу."""
         order = get_object_or_404(Order, id=pk)
         serializer = CommentSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
@@ -119,6 +127,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def change_datetime(self, request, pk):
+        """Перенести заказ."""
         order = get_object_or_404(Order, id=pk)
         serializer = DateTimeSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
@@ -131,6 +140,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=(permissions.IsAdminUser,)
     )
     def change_status(self, request, pk):
+        """Изменить статус заказа."""
         order = get_object_or_404(Order, id=pk)
         serializer = OrderStatusSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
@@ -139,6 +149,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
 
 class RatingViewSet(viewsets.ModelViewSet):
+    """Список отзывов."""
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer

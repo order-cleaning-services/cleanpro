@@ -42,7 +42,7 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    '''Модель пользователя.'''
+    """Модель пользователя."""
 
     username = last_name = None
     first_name =  models.CharField('Имя', max_length=256, blank=True,)

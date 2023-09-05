@@ -5,6 +5,7 @@ from service.models import Order, Service_package, Rating, Adress
 from phonenumber_field.serializerfields import PhoneNumberField
 
 class CustomUserSerializer(serializers.ModelSerializer):
+    """Создание пользователя."""
     class Meta:
         model = User
         fields = (
@@ -16,6 +17,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         )
 
 class Confirm_mailSerializer(serializers.ModelSerializer):
+    """Подтвердить электронную почту."""
     email = serializers.EmailField(
         max_length=254,
         required=True
@@ -32,6 +34,7 @@ class Service_packageSerializer(serializers.ModelSerializer):
         fields = 'title', 'price'
 
 class PostOrderSerializer(serializers.Serializer):
+    """Создать заказ."""
     city = serializers.CharField(
         max_length=256,)
     street = serializers.CharField(
@@ -50,8 +53,6 @@ class PostOrderSerializer(serializers.Serializer):
     cleaning_date = serializers.DateField()
     cleaning_time = serializers.TimeField()
     comment = serializers.CharField(required=False)
-
-
 
     def create(self, data):
         adress, created = Adress.objects.get_or_create(city=data['city'],
@@ -78,6 +79,7 @@ class PostOrderSerializer(serializers.Serializer):
         return instance
 
 class OrderStatusSerializer(serializers.ModelSerializer):
+    """Изменить статус заказа."""
     order_status = serializers.ChoiceField(
         choices=Order.STATUS_CHOICES)
 
@@ -92,6 +94,7 @@ class OrderStatusSerializer(serializers.ModelSerializer):
         return instance
     
 class CancellSerializer(serializers.ModelSerializer):
+    """Отменить заказ."""
     order_status = 'cancelled'
 
     class Meta:
@@ -104,6 +107,7 @@ class CancellSerializer(serializers.ModelSerializer):
         return instance
 
 class PaySerializer(serializers.ModelSerializer):
+    """Оплатить заказ."""
     pay_status = True
 
     class Meta:
@@ -116,11 +120,13 @@ class PaySerializer(serializers.ModelSerializer):
         return instance
 
 class AdressSerializer(serializers.ModelSerializer):
+    """Адрес заказа."""
     class Meta:
         model = Adress
         fields = '__all__'
 
 class GetOrderSerializer(serializers.ModelSerializer):
+    """Просмотреть заказ."""
     user = CustomUserSerializer(read_only=True)
     adress = AdressSerializer(read_only=True)
     service_package = Service_packageSerializer(read_only=True)
@@ -132,6 +138,7 @@ class GetOrderSerializer(serializers.ModelSerializer):
         )
 
 class CommentSerializer(serializers.ModelSerializer):
+    """Добавить комментарий к заказу."""
     comment = serializers.CharField()
     class Meta:
         model = Order
@@ -143,6 +150,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return instance
     
 class DateTimeSerializer(serializers.ModelSerializer):
+    """Перенести заказ."""
     class Meta:
         model = Order
         fields = 'cleaning_date', 'cleaning_time'
@@ -156,6 +164,7 @@ class DateTimeSerializer(serializers.ModelSerializer):
         return instance
     
 class RatingSerializer(serializers.ModelSerializer):
+    """Отзыв на уборку."""
     user = CustomUserSerializer(read_only=True)
 
     class Meta:

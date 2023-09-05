@@ -4,7 +4,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Service_package(models.Model):
-    '''Модель пакета услуг.'''
+    """Модель пакета услуг."""
     CLEANING_TYPE = (
         ('maintenance', 'Поддерживающая уборка'),
         ('general', 'Генеральная уборка'),
@@ -24,7 +24,7 @@ class Service_package(models.Model):
         return self.title
 
 class Adress(models.Model):
-    '''Модель адреса.'''
+    """Модель адреса."""
     city = models.CharField(
         max_length=256, verbose_name='Город',
         blank=False,
@@ -51,7 +51,7 @@ class Adress(models.Model):
         blank=True)
 
 class Order(models.Model):
-    '''Модель заказа.'''
+    """Модель заказа."""
     STATUS_CHOICES = (
         ('created', 'Создан'),
         ('accepted', 'Принят'),
@@ -107,7 +107,7 @@ class Order(models.Model):
         return f"Заказ №: {self.id}"
 
 class Rating(models.Model):
-    '''Модель отзыва.'''
+    """Модель отзыва."""
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
