@@ -26,8 +26,4 @@ const FooterList = ({ items }) => {
   )
 }
 
-// return (}
-// )
-// }
-
 export default FooterList

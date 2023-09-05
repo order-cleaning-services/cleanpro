@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import '../../../../../styles/Page404.css'
-import Header from '../../Header/Header'
+import './Page404.scss'
+import Header from '../../components/Header/Header'
 
 function Page404() {
   return (

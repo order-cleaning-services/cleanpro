@@ -1,15 +1,7 @@
-import React from 'react';
-
-import '../../../../styles/Button.css';
+import './Button.scss'
 
 function Button({ buttonClassName, buttonText }) {
-
-	return (
-		<button 
-	className={buttonClassName}>{buttonText}
-	</button>
-
-	);
+  return <button className={buttonClassName}>{buttonText}</button>
 }
 
-export default Button;
+export default Button
