@@ -72,10 +72,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny, ]
     queryset = Order.objects.all()
     methods=['get', 'post', 'patch', 'delete'],
-
-    def get_serializer_class(self):
-        if self.request.method in SAFE_METHODS:
-            return GetOrderSerializer
+    serializer_class = GetOrderSerializer
 
     def perform_update(self, serializer):
         serializer.save()
