@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-
 import '../../../../../styles/Page404.css'
 import Header from '../../Header/Header'
 
