@@ -1,21 +1,20 @@
-import { useRouteError } from 'react-router-dom'
-
+import { Link } from 'react-router-dom'
+import '../../../../../styles/Page404.css'
 import Header from '../../Header/Header'
 
-export default function Page404() {
-  const error = useRouteError()
-  console.error(error)
-
+function Page404() {
   return (
     <>
       <Header />
-      <div id="error-page">
-        <h1>Oops!</h1>
-        <p>Sorry, an unexpected error has occurred.</p>
-        <p>
-          <i>{error.statusText || error.message}</i>
-        </p>
-      </div>
+      <section className="page-404">
+        <div className="page-404__content">
+          <h2 className="page-404__title">404</h2>
+          <p className="page-404__subtitle">Такой страницы не найдено</p>
+          <Link className="page-404__link">Перейти на главную</Link>
+        </div>
+      </section>
     </>
   )
 }
+
+export default Page404
