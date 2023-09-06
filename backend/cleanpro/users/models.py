@@ -2,6 +2,7 @@ from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from service.models import Adress
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -41,17 +42,20 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    '''Модель пользователя.'''
+    """Модель пользователя."""
 
     username = last_name = None
+    first_name =  models.CharField('Имя', max_length=256, blank=True,)
     email = models.EmailField('Адрес электронной почты', unique=True)
-    password = models.CharField('Пароль')
+    password = models.CharField('Пароль', max_length=256)
     phone = PhoneNumberField('Номер телефона', blank=True, region='RU')
-    city = models.CharField('Город', max_length=150, blank=True)
-    street = models.CharField('Улица', max_length=150, blank=True)
-    house = models.PositiveSmallIntegerField('Дом', blank=True, null=True)
-    apartment = models.PositiveSmallIntegerField(
-        'Квартира', blank=True, null=True
+    adress = models.ForeignKey(
+        Adress,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='users',
+        verbose_name='Услуги',
     )
     role = models.CharField(
         'Роль',

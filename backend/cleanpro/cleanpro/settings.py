@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(os.path.join(BASE_DIR.parent.parent, '.env'), verbose=True)
+load_dotenv(os.path.join(BASE_DIR, '.env'), verbose=True)
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'phonenumber_field',
     'users',
     'api',
+    'service',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -130,9 +132,16 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
+        
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 USER = 'user'
 
 ADMIN = 'admin'
+
+DEFAULT_FROM_EMAIL = 'cleanpro@admin.com'
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

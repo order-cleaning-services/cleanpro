@@ -9,11 +9,7 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'first_name',
         'phone',
-        'city',
-        'street',
-        'house',
-        'apartment',
+        'adress'
     )
-    search_fields = ('email', 'first_name', 'phone')
-    list_filter = ('city', 'street')
+    search_fields = ('email', 'first_name', 'phone', 'adress')
     list_per_page = 50
