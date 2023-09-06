@@ -76,7 +76,7 @@ h1 {
 
 h2 {
   font-size: 3.6rem;
-  font-weight: 400;
+  font-weight: 600;
   line-height: 4.32rem;
   letter-spacing: -0.02em;
   text-align: center;
@@ -88,6 +88,11 @@ h3 {
   line-height: 3.64rem;
   letter-spacing: -0.02em;
   color: $text-color-tertiary;
+}
+
+label {
+  font-size: 1.4rem;
+  line-height: 1.96rem;
 }
 
 abbr[title] {
@@ -252,7 +257,7 @@ template {
 
 .text-s {
   font-size: 1.4rem;
-  line-height: 19.6rem;
+  line-height: 1.96rem;
 }
 
 .text-m {

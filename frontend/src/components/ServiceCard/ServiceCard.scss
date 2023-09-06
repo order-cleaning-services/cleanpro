@@ -1,6 +1,6 @@
 .service-card__container {
-  width: 24rem;
-  height: 7.5rem;
+  width: 22rem;
+  height: 6rem;
   border: none;
   border-radius: 20px;
   background-color: #ffffff;
@@ -9,23 +9,23 @@
   flex-direction: column;
 
   &:has(img) {
-    height: 15rem;
+    height: 12rem;
   }
 
   p {
-    margin: 1.6rem 1.6rem 0;
+    margin: 0.8rem 1.6rem 0;
   }
 }
 
 .service-card__img {
   display: flex;
   justify-content: flex-end;
-  width: 24rem;
-  height: 7.5rem;
+  width: 22rem;
+  height: 6rem;
 
   img {
-    width: 12rem;
-    height: 7.5rem;
+    width: 11rem;
+    height: 6rem;
     border-radius: 0 0 20px 0;
   }
 }

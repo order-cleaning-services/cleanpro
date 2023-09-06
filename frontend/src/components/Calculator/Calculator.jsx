@@ -1,18 +1,31 @@
 import "./Calculator.scss"
-import Input from "../input/Input"
 import Tab from "../Tab/Tab"
 import Counter from "../Counter/Counter"
-import ServiceCard from "../ServiceCard/ServiceCard"
-import { extraServices, serviceCards } from "../../utils/initialData"
-import { useState } from "react"
-import ExtraServiceField from "../ExtraServiceField/ExtraServiceField"
+import { useEffect, useState } from "react"
+import OrderForm from "../OrderForm/OrderForm"
+import Total from "../Total/Total"
+import ExtraServices from "../ExtraServices/ExtraServices"
+import IncludeServices from "../IncludeServices/IncludeServices"
+import { serviceCards } from "../../utils/initialData"
 
 function Calculator() {
   const [cleanType, setCleanType] = useState(serviceCards[0].id)
-  const [extraIsOpen, setExtraIsOpen] = useState(false)
+  const [total, setTotal] = useState(serviceCards[0].price)
+  const [room, setRoom] = useState(1)
+  const [toilet, setToilet] = useState(1)
+  const [window, setWindow] = useState(1)
+
+  const isTypeWindow =
+    serviceCards.filter((card) => card.id === cleanType)[0].title === "Окна"
+
+  useEffect(() => {
+    setTotal(serviceCards.filter((card) => card.id === cleanType)[0].price)
+  }, [cleanType])
 
   function handleActiveType(id) {
     setCleanType(id)
+    setRoom(1)
+    setToilet(1)
   }
 
   function isActive(id) {
@@ -21,7 +34,7 @@ function Calculator() {
 
   return (
     <section className="calculator__container">
-      <h2>Выберите вариант уборки, а все сложности оставьте нам</h2>
+      <h2>Выберите тип уборки</h2>
       <div className="calculator__wrapper">
         <div className="cleaning-type__container">
           <div className="cleaning-type__wrapper">
@@ -39,104 +52,57 @@ function Calculator() {
             </div>
           </div>
           <div className="rooms-quantity">
-            <div className="amount__container">
-              <p className="text-l">Количество комнат</p>
-              <Counter min={1} max={5} />
-            </div>
-            <div className="amount__container">
-              <p className="amount__title">Количество санузлов</p>
-              <Counter min={1} max={5} />
-            </div>
-          </div>
-          <div className="include-service__container">
-            <p className="text-l">Услуги, которые уже включены</p>
-            <div className="include-service__cards">
-              {serviceCards
-                .filter((card) => card.id === cleanType)[0]
-                .cards.map((card) => (
-                  <ServiceCard
-                    key={card.content}
-                    content={card.content}
-                    img={card.img}
+            {isTypeWindow ? (
+              <>
+                <div className="amount__container">
+                  <p className="text-l">Количество окон</p>
+                  <Counter
+                    count={window}
+                    min={1}
+                    max={10}
+                    price={1500}
+                    setCount={setWindow}
+                    setTotal={setTotal}
                   />
-                ))}
-            </div>
+                </div>
+                <div className="checkbox__wrapper">
+                  <p className="text-l">Панорамные окна</p>
+                  <input type="checkbox" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="amount__container">
+                  <p className="text-l">Количество комнат</p>
+                  <Counter
+                    count={room}
+                    min={1}
+                    max={5}
+                    price={1500}
+                    setCount={setRoom}
+                    setTotal={setTotal}
+                  />
+                </div>
+                <div className="amount__container">
+                  <p className="amount__title">Количество санузлов</p>
+                  <Counter
+                    count={toilet}
+                    min={1}
+                    max={5}
+                    price={1000}
+                    setCount={setToilet}
+                    setTotal={setTotal}
+                  />
+                </div>
+              </>
+            )}
           </div>
-          <div className="extra-service">
-            <p className="text-l">Дополнительные услуги</p>
-            <div className="extra-service__container">
-              <div className="extra-service-fields__wrapper">
-                {extraServices.map(
-                  (extra, index) =>
-                    (index < 2 || extraIsOpen) && (
-                      <ExtraServiceField
-                        key={extra.title}
-                        title={extra.title}
-                        price={extra.price}
-                        maxCount={extra.maxCount}
-                      />
-                    )
-                )}
-              </div>
-              <button
-                onClick={() => setExtraIsOpen((prev) => !prev)}
-                className="extra-service__btn text-l-bold"
-              >
-                {extraIsOpen ? "Свернуть" : "Посмотреть еще 4 опции"}
-              </button>
-            </div>
-          </div>
+          <IncludeServices cleanType={cleanType} />
+          {!isTypeWindow && <ExtraServices setTotal={setTotal} />}
         </div>
         <div className="calculator-form__wrapper">
-          <div className="calculator-form__total">
-            <p className="text-l-bold">
-              Уборка квартиры с 1 жилой комнатой и 1 санузлом
-            </p>
-            <div className="total__wrapper">
-              <div className="flex__wrapper">
-                <h3 className="text-grey">К оплате</h3>
-                <h1 className="text-black">5 000 ₽</h1>
-              </div>
-              <div className="flex__wrapper">
-                <p className="clean-time">Примерное время уборки</p>
-                <span className="clean-time">≈ 2ч 10мин</span>
-              </div>
-            </div>
-          </div>
-          <form>
-            <Input placeholder="Имя" />
-            <Input placeholder="e-mail" />
-            <Input placeholder="Телефон" />
-            <Input placeholder="Город" />
-            <Input placeholder="Улица" />
-            <div className="inputs_wrapper">
-              <Input size="small" placeholder="Дом" />
-              <Input size="small" placeholder="Квартира" />
-              <Input size="small" placeholder="Подъезд" />
-              <Input size="small" placeholder="Этаж" />
-              <Input size="small" type="date" placeholder="Дата" />
-              <select required name="time" className="time-selection">
-                <option className="option-time" value="0" hidden>
-                  Время
-                </option>
-                {Array.from({ length: 8 }, (_, i) => i + 9).map((num) => (
-                  <option className="time-option" value={num} key={num}>
-                    {num < 10 ? `0${num}` : num}:00
-                  </option>
-                ))}
-              </select>
-            </div>
-            <textarea
-              className="order-comment"
-              placeholder="Комментарии к заказу (например, имеется аллергия на чистящие средства или необходимо забрать вещи из химчистки)"
-            />
-            <button className="form-btn">Заказать</button>
-            <p className="inform-text">
-              Нажимая «Заказать», я даю согласие на{" "}
-              <span>Обработку персональных данных</span> и{" "}
-              <span>Договор оферты</span>
-            </p>
-          </form>
+          <Total total={total} />
+          <OrderForm />
         </div>
       </div>
     </section>

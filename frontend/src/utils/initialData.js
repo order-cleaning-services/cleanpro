@@ -17,11 +17,12 @@ export const serviceCards = [
   {
     id: 1,
     title: "Поддерживающая",
+    price: 5000,
     cards: [
       { id: 1, content: "Пылесосим", img: hoover },
       { id: 2, content: "Протираем от пыли торшеры и бра", img: floorLamp },
       { id: 3, content: "Моем пол и плинтусы", img: bucket },
-      { id: 4, content: "Моем зеркала и стеклянные поверхности", img: sprayer },
+      { id: 4, content: "Моем зеркала и стекла", img: sprayer },
       { id: 5, content: "Протираем бытовую технику", img: oven },
       { id: 6, content: "Выносим мусор", img: garbage },
       { id: 7, content: "Моем горизонтальные поверхности", img: cleanDust },
@@ -33,11 +34,12 @@ export const serviceCards = [
   {
     id: 2,
     title: "Генеральная",
+    price: 8000,
     cards: [
       { id: 1, content: "Пылесосим", img: hoover },
       { id: 2, content: "Протираем от пыли торшеры и бра", img: floorLamp },
       { id: 3, content: "Моем пол и плинтусы", img: bucket },
-      { id: 4, content: "Моем зеркала и стеклянные поверхности", img: sprayer },
+      { id: 4, content: "Моем зеркала и стекла", img: sprayer },
       { id: 5, content: "Протираем бытовую технику", img: oven },
       { id: 6, content: "Выносим мусор", img: garbage },
       { id: 7, content: "Моем горизонтальные поверхности", img: cleanDust },
@@ -52,7 +54,7 @@ export const serviceCards = [
       },
       {
         id: 10,
-        content: "Удаляем пыль с дверных проемов и дверей",
+        content: "Удаляем пыль с дверных проемов",
         img: doors,
       },
       {
@@ -65,11 +67,12 @@ export const serviceCards = [
   {
     id: 3,
     title: "После ремонта",
+    price: 9000,
     cards: [
       { id: 1, content: "Пылесосим", img: hoover },
       { id: 2, content: "Протираем от пыли торшеры и бра", img: floorLamp },
       { id: 3, content: "Моем пол и плинтусы", img: bucket },
-      { id: 4, content: "Моем зеркала и стеклянные поверхности", img: sprayer },
+      { id: 4, content: "Моем зеркала и стекла", img: sprayer },
       { id: 5, content: "Протираем бытовую технику", img: oven },
       { id: 6, content: "Выносим мусор", img: garbage },
       { id: 7, content: "Моем горизонтальные поверхности", img: cleanDust },
@@ -78,7 +81,7 @@ export const serviceCards = [
       { id: 10, content: "Аккуратно протираем мебель от пыли", img: sofa },
       {
         id: 11,
-        content: "Удаляем пыль с дверных проемов и дверей",
+        content: "Удаляем пыль с дверных проемов",
         img: doors,
       },
       {
@@ -91,17 +94,18 @@ export const serviceCards = [
   {
     id: 4,
     title: "После праздника",
+    price: 6000,
     cards: [
       { id: 1, content: "Пылесосим", img: hoover },
       { id: 2, content: "Моем пол и плинтусы", img: bucket },
-      { id: 3, content: "Моем зеркала и стеклянные поверхности", img: sprayer },
+      { id: 3, content: "Моем зеркала и стекла", img: sprayer },
       { id: 4, content: "Выносим мусор", img: garbage },
       { id: 5, content: "Моем горизонтальные поверхности", img: cleanDust },
       { id: 6, content: "Моем плиту, раковину и посуду", img: kitchen },
       { id: 7, content: "Убираем санузел", img: toilet },
       {
         id: 8,
-        content: "Удаляем пыль с дверных проемов и дверей",
+        content: "Удаляем пыль с дверных проемов",
         img: toilet,
       },
       { id: 9, content: "Аккуратно протираем мебель от пыли", img: sofa },
@@ -109,7 +113,8 @@ export const serviceCards = [
   },
   {
     id: 5,
-    title: "Мытье окон",
+    title: "Окна",
+    price: 1500,
     cards: [
       { id: 1, content: "Протираем окна с двух сторон" },
       { id: 2, content: "Протираем от пыли оконные рамы" },

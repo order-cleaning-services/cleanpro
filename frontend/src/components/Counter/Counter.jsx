@@ -1,20 +1,23 @@
-import { useState } from "react"
 import "./Counter.scss"
 
-function Counter({ min, max }) {
-  const [count, setCount] = useState(min)
-
+function Counter({ count, min, max, price = 0, setCount, setTotal }) {
   function handleDecrement() {
-    count > min && setCount((prev) => prev - 1)
+    if (count > min) {
+      setCount((prev) => prev - 1)
+      setTotal((prev) => prev - price)
+    }
   }
 
   function handleIncrement() {
-    count < max && setCount((prev) => prev + 1)
+    if (count < max) {
+      setCount((prev) => prev + 1)
+      setTotal((prev) => prev + price)
+    }
   }
   return (
     <div className="counter__container">
       <button className="btn-decrement" onClick={handleDecrement}>
-        -
+        −
       </button>
       <span>{count}</span>
       <button className="btn-increment" onClick={handleIncrement}>
