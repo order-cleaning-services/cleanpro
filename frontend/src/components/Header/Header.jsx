@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
-import Logo from '../Logo/Logo';
-import signin from '../../images/signin.svg';
-import profile from '../../images/profile.svg';
-import './Header.scss';
+import { Link } from 'react-router-dom'
+
+import Logo from '../Logo/Logo'
+import signin from '../../images/signin.svg'
+import profile from '../../images/profile.svg'
+import './Header.scss'
 
 const Header = ({ isLoggedIn }) => {
   return (
@@ -16,7 +17,7 @@ const Header = ({ isLoggedIn }) => {
             </Link>
           </li>
           <li>
-            <Link className="header__link " to="#">
+            <Link className="header__link " to="/about">
               О компании
             </Link>
           </li>
@@ -24,28 +25,20 @@ const Header = ({ isLoggedIn }) => {
         <div className="header__info">
           <p className="header__phone">+7 (495) 783-99-00</p>
           {isLoggedIn ? (
-            <Link className="header__profile" to="profile">
-              <img
-                src={profile}
-                className="header__profile-icon"
-                alt="Иконка профиля"
-              />
+            <Link className="header__profile" to="/profile">
+              <img src={profile} className="header__profile-icon" alt="Иконка профиля" />
               Профиль
             </Link>
           ) : (
-            <Link className="header__signin" to="signin">
-              <img
-                src={signin}
-                className="header__signin-icon"
-                alt="Иконка авторизации"
-              />
+            <Link className="header__signin" to="/signin">
+              <img src={signin} className="header__signin-icon" alt="Иконка авторизации" />
               Войти
             </Link>
           )}
         </div>
       </nav>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header
