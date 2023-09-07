@@ -1,13 +1,11 @@
-import React from 'react';
-
-import '../../../../styles/Button.css';
+import './Button.scss';
 
 function Button({ buttonClassName, buttonText }) {
 
 	return (
-		<button 
-	className={buttonClassName}>{buttonText}
-	</button>
+		<button
+			className={buttonClassName}>{buttonText}
+		</button>
 
 	);
 }

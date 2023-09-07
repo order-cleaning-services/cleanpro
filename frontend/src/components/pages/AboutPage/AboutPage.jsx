@@ -1,17 +1,16 @@
-import '../../../../../styles/AboutPage.css';
+import './AboutPage.scss';
 
-import Title from './Title/Title';
 import About from './About/About';
 import Cleaners from './Сleaners/Сleaners';
 
 function AboutPage() {
-
 	return (
 		<div className="about-page">
-				<Title titleText={"О компании"} />
+				<h2 className="about-page__title">О компании</h2>
 				<About />		
-				<Title titleText={"Наши клинеры"} />	
-				<Cleaners />				
+				<h2 className="about-page__title">Наши клинеры</h2>
+				<Cleaners
+				/>				
 		</div>
 	);
 }

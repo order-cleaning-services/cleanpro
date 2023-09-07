@@ -1,6 +1,6 @@
 // import React from 'react';
 
-import '../../../../styles/Input.css'
+import './Input.scss'
 
 function Input(props) {
   return (

@@ -4,3 +4,6 @@
   margin: 0 auto;
   padding: 6rem 10rem 0 10rem;
 }
+.about-page__title {
+  font-weight: 600;
+}
