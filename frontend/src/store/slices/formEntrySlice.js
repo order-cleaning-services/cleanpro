@@ -1,22 +1,22 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit'
 
 const formEntrySlice = createSlice({
-	name: 'formEntrySlice',
-	initialState: {
-		formView: 'registration',
-	},
-	reducers: {
-		handleClickEntry: (state, action) => {
-			state.formView = 'entry';
-		},
-		handleClickRecovery: (state, action) => {
-			state.formView = 'recovery';
-		},
-		handleClickRegistration: (state, action) => {
-			state.formView = 'registration';
-		},
-	},
-});
+  name: 'formEntrySlice',
+  initialState: {
+    formView: 'registration',
+  },
+  reducers: {
+    handleClickEntry: state => {
+      state.formView = 'entry'
+    },
+    handleClickRecovery: state => {
+      state.formView = 'recovery'
+    },
+    handleClickRegistration: state => {
+      state.formView = 'registration'
+    },
+  },
+})
 
-export const { handleClickEntry, handleClickRecovery, handleClickRegistration } = formEntrySlice.actions;
-export default formEntrySlice.reducer;
+export const { handleClickEntry, handleClickRecovery, handleClickRegistration } = formEntrySlice.actions
+export default formEntrySlice.reducer
