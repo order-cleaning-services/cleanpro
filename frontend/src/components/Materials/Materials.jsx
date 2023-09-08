@@ -5,15 +5,16 @@ import material3 from '../../images/material3.png'
 const Materials = () => {
   return (
     <section className="materials">
-      <h3 className="materials__title">Средства и материалы</h3>
+      <h2 className="materials__title">Средства и материалы</h2>
       <div className="materials__cards">
         <div className="materials__card full">
           <p className="materials__card-title">Специальная техника</p>
           <img className="materials__card-img full-img" src={material1} alt="" />
           <p className="materials__card-text full-text">
-            Lorem ipsum dolor sit amet consectetur. Sed posuere sit nec ullamcorper cursus tempus massa cum nulla. Ac
-            praesent magnis amet lobortis erat facilisis. Lorem ipsum dolor sit amet consectetur. Sed posuere sit nec
-            ullamcorper cursus tempus massa cum nulla. Ac praesent magnis amet lobortis erat facilisis.{' '}
+            Профессиональная техника Karcher предоставляет возможность быстро и эффективно избавиться от загрязнений
+            любой степени сложности. Эти аппараты идеально подходят для глубокой очистки ковров и мягкой мебели,
+            обеспечивая высокое качество работы. Справляются даже с самыми стойкими загрязнениями, обеспечивают борьбу с
+            микробами и осуществляют дезинфекцию, гарантируя чистоту и гигиеничность.
           </p>
         </div>
 
@@ -22,16 +23,18 @@ const Materials = () => {
             <p className="materials__card-title">Профессиональные средства</p>
             <img className="materials__card-img" src={material2} alt="material-img" />
             <p className="materials__card-text">
-              Lorem ipsum dolor sit amet consectetur. Sed posuere sit nec ullamcorper cursus tempus massa cum nulla. Ac
-              praesent magnis amet lobortis erat facilisis.
+              Мы предпочитаем использовать только сертифицированные чистящие средства от бельгийской компании CHRISAL,
+              известной под брендом Ecolife (Эколайф). Эта компания специализируется на создании экологически безопасных
+              профессиональных очистителей.
             </p>
           </div>
           <div className="materials__card ">
             <p className="materials__card-title">Гипоаллергенные составы</p>
             <img className="materials__card-img" src={material3} alt="material-img" />
             <p className="materials__card-text">
-              Lorem ipsum dolor sit amet consectetur. Sed posuere sit nec ullamcorper cursus tempus massa cum nulla. Ac
-              praesent magnis amet lobortis erat facilisis.
+              Вся продукция Ecolife, независимо от области применения, разработана без использования агрессивных
+              химических компонентов, а также не содержит ароматических веществ и красителей, что позволяет избежать
+              аллергических реакций.
             </p>
           </div>
         </div>

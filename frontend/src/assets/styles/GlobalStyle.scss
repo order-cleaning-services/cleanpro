@@ -1,41 +1,41 @@
-@import "./colors.scss";
-
-@font-face {
-  font-family: "NunitoReg";
-  font-display: swap;
-  font-style: normal;
-  font-weight: normal;
-  src: url("../fonts/Nunito-Regular.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  font-style: normal;
-  font-weight: 600;
-  src: url("../fonts/Nunito-SemiBold.ttf") format("truetype");
-}
-
-@font-face {
-  font-family: "Nunito";
-  font-display: swap;
-  font-style: normal;
-  font-weight: 700;
-  src: url("../fonts/Nunito-Bold.ttf") format("truetype");
-}
-
-body {
-  font-family: "NunitoReg", sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  margin: 0;
-  color: $text-color-main;
-}
+@import './colors.scss';
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+@font-face {
+  font-family: 'NunitoReg';
+  font-display: swap;
+  font-style: normal;
+  font-weight: normal;
+  src: url('../fonts/Nunito-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Nunito';
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+  src: url('../fonts/Nunito-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Nunito';
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/Nunito-Bold.ttf') format('truetype');
+}
+
+body {
+  font-family: 'NunitoReg', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  margin: 0;
+  color: $text-color-main;
 }
 
 html {
@@ -176,24 +176,24 @@ select {
 }
 
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
+[type='button'],
+[type='reset'],
+[type='submit'] {
   appearance: button;
 }
 
 button::-moz-focus-inner,
-[type="button"]::-moz-focus-inner,
-[type="reset"]::-moz-focus-inner,
-[type="submit"]::-moz-focus-inner {
+[type='button']::-moz-focus-inner,
+[type='reset']::-moz-focus-inner,
+[type='submit']::-moz-focus-inner {
   border-style: none;
   padding: 0;
 }
 
 button:-moz-focusring,
-[type="button"]:-moz-focusring,
-[type="reset"]:-moz-focusring,
-[type="submit"]:-moz-focusring {
+[type='button']:-moz-focusring,
+[type='reset']:-moz-focusring,
+[type='submit']:-moz-focusring {
   outline: 1px dotted ButtonText;
 }
 
@@ -214,23 +214,23 @@ progress {
   vertical-align: baseline;
 }
 
-[type="checkbox"],
-[type="radio"] {
+[type='checkbox'],
+[type='radio'] {
   box-sizing: border-box;
   padding: 0;
 }
 
-[type="number"]::-webkit-inner-spin-button,
-[type="number"]::-webkit-outer-spin-button {
+[type='number']::-webkit-inner-spin-button,
+[type='number']::-webkit-outer-spin-button {
   height: auto;
 }
 
-[type="search"] {
+[type='search'] {
   appearance: textfield;
   outline-offset: -2px;
 }
 
-[type="search"]::-webkit-search-decoration {
+[type='search']::-webkit-search-decoration {
   appearance: none;
 }
 

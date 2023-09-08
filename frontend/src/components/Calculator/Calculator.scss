@@ -1,7 +1,8 @@
-@import "../../assets/styles/colors.scss";
+@import '../../assets/styles/colors.scss';
 
 .calculator__container {
   width: 144rem;
+  margin: 12rem auto;
   height: fit-content;
   display: flex;
   flex-direction: column;

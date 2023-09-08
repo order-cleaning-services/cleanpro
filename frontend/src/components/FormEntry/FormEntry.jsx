@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/slices/formEntrySlice'
 import Button from '../Button/Button'
-import Input from '../Input/Input'
+import Input from '../input/Input'
 import './FormEntry.scss'
 
 function FormEntry() {

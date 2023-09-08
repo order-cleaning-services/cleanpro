@@ -1,11 +1,11 @@
 @import '../../assets/styles/colors.scss';
+@import '../../assets/styles/GlobalStyle.scss';
 
 .header {
   width: 144rem;
   margin: 0 auto;
   justify-content: space-between;
-  padding: 4rem 10rem 5rem;
-  box-shadow: 0px 4px 10px 0px $box-shadow;
+  padding: 2.25rem 10rem;
 }
 
 .header__menu {
@@ -26,6 +26,14 @@
   font-size: 2rem;
   text-decoration: none;
   color: $text-color-main;
+
+  &-active {
+    @extend .text-l-bold;
+    text-decoration: none;
+    color: $text-color-main;
+    padding-bottom: 1.6rem;
+    border-bottom: 0.2rem solid #ffb22e;
+  }
 }
 
 .header__info {
