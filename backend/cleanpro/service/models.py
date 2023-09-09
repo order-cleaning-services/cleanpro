@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from users.models import Adress
+
 
 class Service_package(models.Model):
     """Модель пакета услуг."""
@@ -23,32 +25,6 @@ class Service_package(models.Model):
     def __str__(self):
         return self.title
 
-class Adress(models.Model):
-    """Модель адреса."""
-    city = models.CharField(
-        max_length=256, verbose_name='Город',
-        blank=False,
-        null=False,)
-    street = models.CharField(
-        max_length=256, verbose_name='Улица',
-        blank=False,
-        null=False,)
-    house = models.IntegerField(
-        verbose_name='Дом',
-        blank=False,
-        null=False,)
-    apartment = models.IntegerField(
-        verbose_name='Квартира',
-        null=True,
-        blank=True, default=None)
-    floor = models.IntegerField(
-        verbose_name='Этаж',
-        null=True,
-        blank=True)
-    entrance = models.IntegerField(
-        verbose_name='Подъезд',
-        null=True,
-        blank=True)
 
 class Order(models.Model):
     """Модель заказа."""
