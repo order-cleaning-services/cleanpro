@@ -1,9 +1,9 @@
 .comments {
   position: relative;
   margin: 0 auto;
-  max-width: 144rem;
+  width: 144rem;
   background: #e5f0ff;
-  padding: 7.2rem 10rem 14.4rem;
+  padding: 7.2rem 10rem;
   box-sizing: border-box;
 
   &__wrapper {
@@ -17,7 +17,7 @@
     font-size: 3.6rem;
     font-weight: 600;
     line-height: 4.3rem;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.02rem;
     color: #242424;
     margin: 0;
   }
@@ -26,41 +26,14 @@
     text-decoration: none;
     font-size: 2rem;
     font-weight: 700;
-    line-height: 26px;
+    line-height: 2.6rem;
     letter-spacing: 0em;
   }
 
   &__list {
     list-style: none;
-    padding: 0;
+    padding: 0 0 7.2rem;
     margin: 0;
     display: flex;
-    gap: 3.2rem;
-  }
-
-  &__button {
-    position: absolute;
-    bottom: 3.2rem;
-    width: 4rem;
-    height: 4rem;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    padding: 0;
-    bottom: 7.2rem;
-  }
-
-  &__button:first-child {
-    margin-right: 3.2rem;
-  }
-
-  &__button_left {
-    background: #fff url(../../images/arrow-left.png) center no-repeat;
-    right: calc(50% + 1.6rem);
-  }
-
-  &__button_rigth {
-    background: #fff url(../../images/arrow-rigth.png) center no-repeat;
-    left: calc(50% + 1.6rem);
   }
 }

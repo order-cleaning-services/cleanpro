@@ -3,7 +3,7 @@ const CommentsList = props => {
   const { rating, comment, clientName, charwomanName } = props
 
   return (
-    <li className="comments__cell">
+    <div className="comments__cell">
       <div className="comments__upblock">
         <div className="comments__wrapper-rating">
           <h3 className="comments__name-client">{clientName}</h3>
@@ -14,7 +14,7 @@ const CommentsList = props => {
       <div>
         <p className="comments__name-charwoman">Клинер: {charwomanName}</p>
       </div>
-    </li>
+    </div>
   )
 }
 export default CommentsList
