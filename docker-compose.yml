@@ -29,7 +29,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       # - ../frontend/build:/usr/share/nginx/html/
-      - ../docs/:/usr/share/nginx/html/docs/
+      - ./redocs/:/usr/share/nginx/html/redocs/
       - static_cs:/var/html/static/
       - media_cs:/var/html/media/
     depends_on:
