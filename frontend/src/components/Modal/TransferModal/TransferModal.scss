@@ -1,0 +1,29 @@
+.form-transfer {
+	&__title {
+		font-weight: 400;
+		text-align: left;
+	}		
+	&__input-container {
+		padding: 2.6rem 0 0 0;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.2rem;
+		max-width: 39.2rem;
+	}
+	&__input-date {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+	}
+}
+
+.overlay-arrow {
+	font-size: 9px;
+	color: red;
+	position: absolute;
+	right: 5px;
+	bottom : 14px;
+	line-height: 1px;
+	background-color: #fff;
+	pointer-events: none;
+}

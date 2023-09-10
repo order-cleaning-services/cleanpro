@@ -1,0 +1,80 @@
+.calculator__container {
+  width: 144rem;
+  margin: 12rem auto;
+  height: -moz-fit-content;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 6rem;
+  background-color: #f2f2f2;
+  padding: 7.2rem 10rem;
+}
+
+.calculator__wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 3.2rem;
+}
+
+.cleaning-type__container {
+  display: flex;
+  flex-direction: column;
+  max-width: 81.6rem;
+  gap: 3.2rem;
+}
+
+.cleaning-type__wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 75.2rem;
+  gap: 2rem;
+}
+
+.cleaning-type__tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.calculator-form__wrapper {
+  width: 39.2rem;
+}
+
+.rooms-quantity {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+.rooms-quantity:has(input) {
+  flex-direction: row;
+  gap: 4.4rem;
+}
+
+.amount__container {
+  display: flex;
+  width: 34.9rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.amount__title {
+  font-size: 2rem;
+  line-height: 2.6rem;
+}
+
+.checkbox__wrapper {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+}
+
+.calculator-form__wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
