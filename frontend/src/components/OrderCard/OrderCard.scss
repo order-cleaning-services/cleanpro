@@ -1,0 +1,73 @@
+.card {
+  padding: 2.4rem 3.2rem;
+  border-radius: 20px;
+  background-color: #e5f0ff;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2.4rem;
+
+    &-info {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &__status-led {
+    width: 0.6rem;
+    height: 0.6rem;
+    background-color: #19be20;
+    border-radius: 50%;
+    margin-right: 0.8rem;
+  }
+
+  &__status-text {
+    font-size: 1.4rem;
+    line-height: 140%;
+    margin-right: 3.2rem;
+  }
+
+  &__cost {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 130%;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 130%;
+  }
+
+  &__info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    list-style: none;
+  }
+
+  &__info-line {
+    display: flex;
+    align-items: center;
+  }
+
+  &__date-time {
+    font-size: 1.6rem;
+    line-height: 140%;
+  }
+
+
+  &__breaker {
+    display: inline-block;
+    width: 0.9rem;
+    height: 1.2rem;
+    font-size: 5rem;
+    vertical-align: middle;
+    line-height: 10%;
+  }
+
+  &__order {
+  }
+}

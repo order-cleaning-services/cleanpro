@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import ProfileForm from '../../components/ProfileForm/ProfileForm'
 import './ProfilePage.scss'
+import OrderCard from '../../components/OrderCard/OrderCard'
 
 export default function Profile() {
   const [isProfileFormActive, setIsProfileFormActive] = useState(false)
@@ -20,7 +21,7 @@ export default function Profile() {
           Личные данные
         </button>
       </nav>
-      {isProfileFormActive && <ProfileForm />}
+      {isProfileFormActive ? <ProfileForm /> : <OrderCard />}
     </div>
   )
 }
