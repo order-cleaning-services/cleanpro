@@ -1,3 +1,4 @@
+import Button from '../Button/Button'
 import InputField from '../InputField/InputField'
 import './ProfileForm.scss'
 
@@ -26,6 +27,9 @@ const ProfileForm = () => {
             <InputField label="Этаж" size="small" />
           </div>
         </div>
+      </div>
+      <div className="profile-form__button-wrapper">
+        <Button buttonClassName="button" buttonText="Сохранить изменения" />
       </div>
     </form>
   )
