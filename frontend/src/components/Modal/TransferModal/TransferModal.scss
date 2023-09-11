@@ -1,3 +1,5 @@
+@import '../../../assets/styles/GlobalStyle.scss';
+
 .form-transfer {
 	&__title {
 		font-weight: 400;
@@ -10,10 +12,19 @@
 		gap: 1.2rem;
 		max-width: 39.2rem;
 	}
-	&__input-date {
-		position: relative;
-		display: flex;
-		flex-direction: column;
+	&__date {
+		border: none;
+		&:hover,
+  :focus,
+  :active {
+    border: 1px solid $border-color;
+    border-color: $border-color-active;
+		box-shadow: 0px 0px 0px 2px rgba(129, 172, 229, 0.3);
+  }
+  &:disabled {
+    border: 1px solid $border-color;
+    background-color: $border-color;
+  }
 	}
 }
 

@@ -1,6 +1,6 @@
 import './InputField.scss'
 
-function InputField({ placeholder = '', size, type = 'text', focus = false, label }) {
+function InputField({ placeholder = '', size, type = 'text', focus = false, label, classNameModal }) {
   function handleFocus(e) {
     if (focus) e.target.setAttribute('type', 'date')
   }
@@ -10,7 +10,7 @@ function InputField({ placeholder = '', size, type = 'text', focus = false, labe
       <input
         className={`form-input ${size === 'small' ? 'form-input-small' : ''} ${
           type === 'password' ? 'input__password' : ''
-        }`}
+        } ${classNameModal}`}
         placeholder={placeholder}
         type={type}
         onFocus={e => handleFocus(e)}
