@@ -50,14 +50,23 @@
 
   &__info-line {
     display: flex;
-    align-items: center;
-  }
+    align-items: start;
 
-  &__date-time {
-    font-size: 1.6rem;
-    line-height: 140%;
-  }
+    &-image {
+      margin-right: 0.8rem;
+    }
 
+    &-text {
+      font-size: 1.6rem;
+      line-height: 140%;
+    }
+
+    &-cleaners {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+  }
 
   &__breaker {
     display: inline-block;
