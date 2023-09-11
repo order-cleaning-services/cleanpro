@@ -1,7 +1,7 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/slices/formEntrySlice'
 import Button from '../Button/Button'
-import Input from '../Input/Input'
+import InputField from '../InputField/InputField'
 import './FormEntry.scss'
 
 function FormEntry() {
@@ -31,44 +31,43 @@ function FormEntry() {
               <p className="form-entry__title form-entry__title_active">Вход</p>
             </div>
           ) : (
-            <p className="form-entry__title">Забыли пароль?</p>
+            <p className="form-entry__title-recovery">Восстановление пароля</p>
           )}
 
           <div className="form-entry__input-container">
-            <Input key={`${viewForm}-email`} inputClassName="input" inputType="email" inputPlaceHolder="Email" />
+            <InputField key={`${viewForm}-email`} type="email" label="Почта" />
             {(viewForm === 'registration' || viewForm === 'entry') && (
               <div className="form-enter__wrapper-input">
-                <Input
-                  key={`${viewForm}-password`}
-                  inputType="password"
-                  inputClassName="input input_type_password"
-                  inputPlaceHolder="Введите пароль"
-                />
+                <InputField key={`${viewForm}-password`} type="password" label="Пароль" />
               </div>
             )}
           </div>
           <div className="form-entry__button-container">
             {viewForm === 'registration' ? (
-              <Button buttonText={'Зарегистрироваться'} buttonClassName="button indent button_disabled" />
+              <Button buttonText={'Зарегистрироваться'} buttonClassName="button" />
             ) : viewForm === 'entry' ? (
-              <Button buttonText={'Войти'} buttonClassName="button indent button_disabled" />
+              <Button buttonText={'Войти'} buttonClassName="button" />
             ) : (
-              <Button buttonText={'Восстановить пароль'} buttonClassName="button button__recovery button_disabled" />
+              <Button buttonText={'Восстановить пароль'} buttonClassName="button button__recovery" />
             )}
           </div>
           {viewForm === 'registration' ? (
             <p className="form-entry__acceptance">
-              Нажимая «Зарегистрироваться», я даю{' '}
-              <span className="form-entry__acceptance-span">согласие на обработку персональных данных.</span>
+              Нажимая «Зарегистрироваться», я даю согласие на обработку персональных данных.
             </p>
           ) : viewForm === 'entry' ? (
             <p onClick={handleRecovery} className="form-entry__password-recovery">
               Забыли пароль?
             </p>
           ) : (
-            <p onClick={handleEntry} className="form-entry__password-recovery">
-              Вспомнил пароль
-            </p>
+            <>
+              <p className="form-entry__recovery-text">
+                Мы отправим письмо со ссылкой для восстановления пароля на указанную почту.
+              </p>
+              <p onClick={handleEntry} className="form-entry__password-recovery">
+                Вернуться к авторизации
+              </p>
+            </>
           )}
         </div>
       </form>

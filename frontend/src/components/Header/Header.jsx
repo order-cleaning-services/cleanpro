@@ -1,23 +1,25 @@
-import { Link } from 'react-router-dom'
-
+import { Link, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
 import signin from '../../images/signin.svg'
 import profile from '../../images/profile.svg'
 import './Header.scss'
+import { ROUTES } from '../../constants/constants'
 
 const Header = ({ isLoggedIn }) => {
+  const location = useLocation()
+
   return (
     <header className="header">
       <nav className="header__menu">
         <Logo />
         <ul className="header__links">
           <li>
-            <Link className="header__link " to="/">
+            <Link className={`header__link${location.pathname === ROUTES.home ? '-active' : ''}`} to="/">
               Уборка
             </Link>
           </li>
           <li>
-            <Link className="header__link " to="/about">
+            <Link className={`header__link${location.pathname === ROUTES.about ? '-active' : ''}`} to="/about">
               О компании
             </Link>
           </li>
