@@ -5,9 +5,10 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 
-class Adress(models.Model):
+class Address(models.Model):
     """Модель адреса."""
     city = models.CharField(
+        # TODO: прописать все магические числа. Везде.
         max_length=256, verbose_name='Город',
         blank=False,
         null=False,)
@@ -72,12 +73,23 @@ class User(AbstractUser):
     """Модель пользователя."""
 
     username = last_name = None
-    first_name =  models.CharField('Имя', max_length=256, blank=True,)
-    email = models.EmailField('Адрес электронной почты', unique=True)
-    password = models.CharField('Пароль', max_length=256)
-    phone = PhoneNumberField('Номер телефона', blank=True, region='RU')
-    adress = models.ForeignKey(
-        Adress,
+    first_name =  models.CharField(
+        'Имя',
+        max_length=256,
+        blank=True)
+    email = models.EmailField(
+        'Адрес электронной почты',
+        max_length=254,
+        unique=True)
+    password = models.CharField(
+        'Пароль',
+        max_length=256)
+    phone = PhoneNumberField(
+        'Номер телефона',
+        blank=True,
+        region='RU')
+    address = models.ForeignKey(
+        Address,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
@@ -88,7 +100,7 @@ class User(AbstractUser):
         'Роль',
         choices=(
             (USER, 'Пользователь'),
-            (ADMIN, 'Администатор'),
+            (ADMIN, 'Администратор'),
         ),
         max_length=5,
         default=USER,
@@ -109,4 +121,5 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        self.role == ADMIN
+        return
