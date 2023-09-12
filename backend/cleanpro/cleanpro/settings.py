@@ -11,6 +11,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
+# TODO архинебезопасно! Для прода вписать допустимые данные. Лучше через
+# переменные окружения, чтобы скрыть их от злоумышленников.
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -133,8 +135,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        
+        'rest_framework.authentication.TokenAuthentication',  
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
