@@ -9,7 +9,7 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'first_name',
         'phone',
-        'adress'
+        'address'
     )
-    search_fields = ('email', 'first_name', 'phone', 'adress')
+    search_fields = ('email', 'first_name', 'phone', 'address')
     list_per_page = 50
