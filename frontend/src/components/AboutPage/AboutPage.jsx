@@ -1,7 +1,7 @@
 import './AboutPage.scss';
 
-import About from './About/About';
-import Cleaners from './Сleaners/Сleaners';
+import About from '../About/About'
+import Cleaners from '../Сleaners/Сleaners';
 
 function AboutPage() {
 	return (

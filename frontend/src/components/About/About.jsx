@@ -1,7 +1,7 @@
-import Logo from "../../../Logo/Logo";
+import Logo from "../Logo/Logo";
 import './About.scss';
 
-import AboutMore from "./AboutMore/AboutMore";
+import AboutMore from "../AboutMore/AboutMore";
 
 function About() {
 
@@ -35,27 +35,27 @@ function About() {
 				</div>
 				<div className="about__more">
 					<AboutMore
-					title='Калькулятор стоимости'
-					subTitle='Узнайте полную стоимость услуг перед&nbsp;оплатой'
-					src='./src/images/calc-rub-about.svg'
+						title='Калькулятор стоимости'
+						subTitle='Узнайте полную стоимость услуг перед&nbsp;оплатой'
+						src='./src/images/calc-rub-about.svg'
 					/>
 					<AboutMore
-					title='Опытные профессионалы'
-					subTitle='Отбираем наши сотрудников по&nbsp;какой нибудь системе'
-					src='./src/images/profs-about.svg'
+						title='Опытные профессионалы'
+						subTitle='Отбираем наши сотрудников по&nbsp;какой нибудь системе'
+						src='./src/images/profs-about.svg'
 					/>
 					<AboutMore
-					title='Без сюрпризов'
-					subTitle='Обосновать удобство предоплаты, цена после&nbsp;уборки не&nbsp;изменится'
-					src='./src/images/warranty-about.svg'
+						title='Без сюрпризов'
+						subTitle='Обосновать удобство предоплаты, цена после&nbsp;уборки не&nbsp;изменится'
+						src='./src/images/warranty-about.svg'
 					/>
 					<AboutMore
-					title='Выбор клинера'
-					subTitle='Выберите клинера, который уже&nbsp;знает что&nbsp;как'
-					src='./src/images/choice-about.svg'
+						title='Выбор клинера'
+						subTitle='Выберите клинера, который уже&nbsp;знает что&nbsp;как'
+						src='./src/images/choice-about.svg'
 					/>
+				</div>
 			</div>
-			</div>			
 		</>
 	);
 }
