@@ -13,9 +13,25 @@ const OrderCard = () => {
   const DATE = 'Ср, 20.09.2023'
   const TIME = '12:00-14:00'
   const ADDRESS = 'г. Москва, ул Дмитриевского, д.1, кв 5, подъезд 3, этаж 8'
+  const OPTIONS = [
+    'Уборка пылесосом',
+    'Влажная уборка полов и плинтусов',
+    'Удаление пыли с осветительных приборов',
+    'Влажная уборка подоконников, радиаторов и труб',
+    'Мойка зеркал и стеклянных поверхностей',
+    'Влажная уборка мебели',
+    'Удаление пыли с бытовой техники',
+    'Вынос мусора',
+    'Удаление пыли с дверных проёмов',
+    'Удаление пыли с предметов интерьера',
+    'Мойка дверных блоков',
+    'Мойка мебели внутри, свободной от вещей',
+    'Мытьё карнизов, кондиционеров, гардин',
+    'Влажная очистка перегородок, антресолей',
+  ]
+  const EXTRA_OPTIONS = []
 
   const [isDetailed, setIsDetailed] = useState(false)
-
   const toggleInfo = () => setIsDetailed(!isDetailed)
 
   return (
@@ -53,10 +69,41 @@ const OrderCard = () => {
         </ul>
         <div className="card__control">
           {isDetailed ? (
-            <button className="card__control-btn card__control-btn_more" onClick={toggleInfo}>
-              <img src={up} alt="Стрелка, направленная вверх" />
-              Скрыть
-            </button>
+            <>
+              <button className="card__control-btn card__control-btn_more" onClick={toggleInfo}>
+                <img src={up} alt="Стрелка, направленная вверх" />
+                Скрыть
+              </button>
+              <h2 className="card__title">Услуги</h2>
+              <div className="card__options">
+                <div className="card__options-column">
+                  <h3 className="card__options-title">Основные</h3>
+                  <ul className="card__options-list">
+                    {OPTIONS.map(option => {
+                      return (
+                        <li key={option}>
+                          <p className="card__options-text>">{option}</p>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+                <div className="card__options-column">
+                  <h3 className="card__options-title">Дополнительные</h3>
+                  {EXTRA_OPTIONS.length > 0 ? (
+                    EXTRA_OPTIONS.map(option => {
+                      return (
+                        <li key={option}>
+                          <p className="card__options-text>">{option}</p>
+                        </li>
+                      )
+                    })
+                  ) : (
+                    <p className="card__options-text>">Нет дополнительных услуг</p>
+                  )}
+                </div>
+              </div>
+            </>
           ) : (
             <button className="card__control-btn card__control-btn_more" onClick={toggleInfo}>
               <img src={down} alt="Стрелка, направленная вниз" />
