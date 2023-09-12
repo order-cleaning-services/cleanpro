@@ -1,11 +1,16 @@
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from users.models import User
-from service.models import Order, Service_package, Rating, Adress
+# Советую установить:
+# https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
+# https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
+# Они проверяют орфографию.
+# Поправил много чего. Например, "Adress" -> "Address".
+from service.models import Order, ServicePackage, Rating, Address
 from phonenumber_field.serializerfields import PhoneNumberField
 
 class CustomUserSerializer(serializers.ModelSerializer):
-    """Создание пользователя."""
+    """Сериализатор для регистрации пользователей."""
     class Meta:
         model = User
         fields = (
@@ -13,28 +18,47 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'first_name',
             'email',
             'phone',
-            'adress',
+            'address',
         )
 
-class Confirm_mailSerializer(serializers.ModelSerializer):
-    """Подтвердить электронную почту."""
+
+class ConfirmMailSerializer(serializers.ModelSerializer):
+    """Сериализатор для регистрации подтверждения электронной почты."""
+    # TODO: уточнить надобность прописывания поля, так как все уже есть
+    # в самой модели. Не DRY.
     email = serializers.EmailField(
         max_length=254,
+        # TODO: уточнить, но это поле должно автоматически быть нужным
+        # из-за параметров поля модели.
         required=True
     )
 
     class Meta:
         model = User
         fields = ('email',)
-    
 
-class Service_packageSerializer(serializers.ModelSerializer):
+
+# https://peps.python.org/pep-0008/#class-names
+class ServicePackageSerializer(serializers.ModelSerializer):
+    # TODO: уточнить назначение сериализатора и точно прописать docstring.
+    """Сериализатор для отображения услуг и их цен."""
     class Meta:
-        model = Service_package
-        fields = 'title', 'price'
+        model = ServicePackage
+        fields = ('title', 'price')
+
 
 class PostOrderSerializer(serializers.Serializer):
-    """Создать заказ."""
+    # TODO: WARNING! ВАЖНО!
+    # Best practice: сериализатор нужен только для валидации и перевода
+    # информации из json в python-типы и обратно. Вся логика взаимодействия
+    # с БД - это работа view-функции. Это место обязательно требует
+    # рефакторинга!
+    """Сериализатор для создания заказа."""
+    # TODO: в полях могут быть пустые значения, и получится 500 на сайте,
+    # так как будет не APIException c кастомным указанием ошибки и кода,
+    # а ValueError от БД, и сайт накроется.
+    # TODO: не повторяться, и сделать валидацию через сериализаторы для
+    # моделей User, Address и Order. Этот сериализатор вообще удалить.
     city = serializers.CharField(
         max_length=256,)
     street = serializers.CharField(
@@ -47,7 +71,8 @@ class PostOrderSerializer(serializers.Serializer):
     first_name =  serializers.CharField(max_length=256, required=False)
     email = serializers.EmailField()
     phone = PhoneNumberField(required=False, region='RU')
-    service_package = serializers.PrimaryKeyRelatedField(queryset=Service_package.objects.all(),)
+    service_package = serializers.PrimaryKeyRelatedField(
+        queryset=ServicePackage.objects.all(),)
     total_sum = serializers.IntegerField(
         default=0)
     cleaning_date = serializers.DateField()
@@ -55,20 +80,20 @@ class PostOrderSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False)
 
     def create(self, data):
-        adress, created = Adress.objects.get_or_create(city=data['city'],
+        address, created = Address.objects.get_or_create(city=data['city'],
                                        street=data['street'],
                                        house=data['house'],
                                        )
         user, created = User.objects.get_or_create(email=data['email'])
         user.first_name, = data['first_name'],
-        user.adress, = Adress.objects.get(id=adress.id),
+        user.address, = Address.objects.get(id=address.id),
         user.phone, = data['phone'],
         user.save()
         service = data['service_package']
         total_sum=service.price
         order = Order.objects.create(user=user, service_package=service,
                                      total_sum=service.price,
-                                     adress=user.adress,
+                                     address=user.address,
                                      cleaning_date=data['cleaning_date'],
                                      cleaning_time=data['cleaning_time'],
                                      )
@@ -78,8 +103,10 @@ class PostOrderSerializer(serializers.Serializer):
         instance.save()
         return instance
 
+
 class OrderStatusSerializer(serializers.ModelSerializer):
-    """Изменить статус заказа."""
+    """Сериализатор для изменения статуса заказа."""
+    # TODO: уточнить необходимость параметра, так как он прописан в модели.
     order_status = serializers.ChoiceField(
         choices=Order.STATUS_CHOICES)
 
@@ -93,9 +120,13 @@ class OrderStatusSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
     
-class CancellSerializer(serializers.ModelSerializer):
+
+# TODO: убрать сериализатор, он в точности повторяет предыдущий.
+class CancelSerializer(serializers.ModelSerializer):
     """Отменить заказ."""
+    # Зачем?
     order_status = 'cancelled'
+
 
     class Meta:
         model = Order
@@ -106,8 +137,10 @@ class CancellSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class PaySerializer(serializers.ModelSerializer):
-    """Оплатить заказ."""
+    """Сериализатор для оплаты заказа."""
+    # Зачем?
     pay_status = True
 
     class Meta:
@@ -119,27 +152,33 @@ class PaySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class AdressSerializer(serializers.ModelSerializer):
-    """Адрес заказа."""
+
+class AddressSerializer(serializers.ModelSerializer):
+    """Сериализатор для представления адреса."""
     class Meta:
-        model = Adress
+        model = Address
         fields = '__all__'
 
+
 class GetOrderSerializer(serializers.ModelSerializer):
-    """Просмотреть заказ."""
+    """Сериализатор для представления заказа."""
     user = CustomUserSerializer(read_only=True)
-    adress = AdressSerializer(read_only=True)
-    service_package = Service_packageSerializer(read_only=True)
+    address = AddressSerializer(read_only=True)
+    service_package = ServicePackageSerializer(read_only=True)
 
     class Meta:
         model = Order
+        # TODO: не best practice, указать все поля, это важно с точки зрения
+        # безопасности и читаемости кода. 
         fields = (
             "__all__"
         )
 
+
 class CommentSerializer(serializers.ModelSerializer):
-    """Добавить комментарий к заказу."""
+    """Сериализатор для добавления комментария к заказу."""
     comment = serializers.CharField()
+
     class Meta:
         model = Order
         fields = ('comment',)
@@ -148,12 +187,15 @@ class CommentSerializer(serializers.ModelSerializer):
         instance.comment = validated_data.get('comment', instance.comment)
         instance.save()
         return instance
-    
+
+
+# TODO: уточнить необходимость таких сериализаторов. Рассмотреть возможность
+# PATCH запросов и использования сериализатора для отображения модели.
 class DateTimeSerializer(serializers.ModelSerializer):
-    """Перенести заказ."""
+    """Сериализатор для переноса времени заказа."""
     class Meta:
         model = Order
-        fields = 'cleaning_date', 'cleaning_time'
+        fields = ('cleaning_date', 'cleaning_time')
 
     def update(self, instance, validated_data):
         instance.cleaning_date = validated_data.get(
@@ -162,9 +204,10 @@ class DateTimeSerializer(serializers.ModelSerializer):
             'cleaning_time', instance.cleaning_time)
         instance.save()
         return instance
-    
+
+
 class RatingSerializer(serializers.ModelSerializer):
-    """Отзыв на уборку."""
+    """Сериализатор для представления отзыва на уборку."""
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
