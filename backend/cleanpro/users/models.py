@@ -2,8 +2,35 @@ from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from service.models import Adress
 from phonenumber_field.modelfields import PhoneNumberField
+
+
+class Adress(models.Model):
+    """Модель адреса."""
+    city = models.CharField(
+        max_length=256, verbose_name='Город',
+        blank=False,
+        null=False,)
+    street = models.CharField(
+        max_length=256, verbose_name='Улица',
+        blank=False,
+        null=False,)
+    house = models.IntegerField(
+        verbose_name='Дом',
+        blank=False,
+        null=False,)
+    apartment = models.IntegerField(
+        verbose_name='Квартира',
+        null=True,
+        blank=True, default=None)
+    floor = models.IntegerField(
+        verbose_name='Этаж',
+        null=True,
+        blank=True)
+    entrance = models.IntegerField(
+        verbose_name='Подъезд',
+        null=True,
+        blank=True)
 
 
 class UserManager(BaseUserManager):
