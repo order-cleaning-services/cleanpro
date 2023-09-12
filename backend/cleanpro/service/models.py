@@ -2,10 +2,11 @@ from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
-from users.models import Adress
+from users.models import Address
 
 
-class Service_package(models.Model):
+# https://peps.python.org/pep-0008/#class-names
+class ServicePackage(models.Model):
     """Модель пакета услуг."""
     CLEANING_TYPE = (
         ('maintenance', 'Поддерживающая уборка'),
@@ -51,7 +52,7 @@ class Order(models.Model):
         default='created', max_length=256,
         verbose_name='Статус',)
     service_package = models.ForeignKey(
-        Service_package,
+        ServicePackage,
         on_delete=models.CASCADE,
         blank=False,
         null=False,
@@ -59,8 +60,8 @@ class Order(models.Model):
         verbose_name='Услуги',
     )
     pay_status = models.BooleanField(default=False)
-    adress = models.ForeignKey(
-        Adress,
+    address = models.ForeignKey(
+        Address,
         on_delete=models.CASCADE,
         blank=False,
         null=False,
@@ -81,6 +82,7 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Заказ №: {self.id}"
+
 
 class Rating(models.Model):
     """Модель отзыва."""
