@@ -7,13 +7,14 @@ from .views import (
 
 # TODO: нарушается DRY
 router = routers.DefaultRouter()
-router.register('users', UserViewSet)
-router.register('orders', OrderViewSet)
-router.register('ratings', RatingViewSet)
-router.register(
-    r'^orders/(?P<order_id>\d+)/rating',
-    RatingViewSet,
-    basename='rating')
+router.register('users', UserViewSet, basename='users')
+router.register('orders', OrderViewSet, basename='orders')
+# TODO: разобраться с рейтингом, как это должно работать и удалить
+# лишний роутер, так быть не должно
+router.register('ratings', RatingViewSet, basename='ratings')
+router.register(r'^orders/(?P<order_id>\d+)/rating',
+                RatingViewSet,
+                basename='rating_via_orders')
 
 urlpatterns = [
     path('', include(router.urls)),
