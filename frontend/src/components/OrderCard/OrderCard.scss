@@ -36,9 +36,9 @@
 
   &__title {
     font-size: 2rem;
-    font-style: normal;
     font-weight: 700;
     line-height: 130%;
+    text-align: start;
   }
 
   &__info-list {
@@ -107,6 +107,32 @@
     }
   }
 
-  &__order {
+  &__options {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+
+    &-title {
+      margin-bottom: 1.2rem;
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 140%;
+      color: #242424;
+    }
+
+    &-container {
+      display: flex;
+    }
+
+    &-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      list-style: circle;
+    }
+
+    &-item::marker {
+     text-align: end;
+    }
   }
 }
