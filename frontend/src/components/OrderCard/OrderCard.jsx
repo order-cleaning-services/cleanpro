@@ -94,7 +94,7 @@ const OrderCard = () => {
                   {OPTIONS.map(option => {
                     return (
                       <li className="card__options-item" key={option}>
-                        <p className="card__options-text>">{option}</p>
+                        {option}
                       </li>
                     )
                   })}
@@ -107,13 +107,13 @@ const OrderCard = () => {
                     {EXTRA_OPTIONS.map(option => {
                       return (
                         <li className="card__options-item" key={option}>
-                          <p className="card__options-text>">{option}</p>
+                          {option}
                         </li>
                       )
                     })}
                   </ul>
                 ) : (
-                  <p className="card__options-text>">Нет дополнительных услуг</p>
+                  <p className="card__options-item">Нет дополнительных услуг</p>
                 )}
               </div>
             </div>

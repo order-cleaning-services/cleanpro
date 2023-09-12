@@ -2,6 +2,7 @@
   padding: 2.4rem 3.2rem;
   border-radius: 20px;
   background-color: #e5f0ff;
+  max-width: 81.6rem;
 
   &__header {
     display: flex;
@@ -122,17 +123,23 @@
 
     &-container {
       display: flex;
+      gap: 3.2rem;
     }
 
     &-list {
       display: flex;
       flex-direction: column;
       gap: 0.8rem;
-      list-style: circle;
+      list-style: circle inside;
     }
 
-    &-item::marker {
-     text-align: end;
+    &-item {
+      font-size: 1.4rem;
+      line-height: 140%;
+
+      &::marker {
+        margin-right: 0.8rem;
+      }
     }
   }
 }
