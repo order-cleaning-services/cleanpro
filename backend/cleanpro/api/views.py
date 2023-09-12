@@ -38,7 +38,7 @@ class UserViewSet(UserViewSet):
         queryset = Order.objects.filter(user=id)
         page = self.paginate_queryset(queryset)
         serializer = GetOrderSerializer(page, many=True,
-                                            context={'request': request})
+                                        context={'request': request})
         return self.get_paginated_response(serializer.data)
 
 
@@ -62,6 +62,7 @@ def confirm_mail(request):
     )
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def order_create(request):
@@ -76,7 +77,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
     permission_classes = [permissions.AllowAny, ]
     queryset = Order.objects.all()
-    methods=['get', 'post', 'patch', 'delete'],
+    methods = ['get', 'post', 'patch', 'delete'],
     serializer_class = GetOrderSerializer
 
     def perform_update(self, serializer):
@@ -120,7 +121,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(
         detail=True,
         methods=['patch', ],
@@ -133,7 +134,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(
         detail=True,
         methods=['patch', ],
@@ -153,8 +154,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
-    methods=['get', 'post', 'patch', 'delete'],
-
+    methods = ['get', 'post', 'patch', 'delete'],
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')

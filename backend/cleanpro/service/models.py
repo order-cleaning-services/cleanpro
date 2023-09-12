@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+from users.models import Adress
+
 
 class Service_package(models.Model):
     """Модель пакета услуг."""
@@ -12,43 +14,24 @@ class Service_package(models.Model):
         ('holiday', 'Уборка после мероприятия'),
         ('windows', 'Мытье окон'),
     )
-    title = models.CharField(choices=CLEANING_TYPE,
-        default='maintenance', max_length=256,
-        verbose_name='Название',)
+    title = models.CharField(
+        choices=CLEANING_TYPE,
+        verbose_name='Название',
+        default='maintenance',
+        max_length=256
+    )
     price = models.IntegerField(
-        default=0, verbose_name='Сумма',)
-    quantity = models.IntegerField(default=0,
-        verbose_name='Количество',)
+        verbose_name='Сумма',
+        default=0
+    )
+    quantity = models.IntegerField(
+        verbose_name='Количество',
+        default=0
+    )
 
     def __str__(self):
         return self.title
 
-class Adress(models.Model):
-    """Модель адреса."""
-    city = models.CharField(
-        max_length=256, verbose_name='Город',
-        blank=False,
-        null=False,)
-    street = models.CharField(
-        max_length=256, verbose_name='Улица',
-        blank=False,
-        null=False,)
-    house = models.IntegerField(
-        verbose_name='Дом',
-        blank=False,
-        null=False,)
-    apartment = models.IntegerField(
-        verbose_name='Квартира',
-        null=True,
-        blank=True, default=None)
-    floor = models.IntegerField(
-        verbose_name='Этаж',
-        null=True,
-        blank=True)
-    entrance = models.IntegerField(
-        verbose_name='Подъезд',
-        null=True,
-        blank=True)
 
 class Order(models.Model):
     """Модель заказа."""
@@ -65,46 +48,58 @@ class Order(models.Model):
         verbose_name='Заказчик',
     )
     total_sum = models.IntegerField(
-        default=0, verbose_name='Сумма',)
-    comment = models.TextField(
+        default=0,
+        verbose_name='Сумма'
+    )
+    comment = models.CharField(
         verbose_name='Комментарий',
+        max_length=250,
         blank=True,
         null=True,
-        )
-    order_status = models.CharField(choices=STATUS_CHOICES,
-        default='created', max_length=256,
-        verbose_name='Статус',)
+    )
+    order_status = models.CharField(
+        choices=STATUS_CHOICES,
+        verbose_name='Статус',
+        max_length=256,
+        default='created'
+    )
     service_package = models.ForeignKey(
         Service_package,
         on_delete=models.CASCADE,
-        blank=False,
-        null=False,
         related_name='orders',
-        verbose_name='Услуги',
+        verbose_name='Услуги'
     )
-    pay_status = models.BooleanField(default=False)
+    pay_status = models.BooleanField(
+        default=False
+    )
     adress = models.ForeignKey(
         Adress,
         on_delete=models.CASCADE,
-        blank=False,
-        null=False,
         related_name='orders',
-        verbose_name='Услуги',
+        verbose_name='Услуги'
     )
     creation_date = models.DateField(
-        'Дата создания', auto_now_add=True)
+        verbose_name='Дата создания',
+        auto_now_add=True
+    )
     creation_time = models.TimeField(
-        'Время создания', auto_now_add=True)
+        verbose_name='Время создания',
+        auto_now_add=True
+    )
     cleaning_date = models.DateField(
-        'Дата уборки', db_index=True)
+        verbose_name='Дата уборки',
+        db_index=True
+    )
     cleaning_time = models.TimeField(
-        'Время уборки')
+        verbose_name='Время уборки'
+    )
 
     class Meta:
         ordering = ['-cleaning_date']
 
     def __str__(self):
         return f"Заказ №: {self.id}"
+
 
 class Rating(models.Model):
     """Модель отзыва."""
@@ -121,13 +116,16 @@ class Rating(models.Model):
         verbose_name='Заказчик',
     )
     pub_date = models.DateTimeField(
-        'Дата отзыва',
+        verbose_name='Дата отзыва',
         auto_now_add=True,
         db_index=True,
     )
-    text = models.TextField('Текст отзыва',)
-    score = models.IntegerField(default=0,
+    text = models.CharField(
+        verbose_name='Текст отзыва',
+        max_length=250)
+    score = models.IntegerField(
         verbose_name='Оценка',
+        default=0,
         validators=[
             MinValueValidator(1),
             MaxValueValidator(5)

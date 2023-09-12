@@ -2,8 +2,48 @@ from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from service.models import Adress
+from django.core.validators import (MinLengthValidator, MaxValueValidator)
 from phonenumber_field.modelfields import PhoneNumberField
+
+from .validators import validate_name, validate_password, validate_email
+
+
+class Adress(models.Model):
+    """Модель адреса."""
+    city = models.CharField(
+        verbose_name='Город',
+        max_length=25,
+        validators=[MinLengthValidator(1)]
+    )
+    street = models.CharField(
+        verbose_name='Улица',
+        max_length=150,
+        validators=[MinLengthValidator(1)]
+    )
+    house = models.CharField(
+        verbose_name='Дом',
+        max_length=60,
+        validators=[MinLengthValidator(1)]
+    )
+    apartment = models.PositiveSmallIntegerField(
+        verbose_name='Квартира',
+        null=True,
+        blank=True,
+        default=None,
+        validators=[MaxValueValidator(9999)]
+    )
+    floor = models.PositiveSmallIntegerField(
+        verbose_name='Этаж',
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(99)]
+    )
+    entrance = models.PositiveSmallIntegerField(
+        verbose_name='Подъезд',
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(99)]
+    )
 
 
 class UserManager(BaseUserManager):
@@ -45,10 +85,26 @@ class User(AbstractUser):
     """Модель пользователя."""
 
     username = last_name = None
-    first_name =  models.CharField('Имя', max_length=256, blank=True,)
-    email = models.EmailField('Адрес электронной почты', unique=True)
-    password = models.CharField('Пароль', max_length=256)
-    phone = PhoneNumberField('Номер телефона', blank=True, region='RU')
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=60,
+        validators=[validate_name]
+    )
+    email = models.EmailField(
+        verbose_name='Адрес электронной почты',
+        max_length=30,
+        unique=True,
+        validators=[validate_email]
+    )
+    password = models.CharField(
+        verbose_name='Пароль',
+        max_length=16,
+        validators=[validate_password]
+    )
+    phone = PhoneNumberField(
+        verbose_name='Номер телефона',
+        region='RU'
+    )
     adress = models.ForeignKey(
         Adress,
         on_delete=models.SET_NULL,

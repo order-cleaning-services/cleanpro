@@ -4,6 +4,7 @@ from users.models import User
 from service.models import Order, Service_package, Rating, Adress
 from phonenumber_field.serializerfields import PhoneNumberField
 
+
 class CustomUserSerializer(serializers.ModelSerializer):
     """Создание пользователя."""
     class Meta:
@@ -16,6 +17,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'adress',
         )
 
+
 class Confirm_mailSerializer(serializers.ModelSerializer):
     """Подтвердить электронную почту."""
     email = serializers.EmailField(
@@ -26,46 +28,44 @@ class Confirm_mailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('email',)
-    
+
 
 class Service_packageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service_package
         fields = 'title', 'price'
 
+
 class PostOrderSerializer(serializers.Serializer):
     """Создать заказ."""
-    city = serializers.CharField(
-        max_length=256,)
-    street = serializers.CharField(
-        max_length=256,)
+    city = serializers.CharField()
+    street = serializers.CharField()
     house = serializers.IntegerField()
-    apartment = serializers.IntegerField(
-        required=False)
+    apartment = serializers.IntegerField(required=False)
     floor = serializers.IntegerField(required=False)
     entrance = serializers.IntegerField(required=False)
-    first_name =  serializers.CharField(max_length=256, required=False)
+    first_name = serializers.CharField(required=False)
     email = serializers.EmailField()
     phone = PhoneNumberField(required=False, region='RU')
-    service_package = serializers.PrimaryKeyRelatedField(queryset=Service_package.objects.all(),)
-    total_sum = serializers.IntegerField(
-        default=0)
+    service_package = serializers.PrimaryKeyRelatedField(
+        queryset=Service_package.objects.all(),)
+    total_sum = serializers.IntegerField(default=0)
     cleaning_date = serializers.DateField()
     cleaning_time = serializers.TimeField()
     comment = serializers.CharField(required=False)
 
     def create(self, data):
         adress, created = Adress.objects.get_or_create(city=data['city'],
-                                       street=data['street'],
-                                       house=data['house'],
-                                       )
+                                                       street=data['street'],
+                                                       house=data['house'],
+                                                       )
         user, created = User.objects.get_or_create(email=data['email'])
         user.first_name, = data['first_name'],
         user.adress, = Adress.objects.get(id=adress.id),
         user.phone, = data['phone'],
         user.save()
         service = data['service_package']
-        total_sum=service.price
+        total_sum = service.price
         order = Order.objects.create(user=user, service_package=service,
                                      total_sum=service.price,
                                      adress=user.adress,
@@ -73,10 +73,11 @@ class PostOrderSerializer(serializers.Serializer):
                                      cleaning_time=data['cleaning_time'],
                                      )
         return order, created
-    
+
     def update(self, instance, validated_data):
         instance.save()
         return instance
+
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     """Изменить статус заказа."""
@@ -92,7 +93,8 @@ class OrderStatusSerializer(serializers.ModelSerializer):
             'order_status', instance.order_status)
         instance.save()
         return instance
-    
+
+
 class CancellSerializer(serializers.ModelSerializer):
     """Отменить заказ."""
     order_status = 'cancelled'
@@ -105,6 +107,7 @@ class CancellSerializer(serializers.ModelSerializer):
         instance.order_status = 'cancelled'
         instance.save()
         return instance
+
 
 class PaySerializer(serializers.ModelSerializer):
     """Оплатить заказ."""
@@ -119,11 +122,13 @@ class PaySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
 class AdressSerializer(serializers.ModelSerializer):
     """Адрес заказа."""
     class Meta:
         model = Adress
         fields = '__all__'
+
 
 class GetOrderSerializer(serializers.ModelSerializer):
     """Просмотреть заказ."""
@@ -137,9 +142,11 @@ class GetOrderSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
+
 class CommentSerializer(serializers.ModelSerializer):
     """Добавить комментарий к заказу."""
     comment = serializers.CharField()
+
     class Meta:
         model = Order
         fields = ('comment',)
@@ -148,7 +155,8 @@ class CommentSerializer(serializers.ModelSerializer):
         instance.comment = validated_data.get('comment', instance.comment)
         instance.save()
         return instance
-    
+
+
 class DateTimeSerializer(serializers.ModelSerializer):
     """Перенести заказ."""
     class Meta:
@@ -162,7 +170,8 @@ class DateTimeSerializer(serializers.ModelSerializer):
             'cleaning_time', instance.cleaning_time)
         instance.save()
         return instance
-    
+
+
 class RatingSerializer(serializers.ModelSerializer):
     """Отзыв на уборку."""
     user = CustomUserSerializer(read_only=True)
