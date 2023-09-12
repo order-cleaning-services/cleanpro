@@ -4,6 +4,10 @@
   background-color: #e5f0ff;
   max-width: 81.6rem;
 
+  &_completed {
+    background-color: #f2f2f2;
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
@@ -98,7 +102,7 @@
       &_more {
         border: none;
         padding: 0;
-        background-color: #e5f0ff;
+        background-color: #ffffff00;
       }
     }
 

@@ -1,14 +1,17 @@
+import { useState } from 'react'
 import './OrderCard.scss'
 import calendar from '../../images/date.svg'
 import geo from '../../images/address.svg'
 import user from '../../images/profile.svg'
 import up from '../../images/chevron-up.svg'
 import down from '../../images/chevron-down.svg'
-import { useState } from 'react'
 
 const OrderCard = () => {
-  // Переменные из констант нужно будет переписать в аргументы, получаемые на рендер компонентом
+  const [isDetailed, setIsDetailed] = useState(false)
+  const toggleInfo = () => setIsDetailed(!isDetailed)
 
+  // Переменные из констант нужно будет переписать в аргументы, получаемые на рендер компонентом
+  const isCompleted = true
   const CLEANERS = ['Климова Ольга', 'Плотников Евгений']
   const DATE = 'Ср, 20.09.2023'
   const TIME = '12:00-14:00'
@@ -31,11 +34,8 @@ const OrderCard = () => {
   ]
   const EXTRA_OPTIONS = []
 
-  const [isDetailed, setIsDetailed] = useState(false)
-  const toggleInfo = () => setIsDetailed(!isDetailed)
-
   return (
-    <div className="card">
+    <div className={`card ${isCompleted ? 'card_completed' : ''}`}>
       <div className="card__header">
         <h2 className="card__title">Генеральная уборка</h2>
         <div className="card__header-info">
@@ -79,10 +79,17 @@ const OrderCard = () => {
               Посмотреть подробнее
             </button>
           )}
-          <div className="card__control-buttons">
-            <button className="card__control-btn">Перенести</button>
-            <button className="card__control-btn">Отменить</button>
-          </div>
+          {isCompleted ? (
+            <div className="card__control-buttons">
+              <button className="card__control-btn">Оценить</button>
+              <button className="card__control-btn">Повторить заказ</button>
+            </div>
+          ) : (
+            <div className="card__control-buttons">
+              <button className="card__control-btn">Перенести</button>
+              <button className="card__control-btn">Отменить</button>
+            </div>
+          )}
         </div>
         {isDetailed && (
           <div className="card__options">
