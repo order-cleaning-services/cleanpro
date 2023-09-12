@@ -6,6 +6,7 @@ import AboutPage from '../pages/AboutPage/AboutPage.jsx'
 import ProfilePage from '../pages/ProfilePage/ProfilePage.jsx'
 import SigninPage from '../pages/SigninPage/SigninPage.jsx'
 import Page404 from '../pages/Page404/Page404.jsx'
+import PaymentPage from '../pages/PaymentPage/PaymentPage.jsx'
 
 import { ROUTES } from '../constants/constants.js'
 
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.signin,
         element: <SigninPage />,
+      },
+      {
+        path: ROUTES.payment,
+        element: <PaymentPage />,
       },
     ],
   },
