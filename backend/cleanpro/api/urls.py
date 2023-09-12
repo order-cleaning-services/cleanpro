@@ -3,6 +3,8 @@ from rest_framework import routers
 
 from .views import UserViewSet, OrderViewSet, RatingViewSet, order_create, confirm_mail
 
+app_name = 'api'
+
 router = routers.DefaultRouter()
 router.register('users', UserViewSet)
 router.register('orders', OrderViewSet)

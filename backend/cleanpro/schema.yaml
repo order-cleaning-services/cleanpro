@@ -3,7 +3,7 @@ info:
   title: ''
   version: ''
 paths:
-  /users/:
+  /api/users/:
     get:
       operationId: listUsers
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -41,7 +41,7 @@ paths:
                       $ref: '#/components/schemas/CustomUser'
           description: ''
       tags:
-      - users
+      - api
     post:
       operationId: createUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -66,8 +66,8 @@ paths:
                 $ref: '#/components/schemas/UserCreate'
           description: ''
       tags:
-      - users
-  /users/me/:
+      - api
+  /api/users/me/:
     get:
       operationId: meUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -81,7 +81,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
       tags:
-      - users
+      - api
     put:
       operationId: meUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -106,7 +106,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
       tags:
-      - users
+      - api
     patch:
       operationId: meUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -131,7 +131,7 @@ paths:
                 $ref: '#/components/schemas/User'
           description: ''
       tags:
-      - users
+      - api
     delete:
       operationId: meUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -141,8 +141,8 @@ paths:
         '204':
           description: ''
       tags:
-      - users
-  /users/{id}/:
+      - api
+  /api/users/{id}/:
     get:
       operationId: retrieveUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -163,7 +163,7 @@ paths:
                 $ref: '#/components/schemas/CustomUser'
           description: ''
       tags:
-      - users
+      - api
     put:
       operationId: updateUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -195,7 +195,7 @@ paths:
                 $ref: '#/components/schemas/CustomUser'
           description: ''
       tags:
-      - users
+      - api
     patch:
       operationId: partialUpdateUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -227,7 +227,7 @@ paths:
                 $ref: '#/components/schemas/CustomUser'
           description: ''
       tags:
-      - users
+      - api
     delete:
       operationId: destroyUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -244,8 +244,8 @@ paths:
         '204':
           description: ''
       tags:
-      - users
-  /users/{id}/orders/:
+      - api
+  /api/users/{id}/orders/:
     get:
       operationId: ordersUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -267,8 +267,8 @@ paths:
                 $ref: '#/components/schemas/CustomUser'
           description: ''
       tags:
-      - users
-  /orders/:
+      - api
+  /api/orders/:
     get:
       operationId: listOrders
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -306,7 +306,7 @@ paths:
                       $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
+      - api
     post:
       operationId: createOrder
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -331,8 +331,8 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
-  /orders/{id}/:
+      - api
+  /api/orders/{id}/:
     get:
       operationId: retrieveOrder
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -352,7 +352,7 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
+      - api
     put:
       operationId: updateOrder
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -383,7 +383,7 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
+      - api
     patch:
       operationId: partialUpdateOrder
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -414,7 +414,7 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
+      - api
     delete:
       operationId: destroyOrder
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u0437\u0430\u043A\u0430\u0437\
@@ -430,8 +430,8 @@ paths:
         '204':
           description: ''
       tags:
-      - orders
-  /ratings/:
+      - api
+  /api/ratings/:
     get:
       operationId: listRatings
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -469,7 +469,7 @@ paths:
                       $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - ratings
+      - api
     post:
       operationId: createRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -494,8 +494,8 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - ratings
-  /ratings/{id}/:
+      - api
+  /api/ratings/{id}/:
     get:
       operationId: retrieveRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -515,7 +515,7 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - ratings
+      - api
     put:
       operationId: updateRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -546,7 +546,7 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - ratings
+      - api
     patch:
       operationId: partialUpdateRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -577,7 +577,7 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - ratings
+      - api
     delete:
       operationId: destroyRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -593,8 +593,8 @@ paths:
         '204':
           description: ''
       tags:
-      - ratings
-  /orders/{order_id}/rating/:
+      - api
+  /api/orders/{order_id}/rating/:
     get:
       operationId: listRatings
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -638,7 +638,7 @@ paths:
                       $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - orders
+      - api
     post:
       operationId: createRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -669,8 +669,8 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - orders
-  /orders/{order_id}/rating/{id}/:
+      - api
+  /api/orders/{order_id}/rating/{id}/:
     get:
       operationId: retrieveRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -696,7 +696,7 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - orders
+      - api
     put:
       operationId: updateRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -733,7 +733,7 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - orders
+      - api
     patch:
       operationId: partialUpdateRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -770,7 +770,7 @@ paths:
                 $ref: '#/components/schemas/Rating'
           description: ''
       tags:
-      - orders
+      - api
     delete:
       operationId: destroyRating
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043E\u0442\u0437\u044B\u0432\
@@ -792,8 +792,8 @@ paths:
         '204':
           description: ''
       tags:
-      - orders
-  /auth/token/login/:
+      - api
+  /api/auth/token/login/:
     post:
       operationId: createTokenCreate
       description: Use this endpoint to obtain user authentication token.
@@ -817,8 +817,8 @@ paths:
                 $ref: '#/components/schemas/TokenCreate'
           description: ''
       tags:
-      - auth
-  /auth/token/logout/:
+      - api
+  /api/auth/token/logout/:
     post:
       operationId: createTokenDestroy
       description: Use this endpoint to logout user (remove user authentication token).
@@ -838,8 +838,8 @@ paths:
               schema: {}
           description: ''
       tags:
-      - auth
-  /users/activation/:
+      - api
+  /api/users/activation/:
     post:
       operationId: activationUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -864,8 +864,8 @@ paths:
                 $ref: '#/components/schemas/Activation'
           description: ''
       tags:
-      - users
-  /users/resend_activation/:
+      - api
+  /api/users/resend_activation/:
     post:
       operationId: resendActivationUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -890,8 +890,8 @@ paths:
                 $ref: '#/components/schemas/SendEmailReset'
           description: ''
       tags:
-      - users
-  /users/reset_password/:
+      - api
+  /api/users/reset_password/:
     post:
       operationId: resetPasswordUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -916,8 +916,8 @@ paths:
                 $ref: '#/components/schemas/SendEmailReset'
           description: ''
       tags:
-      - users
-  /users/reset_password_confirm/:
+      - api
+  /api/users/reset_password_confirm/:
     post:
       operationId: resetPasswordConfirmUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -942,8 +942,8 @@ paths:
                 $ref: '#/components/schemas/PasswordResetConfirm'
           description: ''
       tags:
-      - users
-  /users/reset_email/:
+      - api
+  /api/users/reset_email/:
     post:
       operationId: resetUsernameUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -968,8 +968,8 @@ paths:
                 $ref: '#/components/schemas/SendEmailReset'
           description: ''
       tags:
-      - users
-  /users/reset_email_confirm/:
+      - api
+  /api/users/reset_email_confirm/:
     post:
       operationId: resetUsernameConfirmUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -994,8 +994,8 @@ paths:
                 $ref: '#/components/schemas/UsernameResetConfirm'
           description: ''
       tags:
-      - users
-  /users/set_password/:
+      - api
+  /api/users/set_password/:
     post:
       operationId: setPasswordUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -1020,8 +1020,8 @@ paths:
                 $ref: '#/components/schemas/SetPassword'
           description: ''
       tags:
-      - users
-  /users/set_email/:
+      - api
+  /api/users/set_email/:
     post:
       operationId: setUsernameUser
       description: "\u0421\u043F\u0438\u0441\u043E\u043A \u043F\u043E\u043B\u044C\u0437\
@@ -1046,8 +1046,8 @@ paths:
                 $ref: '#/components/schemas/SetUsername'
           description: ''
       tags:
-      - users
-  /order_create/:
+      - api
+  /api/order_create/:
     post:
       operationId: createorder_create
       description: "\u0421\u043E\u0437\u0434\u0430\u0442\u044C \u0437\u0430\u043A\u0430\
@@ -1068,8 +1068,8 @@ paths:
               schema: {}
           description: ''
       tags:
-      - order-create
-  /confirm_mail/:
+      - api
+  /api/confirm_mail/:
     post:
       operationId: createconfirm_mail
       description: "\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C\
@@ -1091,8 +1091,29 @@ paths:
               schema: {}
           description: ''
       tags:
-      - confirm-mail
-  /orders/{id}/cancell/:
+      - api
+  /api/get_token/:
+    post:
+      operationId: createget_token
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema: {}
+          application/x-www-form-urlencoded:
+            schema: {}
+          multipart/form-data:
+            schema: {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema: {}
+          description: ''
+      tags:
+      - api
+  /api/orders/{id}/cancell/:
     patch:
       operationId: cancellOrder
       description: "\u041E\u0442\u043C\u0435\u043D\u0438\u0442\u044C \u0437\u0430\u043A\
@@ -1123,8 +1144,8 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
-  /orders/{id}/change_datetime/:
+      - api
+  /api/orders/{id}/change_datetime/:
     patch:
       operationId: changeDatetimeOrder
       description: "\u041F\u0435\u0440\u0435\u043D\u0435\u0441\u0442\u0438 \u0437\u0430\
@@ -1155,8 +1176,8 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
-  /orders/{id}/change_status/:
+      - api
+  /api/orders/{id}/change_status/:
     patch:
       operationId: changeStatusOrder
       description: "\u0418\u0437\u043C\u0435\u043D\u0438\u0442\u044C \u0441\u0442\u0430\
@@ -1187,8 +1208,8 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
-  /orders/{id}/comment/:
+      - api
+  /api/orders/{id}/comment/:
     patch:
       operationId: commentOrder
       description: "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u043A\u043E\u043C\
@@ -1220,8 +1241,8 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
-  /orders/{id}/pay/:
+      - api
+  /api/orders/{id}/pay/:
     patch:
       operationId: payOrder
       description: "\u041E\u043F\u043B\u0430\u0442\u0438\u0442\u044C \u0437\u0430\u043A\
@@ -1252,7 +1273,7 @@ paths:
                 $ref: '#/components/schemas/GetOrder'
           description: ''
       tags:
-      - orders
+      - api
 components:
   schemas:
     CustomUser:

@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 from users.models import User
 from service.models import Order, Service_package, Rating, Adress
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -15,23 +14,24 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'phone',
             'adress',
         )
-
-class Confirm_mailSerializer(serializers.ModelSerializer):
-    """Подтвердить электронную почту."""
-    email = serializers.EmailField(
-        max_length=254,
-        required=True
-    )
+    
+class TokenSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ('email',)
-    
+        fields = ('password',)
 
 class Service_packageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Service_package
         fields = 'title', 'price'
+
+class AdressSerializer(serializers.ModelSerializer):
+    """Адрес заказа."""
+    class Meta:
+        model = Adress
+        fields = '__all__'
 
 class PostOrderSerializer(serializers.Serializer):
     """Создать заказ."""
@@ -59,13 +59,19 @@ class PostOrderSerializer(serializers.Serializer):
                                        street=data['street'],
                                        house=data['house'],
                                        )
+        if 'apartment' in data:
+            adress.apartment = data['apartment']
+        if 'floor' in data:
+            adress.floor = data['floor']
+        if 'entrance' in data:
+            adress.entrance = data['entrance']
+        adress.save()
         user, created = User.objects.get_or_create(email=data['email'])
         user.first_name, = data['first_name'],
         user.adress, = Adress.objects.get(id=adress.id),
         user.phone, = data['phone'],
         user.save()
         service = data['service_package']
-        total_sum=service.price
         order = Order.objects.create(user=user, service_package=service,
                                      total_sum=service.price,
                                      adress=user.adress,
@@ -73,10 +79,7 @@ class PostOrderSerializer(serializers.Serializer):
                                      cleaning_time=data['cleaning_time'],
                                      )
         return order, created
-    
-    def update(self, instance, validated_data):
-        instance.save()
-        return instance
+
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     """Изменить статус заказа."""
@@ -119,11 +122,7 @@ class PaySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-class AdressSerializer(serializers.ModelSerializer):
-    """Адрес заказа."""
-    class Meta:
-        model = Adress
-        fields = '__all__'
+
 
 class GetOrderSerializer(serializers.ModelSerializer):
     """Просмотреть заказ."""

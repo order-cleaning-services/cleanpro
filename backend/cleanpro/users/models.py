@@ -2,8 +2,8 @@ from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from service.models import Adress
 from phonenumber_field.modelfields import PhoneNumberField
+from service.models import Adress
 
 
 class UserManager(BaseUserManager):
@@ -39,7 +39,6 @@ class UserManager(BaseUserManager):
             )
 
         return self._create_user(email, password, **extra_fields)
-
 
 class User(AbstractUser):
     """Модель пользователя."""

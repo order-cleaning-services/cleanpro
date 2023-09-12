@@ -3,26 +3,6 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 
-class Service_package(models.Model):
-    """Модель пакета услуг."""
-    CLEANING_TYPE = (
-        ('maintenance', 'Поддерживающая уборка'),
-        ('general', 'Генеральная уборка'),
-        ('repair', 'Уборка после ремонта'),
-        ('holiday', 'Уборка после мероприятия'),
-        ('windows', 'Мытье окон'),
-    )
-    title = models.CharField(choices=CLEANING_TYPE,
-        default='maintenance', max_length=256,
-        verbose_name='Название',)
-    price = models.IntegerField(
-        default=0, verbose_name='Сумма',)
-    quantity = models.IntegerField(default=0,
-        verbose_name='Количество',)
-
-    def __str__(self):
-        return self.title
-
 class Adress(models.Model):
     """Модель адреса."""
     city = models.CharField(
@@ -49,6 +29,27 @@ class Adress(models.Model):
         verbose_name='Подъезд',
         null=True,
         blank=True)
+
+class Service_package(models.Model):
+    """Модель пакета услуг."""
+    CLEANING_TYPE = (
+        ('maintenance', 'Поддерживающая уборка'),
+        ('general', 'Генеральная уборка'),
+        ('repair', 'Уборка после ремонта'),
+        ('holiday', 'Уборка после мероприятия'),
+        ('windows', 'Мытье окон'),
+    )
+    title = models.CharField(choices=CLEANING_TYPE,
+        default='maintenance', max_length=256,
+        verbose_name='Название',)
+    price = models.IntegerField(
+        default=0, verbose_name='Сумма',)
+    quantity = models.IntegerField(default=0,
+        verbose_name='Количество',)
+
+    def __str__(self):
+        return self.title
+
 
 class Order(models.Model):
     """Модель заказа."""

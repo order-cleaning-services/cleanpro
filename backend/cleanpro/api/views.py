@@ -1,7 +1,8 @@
 from rest_framework.permissions import SAFE_METHODS
 from django.conf import settings
+from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -19,9 +20,9 @@ from .serializers import (PostOrderSerializer,
                           DateTimeSerializer,
                           RatingSerializer,
                           OrderStatusSerializer,
-                          Confirm_mailSerializer,
                           PaySerializer,
-                          CancellSerializer)
+                          CancellSerializer,
+                          TokenSerializer)
 
 
 class UserViewSet(UserViewSet):
@@ -46,21 +47,19 @@ class UserViewSet(UserViewSet):
 @permission_classes([permissions.AllowAny])
 def confirm_mail(request):
     """Подтвердить электронную почту."""
-    email = request.data.get('email')
-    user = get_object_or_404(User, email=email)
-    serializer = Confirm_mailSerializer(user, request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    user.password = default_token_generator.make_token(user)
-    user.save
+    email = request.data['email']
+    user = User.objects.get(email=email)
+    password = User.objects.make_random_password(length=8, allowed_chars="abcdefghjkmnpqrstuvwxyz01234567889")
+    user.set_password(password)
+    user.save()
     send_mail(
         'Пароль',
-        f'Пароль: {user.password}',
-        settings.DEFAULT_FROM_EMAIL,
+        f'Пароль: {password}',
+        settings.EMAIL_HOST_USER,
         [user.email],
         fail_silently=False,
     )
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(f'Пароль: {password}', status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -69,6 +68,21 @@ def order_create(request):
     serializer = PostOrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
+    user=request.user
+    if not user.is_authenticated:
+        email = request.data['email']
+        user = User.objects.get(email=email)
+        password = User.objects.make_random_password(length=8, allowed_chars="abcdefghjkmnpqrstuvwxyz01234567889")
+        user.set_password(password)
+        user.save()
+        send_mail(
+            'Пароль',
+            f'Пароль: {password}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+            )
+        return Response(f'Заказ создан. Пароль от учетной записи: {password}', status=status.HTTP_200_OK)
     return Response(request.data, status=status.HTTP_201_CREATED)
 
 
