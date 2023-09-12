@@ -9,19 +9,26 @@ export default function Profile() {
   return (
     <div className="profile">
       <h1 className="profile__title">Профиль</h1>
-      <nav>
+      <nav className="profile__menu">
         <button
-          className={`profile__button ${isProfileFormActive ? '' : 'profile__button_active'}`}
+          className={`profile__menu-button ${isProfileFormActive ? '' : 'profile__menu-button_active'}`}
           onClick={toggleFormActive}>
           Мои уборки
         </button>
         <button
-          className={`profile__button ${isProfileFormActive ? 'profile__button_active' : ''}`}
+          className={`profile__menu-button ${isProfileFormActive ? 'profile__menu-button_active' : ''}`}
           onClick={toggleFormActive}>
           Личные данные
         </button>
       </nav>
-      {isProfileFormActive ? <ProfileForm /> : <OrderCard />}
+      {isProfileFormActive ? (
+        <ProfileForm />
+      ) : (
+        <div className="profile__cards">
+          <OrderCard />
+          <OrderCard />
+        </div>
+      )}
     </div>
   )
 }

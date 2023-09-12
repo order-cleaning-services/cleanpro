@@ -11,7 +11,7 @@ const OrderCard = () => {
   const toggleInfo = () => setIsDetailed(!isDetailed)
 
   // Переменные из констант нужно будет переписать в аргументы, получаемые на рендер компонентом
-  const isCompleted = true
+  const isCompleted = false
   const CLEANERS = ['Климова Ольга', 'Плотников Евгений']
   const DATE = 'Ср, 20.09.2023'
   const TIME = '12:00-14:00'
