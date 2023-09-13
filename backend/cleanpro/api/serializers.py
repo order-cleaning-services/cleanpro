@@ -16,17 +16,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'adress',
         )
 
-class Confirm_mailSerializer(serializers.ModelSerializer):
+class ConfirmMailSerializer(serializers.Serializer):
     """Подтвердить электронную почту."""
-    email = serializers.EmailField(
-        max_length=254,
-        required=True
-    )
+    email = serializers.EmailField()
 
-    class Meta:
-        model = User
-        fields = ('email',)
-    
+    def validate_email(self, value):
+        """Производит валидацию поля email."""
+        # TODO: я для поля модели писал regexp - его надо сюда
+        return value
+
 
 class Service_packageSerializer(serializers.ModelSerializer):
     class Meta:
