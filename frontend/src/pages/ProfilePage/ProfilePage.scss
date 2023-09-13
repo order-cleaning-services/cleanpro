@@ -1,4 +1,6 @@
 .profile {
+  width: 144rem;
+  margin: 0 auto;
   padding: 6rem 10rem;
 
   &__title {
@@ -27,11 +29,11 @@
       font-weight: 400;
       line-height: 130%;
       background-color: #fff;
-  
+
       &:first-child {
         margin-right: 1.6rem;
       }
-  
+
       &_active {
         font-weight: 700;
         color: #242424;
@@ -39,6 +41,4 @@
       }
     }
   }
-
-  
 }
