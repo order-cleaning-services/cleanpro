@@ -17,7 +17,7 @@ export default function MainPage() {
       <Materials />
       <Faq />
       <Footer />
-      <ButtonOrder />
+      <ButtonOrder height={2700} />
     </>
   )
 }
