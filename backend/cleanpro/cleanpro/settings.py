@@ -146,4 +146,25 @@ ADMIN = 'admin'
 
 DEFAULT_FROM_EMAIL = 'cleanpro@admin.com'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# TODO: адекватно разделить код на смысловые блоки. Частично вынести в core.
+# Допускается не делать core, а складировать пока все здесь. Но навести порядок.
+"""Email backend data"""
+
+# TODO: заменить на реальный серверный
+# TODO: вынести в .env и .env.example файлы 
+EMAIL_HOST: str = 'localhost'  # Хост SMTP-сервера.
+EMAIL_PORT: str = '8000'  # Порт SMTP-сервера.
+EMAIL_HOST_USER: str = 'user'  # Имя пользователя SMTP-сервера.
+EMAIL_HOST_PASSWORD: str = 'pass'  # Пароль пользователя SMTP-сервера.
+EMAIL_USE_TLS: bool = False  # Использовать ли TLS (безопасное) соединение при общении с SMTP-сервером
+EMAIL_USE_SSL: str = False  # Использовать ли неявное TLS (защищенное) соединение при общении с SMTP-сервером
+EMAIL_SSL_CERTFILE: str = None  # Если EMAIL_USE_SSL или EMAIL_USE_TLS - True, вы можете опционально указать путь к файлу цепочки сертификатов в формате PEM
+EMAIL_SSL_KEYFILE: str = 'ssl_keyfile'  # Если EMAIL_USE_SSL или EMAIL_USE_TLS - True, вы можете опционально указать путь к файлу закрытого ключа в формате PEM
+EMAIL_TIMEOUT: str = 60  # Указывает тайм-аут в секундах для блокировки операций, таких как попытка соединения
+
+# TODO: при выключении DEBUG будет ошибка, так как SMTP у нас не арендован
+# и не подключен.
+EMAIL_BACKEND = (
+    'django.core.mail.backends.console.EmailBackend' if DEBUG else
+    'django.core.mail.backends.smtp.EmailBackend')
