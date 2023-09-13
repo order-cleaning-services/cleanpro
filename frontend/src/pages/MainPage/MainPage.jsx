@@ -5,6 +5,7 @@ import Process from '../../components/Process/Process'
 import Calculator from '../../components/Calculator/Calculator'
 import Materials from '../../components/Materials/Materials'
 import Faq from '../../components/Faq/Faq'
+import ButtonOrder from '../../components/ButtonOrder/ButtonOrder'
 
 export default function MainPage() {
   return (
@@ -16,6 +17,7 @@ export default function MainPage() {
       <Materials />
       <Faq />
       <Footer />
+      <ButtonOrder />
     </>
   )
 }
