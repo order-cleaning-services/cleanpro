@@ -1,15 +1,14 @@
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
-
 import 'swiper/scss'
 import 'swiper/css/pagination'
-import './Cleaners.scss'
+import './CleanersList.scss'
 
 import cleanersData from '../../utils/cleaningData'
 import ButtonNavSwiper from '../ButtonNavSwiper/ButtonNavSwiper'
 import CleanerSlide from '../CleanerSlide/CleanerSlide'
 
-function Cleaners() {
+function CleanersList() {
   return (
     <div className="cleaners">
       <Swiper
@@ -32,4 +31,4 @@ function Cleaners() {
   )
 }
 
-export default Cleaners
+export default CleanersList
