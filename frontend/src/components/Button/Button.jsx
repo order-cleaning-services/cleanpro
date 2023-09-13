@@ -1,13 +1,11 @@
-import React from "react";
+import './Button.scss'
 
-import "../../../../styles/Button.css";
-
-function Button(props) {
+function Button({ buttonClassName, buttonText, type }) {
   return (
-    <button className={props.buttonClassName + ` ${props.isValid? '' : 'button_disabled'}`} type={props.type} disabled={!props.isValid}>
-      {props.buttonText}
+    <button type={type} className={buttonClassName}>
+      {buttonText}
     </button>
-  );
+  )
 }
 
-export default Button;
+export default Button
