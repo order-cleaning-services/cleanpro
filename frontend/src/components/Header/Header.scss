@@ -1,9 +1,11 @@
+@import '../../assets/styles/colors.scss';
+@import '../../assets/styles/GlobalStyle.scss';
+
 .header {
-	max-width: 144rem;
-	margin: 0 auto;
+  width: 144rem;
+  margin: 0 auto;
   justify-content: space-between;
-  padding: 4rem 10rem 5rem;
-  box-shadow: 0px 4px 10px 0px rgba(5, 11, 59, 0.1);
+  padding: 2.25rem 10rem;
 }
 
 .header__menu {
@@ -23,7 +25,15 @@
 .header__link {
   font-size: 2rem;
   text-decoration: none;
-  color: #000;
+  color: $text-color-main;
+
+  &-active {
+    @extend .text-l-bold;
+    text-decoration: none;
+    color: $text-color-main;
+    padding-bottom: 1.6rem;
+    border-bottom: 0.2rem solid #ffb22e;
+  }
 }
 
 .header__info {
@@ -35,8 +45,8 @@
 
 .header__phone {
   margin-right: 3rem;
-  font-size: 1.4rem;
-  line-height: 140%;
+  font-size: 2rem;
+  line-height: 2.6rem;
 }
 
 .header__signin {
@@ -44,7 +54,7 @@
   align-items: center;
   font-size: 2rem;
   text-decoration: none;
-  color: #000;
+  color: $text-color-main;
 }
 
 .header__signin-icon {
@@ -57,11 +67,10 @@
   align-items: center;
   font-size: 2rem;
   text-decoration: none;
-  color: #000;
+  color: $text-color-main;
 }
 
 .header__profile-icon {
   display: block;
   margin-right: 0.8rem;
 }
-
