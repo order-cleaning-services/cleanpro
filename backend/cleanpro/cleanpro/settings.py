@@ -146,6 +146,9 @@ ADMIN = 'admin'
 
 DEFAULT_FROM_EMAIL = 'cleanpro@admin.com'
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
 
 # TODO: адекватно разделить код на смысловые блоки. Частично вынести в core.
 # Допускается не делать core, а складировать пока все здесь. Но навести порядок.
@@ -166,5 +169,7 @@ EMAIL_TIMEOUT: str = 60  # Указывает тайм-аут в секунда�
 # TODO: при выключении DEBUG будет ошибка, так как SMTP у нас не арендован
 # и не подключен.
 EMAIL_BACKEND = (
-    'django.core.mail.backends.console.EmailBackend' if DEBUG else
+    'django.core.mail.backends.console.EmailBackend'
+
+ if DEBUG else
     'django.core.mail.backends.smtp.EmailBackend')
