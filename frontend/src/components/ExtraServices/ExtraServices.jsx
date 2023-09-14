@@ -1,6 +1,6 @@
-import { extraServices } from "../../utils/initialData"
-import ExtraServiceField from "../ExtraServiceField/ExtraServiceField"
-import "./ExtraServices.scss"
+import { extraServices } from '../../utils/initialData'
+import ExtraServiceField from '../ExtraServiceField/ExtraServiceField'
+import './ExtraServices.scss'
 
 function ExtraServices({ setTotal }) {
   return (
@@ -8,7 +8,7 @@ function ExtraServices({ setTotal }) {
       <p className="text-l">Дополнительные услуги</p>
       <div className="extra-service__container">
         <div className="extra-service-fields__wrapper">
-          {extraServices.map((extra) => (
+          {extraServices.map(extra => (
             <ExtraServiceField
               key={extra.title}
               title={extra.title}
