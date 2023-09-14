@@ -1,37 +1,48 @@
 from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
+from .validators import validate_name, validate_password, validate_email
+from service.models import Address
 
 
 class Address(models.Model):
     """Модель адреса."""
     city = models.CharField(
         # TODO: прописать все магические числа. Везде.
-        max_length=256, verbose_name='Город',
-        blank=False,
-        null=False,)
+        verbose_name='Город',
+        max_length=25,
+    )
     street = models.CharField(
-        max_length=256, verbose_name='Улица',
-        blank=False,
-        null=False,)
-    house = models.IntegerField(
+        verbose_name='Улица',
+        max_length=150
+    )
+    house = models.CharField(
         verbose_name='Дом',
-        blank=False,
-        null=False,)
-    apartment = models.IntegerField(
+        max_length=60
+    )
+    apartment = models.PositiveSmallIntegerField(
         verbose_name='Квартира',
+        default=None,
+        blank=True,
         null=True,
-        blank=True, default=None)
-    floor = models.IntegerField(
+        validators=[MaxValueValidator(9999)],
+    )
+    floor = models.PositiveSmallIntegerField(
         verbose_name='Этаж',
+        blank=True,
         null=True,
-        blank=True)
-    entrance = models.IntegerField(
+        validators=[MaxValueValidator(200)]
+    )
+    entrance = models.PositiveSmallIntegerField(
         verbose_name='Подъезд',
+        blank=True,
         null=True,
-        blank=True)
+        validators=[MaxValueValidator(99)]
+    )
 
 
 class UserManager(BaseUserManager):
@@ -43,7 +54,6 @@ class UserManager(BaseUserManager):
         '''Создает и сохраняет пользователя с полученными почтой и паролем.'''
         if not email:
             raise ValueError('Email должен быть предоставлен.')
-
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
@@ -58,14 +68,12 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Администратор должен иметь поле is_staff=True.')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError(
                 'Администратор должен иметь поле is_superuser=True.'
             )
-
         return self._create_user(email, password, **extra_fields)
 
 
@@ -74,30 +82,35 @@ class User(AbstractUser):
 
     username = last_name = None
     first_name =  models.CharField(
-        'Имя',
-        max_length=256,
-        blank=True)
+        verbose_name='Имя',
+        max_length=60,
+        validators=[validate_name]
+    )
     email = models.EmailField(
-        'Адрес электронной почты',
-        max_length=254,
-        unique=True)
+        verbose_name='Адрес электронной почты',
+        max_length=50,
+        unique=True,
+        validators=[validate_email]
+    )
     password = models.CharField(
-        'Пароль',
-        max_length=256)
+        verbose_name='Пароль',
+        max_length=16,
+        validators=[validate_password]
+    )
     phone = PhoneNumberField(
-        'Номер телефона',
-        blank=True,
-        region='RU')
+        verbose_name='Номер телефона',
+        region='RU'
+    )
     address = models.ForeignKey(
         Address,
+        verbose_name='Услуги',
+        related_name='users',
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-        related_name='users',
-        verbose_name='Услуги',
     )
     role = models.CharField(
-        'Роль',
+        verbose_name='Роль',
         choices=(
             (USER, 'Пользователь'),
             (ADMIN, 'Администратор'),

@@ -1,13 +1,13 @@
 from rest_framework import serializers
 from django.shortcuts import get_object_or_404
 from users.models import User
-# Советую установить:
+# Советую установить, они проверяют орфографию:
 # https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
 # https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
-# Они проверяют орфографию.
-# Поправил много чего. Например, "Adress" -> "Address".
+# Поправил много чего. Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
 from service.models import Order, ServicePackage, Rating, Address
 from phonenumber_field.serializerfields import PhoneNumberField
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователей."""
@@ -21,6 +21,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'address',
         )
 
+
 class ConfirmMailSerializer(serializers.Serializer):
     """Подтвердить электронную почту."""
     email = serializers.EmailField()
@@ -31,11 +32,19 @@ class ConfirmMailSerializer(serializers.Serializer):
         return value
 
 
-
+# Прошу ознакомиться с правилами названия классов в Python:
 # https://peps.python.org/pep-0008/#class-names
 class ServicePackageSerializer(serializers.ModelSerializer):
     # TODO: уточнить назначение сериализатора и точно прописать docstring.
     """Сериализатор для отображения услуг и их цен."""
+    class Meta:
+        model = ServicePackage
+        fields = ('title', 'price')
+
+
+# TODO: добавить dockstring.
+class Service_packageSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = ServicePackage
         fields = ('title', 'price')
@@ -58,11 +67,10 @@ class PostOrderSerializer(serializers.Serializer):
     street = serializers.CharField(
         max_length=256,)
     house = serializers.IntegerField()
-    apartment = serializers.IntegerField(
-        required=False)
+    apartment = serializers.IntegerField(required=False)
     floor = serializers.IntegerField(required=False)
     entrance = serializers.IntegerField(required=False)
-    first_name =  serializers.CharField(max_length=256, required=False)
+    first_name = serializers.CharField(required=False)
     email = serializers.EmailField()
     phone = PhoneNumberField(required=False, region='RU')
     service_package = serializers.PrimaryKeyRelatedField(
@@ -74,17 +82,17 @@ class PostOrderSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False)
 
     def create(self, data):
-        address, created = Address.objects.get_or_create(city=data['city'],
-                                       street=data['street'],
-                                       house=data['house'],
-                                       )
+        address, created = Address.objects.get_or_create(
+            city=data['city'],
+            street=data['street'],
+            house=data['house'],
+        )
         user, created = User.objects.get_or_create(email=data['email'])
-        user.first_name, = data['first_name'],
-        user.address, = Address.objects.get(id=address.id),
-        user.phone, = data['phone'],
+        user.first_name = data['first_name']
+        user.address = Address.objects.get(id=address.id)
+        user.phone = data['phone']
         user.save()
         service = data['service_package']
-        total_sum=service.price
         order = Order.objects.create(user=user, service_package=service,
                                      total_sum=service.price,
                                      address=user.address,
@@ -92,7 +100,7 @@ class PostOrderSerializer(serializers.Serializer):
                                      cleaning_time=data['cleaning_time'],
                                      )
         return order, created
-    
+
     def update(self, instance, validated_data):
         instance.save()
         return instance
@@ -132,6 +140,7 @@ class CancelSerializer(serializers.ModelSerializer):
         return instance
 
 
+
 class PaySerializer(serializers.ModelSerializer):
     """Сериализатор для оплаты заказа."""
     # Зачем?
@@ -154,6 +163,7 @@ class AddressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+
 class GetOrderSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
     user = CustomUserSerializer(read_only=True)
@@ -169,9 +179,11 @@ class GetOrderSerializer(serializers.ModelSerializer):
         )
 
 
+
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления комментария к заказу."""
     comment = serializers.CharField()
+
 
     class Meta:
         model = Order
@@ -200,6 +212,8 @@ class DateTimeSerializer(serializers.ModelSerializer):
         return instance
 
 
+
+
 class RatingSerializer(serializers.ModelSerializer):
     """Сериализатор для представления отзыва на уборку."""
     user = CustomUserSerializer(read_only=True)
@@ -208,3 +222,4 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Rating
         read_only_fields = ('order',)
+

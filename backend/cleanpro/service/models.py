@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+# TODO: ко всем валидаторам приписать пояснения во всех models.py
 from django.core.validators import MaxValueValidator, MinValueValidator
 
 from users.models import Address
@@ -13,20 +14,20 @@ class ServicePackage(models.Model):
         ('general', 'Генеральная уборка'),
         ('repair', 'Уборка после ремонта'),
         ('holiday', 'Уборка после мероприятия'),
-        ('windows', 'Мытье окон'),
+        ('windows', 'Мытье окон')
     )
-    title = models.CharField(choices=CLEANING_TYPES,
-        max_length=256,
+    title = models.CharField(
         verbose_name='Название',
+        choices=CLEANING_TYPES
     )
     price = models.IntegerField(
-        validators=[MinValueValidator(1, 'Укажите корректную сумму.')],
         verbose_name='Сумма',
+        validators=[MinValueValidator(1, 'Укажите корректную сумму.')]
     )
     # TODO: лишнее поле
     quantity = models.IntegerField(
         default=0,
-        verbose_name='Количество',
+        verbose_name='Количество'
     )
 
     def __str__(self):
@@ -39,63 +40,65 @@ class Order(models.Model):
         ('created', 'Создан'),
         ('accepted', 'Принят'),
         ('finished', 'Завершен'),
-        ('cancelled', 'Отменен'),
+        ('cancelled', 'Отменен')
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='orders',
         verbose_name='Заказчик',
+        to=settings.AUTH_USER_MODEL,
+        related_name='orders',
+        on_delete=models.CASCADE,
     )
     total_sum = models.IntegerField(
-        default=0,
         verbose_name='Сумма',
+        validators=[MinValueValidator(1, 'Укажите корректную итоговую сумму!')]
     )
     comment = models.TextField(
         verbose_name='Комментарий',
+        max_length=250,
+        default=None,
         blank=True,
         null=True,
-        )
-    order_status = models.CharField(choices=STATUS_CHOICES,
-        default='created',
-        max_length=256,
-        verbose_name='Статус',
+    )
+    order_status = models.CharField(
+        verbose_name='Статус заказа',
+        choices=STATUS_CHOICES,
+        default='Создан'
     )
     service_package = models.ForeignKey(
-        ServicePackage,
-        on_delete=models.CASCADE,
-        blank=False,
-        null=False,
-        related_name='orders',
         verbose_name='Услуги',
+        to=ServicePackage,
+        related_name='orders',
+        on_delete=models.CASCADE,
     )
-    pay_status = models.BooleanField(default=False)
+    pay_status = models.BooleanField(
+        default=False
+    )
     address = models.ForeignKey(
-        Address,
-        on_delete=models.CASCADE,
-        blank=False,
-        null=False,
-        related_name='orders',
         verbose_name='Услуги',
+        to=Address,
+        related_name='orders',
+        on_delete=models.CASCADE,
     )
-    # А почему не (?):
+    # А почему(?) не:
     # creation_datetime = models.DateTimeField(
     #     'Дата и время создания',
     #     auto_now_add=True
     # )
     creation_date = models.DateField(
-        'Дата создания',
+        verbose_name='Дата создания',
         auto_now_add=True
     )
     creation_time = models.TimeField(
-        'Время создания',
+        verbose_name='Время создания',
         auto_now_add=True
     )
     cleaning_date = models.DateField(
-        'Дата уборки',
-        db_index=True)
+        verbose_name='Дата уборки',
+        db_index=True
+    )
     cleaning_time = models.TimeField(
-        'Время уборки')
+        verbose_name='Время уборки'
+    )
 
     class Meta:
         ordering = ['-cleaning_date']
@@ -104,26 +107,30 @@ class Order(models.Model):
         return f"Заказ №: {self.id}"
 
 
+
 class Rating(models.Model):
     """Модель отзыва."""
     order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
-        related_name='ratings',
         verbose_name='Название',
+        to=Order,
+        related_name='ratings',
+        on_delete=models.CASCADE
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='ratings',
         verbose_name='Заказчик',
+        to=settings.AUTH_USER_MODEL,
+        related_name='ratings',
+        on_delete=models.CASCADE
     )
     pub_date = models.DateTimeField(
-        'Дата отзыва',
+        verbose_name='Дата отзыва',
         auto_now_add=True,
-        db_index=True,
+        db_index=True
     )
-    text = models.TextField('Текст отзыва',)
+    text = models.TextField(
+        verbose_name='Текст отзыва',
+        max_length=250,
+    )
     score = models.IntegerField(
         verbose_name='Оценка',
         validators=[

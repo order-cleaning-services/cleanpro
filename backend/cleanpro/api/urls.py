@@ -10,7 +10,7 @@ router = routers.DefaultRouter()
 router.register('users', UserViewSet, basename='users')
 router.register('orders', OrderViewSet, basename='orders')
 # TODO: разобраться с рейтингом, как это должно работать и удалить
-# лишний роутер, так быть не должно
+#       лишний роутер, так быть не должно
 router.register('ratings', RatingViewSet, basename='ratings')
 router.register(r'^orders/(?P<order_id>\d+)/rating',
                 RatingViewSet,

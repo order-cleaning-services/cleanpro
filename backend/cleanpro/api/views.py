@@ -1,6 +1,5 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.hashers import make_password
 from django.core import mail
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -19,14 +18,14 @@ from .serializers import (
     OrderStatusSerializer,
     PaySerializer,
     PostOrderSerializer,
-    RatingSerializer,
+    RatingSerializer
 )
 from service.models import Order, Rating
 from users.models import User
 
 
 # TODO: создать core для сайта, перенести туда часть настроек из settings.py,
-# перенести это, сделать там смысловое разделение с указанием блоков.
+#       перенести это, сделать там смысловое разделение с указанием блоков.
 # TODO: Добавить URL сайта из переменных окружения с указанием эндпоинта
 PASSWORD_RESET_LINK: str = None
 EMAIL_CONFIRM_SUBJECT: str = 'Welcome to CleanPro!'
@@ -108,14 +107,14 @@ def confirm_mail(request):
         User, email=serializer.validated_data.get('email')
     )
     # TODO: разобраться, с со строкой кода ниже.
-    # Пароль сам генерируется? Еще и в виде токена?? Что это вообще такое?
-    # Для установки пароля используется метод .set_password()
-    # Только пользователь сам себе ставит пароль при регистрации.
-    # Если это попытка а-ля "хешировать" пароль - Django сам это делает.
+    #       Пароль сам генерируется? Еще и в виде токена? Что это вообще такое?
+    #       Для установки пароля используется метод .set_password()
+    #       Только пользователь сам себе ставит пароль при регистрации.
+    #       Если это попытка а-ля "хешировать" пароль - Django сам это делает.
     # TODO: адекватная практика на мой взгляд: при регистрации делать
-    # пользователя с параметром "is.active=False" и при подтверждении почты
-    # переводить его в состояние "is.active=True". Ниже я закомментил этот
-    # вариант реализации.
+    #       пользователя с параметром "is.active=False" и при подтверждении
+    #       почты переводить его в состояние "is.active=True".
+    #       Ниже я закомментил этот вариант реализации.
     user.password = default_token_generator.make_token(user)
     # TODO: при принятии этого решения - надо переделать регистрацию,
     #       либо переделать поле модели (что надежнее)
@@ -136,8 +135,6 @@ def confirm_mail(request):
     )
 
 
-
-
 @api_view(['POST'])
 def order_create(request):
     """Создать заказ."""
@@ -153,7 +150,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = GetOrderSerializer
     queryset = Order.objects.all().select_related('user', 'address')
 
-    # Зачем?
+    # TODO: 1) зачем?
+    #       2) будет ошибка, что-то типа "сначала надо применить
+    #          метод .is_valid(), а потом только .save"
     def perform_update(self, serializer):
         serializer.save()
 
@@ -162,7 +161,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         # TODO: сделать везде через tuple, ускорит код.
         methods=['patch',],
         url_path='pay',
-        permission_classes=(IsOwner)
+        permission_classes=(IsOwner,)
     )
     def pay(self, request, pk):
         """Оплатить заказ."""
@@ -174,7 +173,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['patch',],
+        methods=('patch',),
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def cancel(self, request, pk):
@@ -187,7 +186,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['patch',],
+        methods=('patch',),
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def comment(self, request, pk):
@@ -197,7 +196,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(
         detail=True,
         methods=['patch',],
@@ -210,7 +209,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(
         detail=True,
         methods=['patch',],
