@@ -3,4 +3,5 @@ export const ROUTES = {
   about: '/about',
   profile: '/profile',
   signin: '/signin',
+  payment: '/payment',
 }
