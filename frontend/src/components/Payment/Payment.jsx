@@ -45,7 +45,7 @@ const Payment = () => {
         <p className="payment__text">Комментарий: аллергия на концентраты</p>
       </div>
 
-      <Button buttonClassName="button" buttonText="Оплатить" />
+      <Button buttonClassName="payment__button" buttonText="Оплатить" />
     </section>
   )
 }
