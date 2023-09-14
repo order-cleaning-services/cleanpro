@@ -11,6 +11,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
+# TODO архинебезопасно! Для прода вписать допустимые данные. Лучше через
+# переменные окружения, чтобы скрыть их от злоумышленников.
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
@@ -133,8 +135,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-        
+        'rest_framework.authentication.TokenAuthentication',  
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -169,7 +170,5 @@ EMAIL_TIMEOUT: str = 60  # Указывает тайм-аут в секунда�
 # TODO: при выключении DEBUG будет ошибка, так как SMTP у нас не арендован
 # и не подключен.
 EMAIL_BACKEND = (
-    'django.core.mail.backends.console.EmailBackend'
-
- if DEBUG else
+    'django.core.mail.backends.console.EmailBackend' if DEBUG else
     'django.core.mail.backends.smtp.EmailBackend')

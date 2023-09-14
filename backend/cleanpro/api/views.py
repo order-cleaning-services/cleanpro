@@ -1,37 +1,34 @@
-from rest_framework.permissions import SAFE_METHODS
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.hashers import make_password
 from django.core import mail
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes, action
-from api.serializers import CustomUserSerializer
 from djoser.views import UserViewSet
-from rest_framework import viewsets, status
-from rest_framework import permissions
-from .permissions import (IsOwnerOrReadOnly, IsOwner)
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import api_view, permission_classes, action
+from rest_framework.response import Response
+
+from .permissions import IsOwnerOrReadOnly, IsOwner
+from .serializers import (
+    CancelSerializer,
+    CommentSerializer,
+    ConfirmMailSerializer,
+    CustomUserSerializer,
+    DateTimeSerializer,
+    GetOrderSerializer,
+    OrderStatusSerializer,
+    PaySerializer,
+    PostOrderSerializer,
+    RatingSerializer,
+)
 from service.models import Order, Rating
 from users.models import User
-from .serializers import (PostOrderSerializer,
-                          GetOrderSerializer,
-                          CommentSerializer,
-                          DateTimeSerializer,
-                          RatingSerializer,
-                          OrderStatusSerializer,
-                          ConfirmMailSerializer,
-                          PaySerializer,
-                          CancellSerializer)
 
 
-# TODO: к отредактированным импортам согласно PEP8
-from cleanpro.settings import DEBUG
 # TODO: создать core для сайта, перенести туда часть настроек из settings.py,
 # перенести это, сделать там смысловое разделение с указанием блоков.
-
 # TODO: Добавить URL сайта из переменных окружения с указанием эндпоинта
 PASSWORD_RESET_LINK: str = None
-
 EMAIL_CONFIRM_SUBJECT: str = 'Welcome to CleanPro!'
 EMAIL_CONFIRM_TEXT: str = (
     'Dear {username},\n'
@@ -84,15 +81,20 @@ class UserViewSet(UserViewSet):
 
     @action(
         detail=True,
-        methods=['get', ],
+        url_path='subscribe',
+        methods=['get',],
         permission_classes=(permissions.IsAuthenticated,)
     )
     def orders(self, request, id):
         """Список заказов пользователя."""
-        queryset = Order.objects.filter(user=id)
+        queryset = Order.objects.filter(user=id
+            ).select_related('user', 'service_package')
         page = self.paginate_queryset(queryset)
-        serializer = GetOrderSerializer(page, many=True,
-                                            context={'request': request})
+        serializer = GetOrderSerializer(
+            page,
+            many=True,
+            context={'request': request}
+        )
         return self.get_paginated_response(serializer.data)
 
 
@@ -134,8 +136,9 @@ def confirm_mail(request):
     )
 
 
+
+
 @api_view(['POST'])
-@permission_classes([permissions.AllowAny])
 def order_create(request):
     """Создать заказ."""
     serializer = PostOrderSerializer(data=request.data)
@@ -146,18 +149,20 @@ def order_create(request):
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    permission_classes = [permissions.AllowAny, ]
-    queryset = Order.objects.all()
-    methods=['get', 'post', 'patch', 'delete'],
+    methods=['get', 'post', 'patch', 'delete']
     serializer_class = GetOrderSerializer
+    queryset = Order.objects.all().select_related('user', 'address')
 
+    # Зачем?
     def perform_update(self, serializer):
         serializer.save()
 
     @action(
         detail=True,
-        methods=['patch', ],
-        permission_classes=(permissions.IsAuthenticated, IsOwner)
+        # TODO: сделать везде через tuple, ускорит код.
+        methods=['patch',],
+        url_path='pay',
+        permission_classes=(IsOwner)
     )
     def pay(self, request, pk):
         """Оплатить заказ."""
@@ -169,20 +174,20 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=['patch', ],
+        methods=['patch',],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
-    def cancell(self, request, pk):
+    def cancel(self, request, pk):
         """Отменить заказ."""
         order = get_object_or_404(Order, id=pk)
-        serializer = CancellSerializer(order, request.data)
+        serializer = CancelSerializer(order, request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
-        methods=['patch', ],
+        methods=['patch',],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def comment(self, request, pk):
@@ -195,7 +200,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     
     @action(
         detail=True,
-        methods=['patch', ],
+        methods=['patch',],
         permission_classes=(permissions.IsAuthenticated, IsOwner)
     )
     def change_datetime(self, request, pk):
@@ -208,7 +213,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     
     @action(
         detail=True,
-        methods=['patch', ],
+        methods=['patch',],
         permission_classes=(permissions.IsAdminUser,)
     )
     def change_status(self, request, pk):
@@ -226,7 +231,6 @@ class RatingViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
     methods=['get', 'post', 'patch', 'delete'],
-
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')
