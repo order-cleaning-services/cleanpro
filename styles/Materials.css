@@ -259,12 +259,12 @@ template {
   display: none;
 }
 
-.text-s {
+.text-s, .materials__card-text {
   font-size: 1.4rem;
   line-height: 1.96rem;
 }
 
-.text-m {
+.text-m, .materials .full-text {
   font-size: 1.6rem;
   line-height: 2.24rem;
 }
@@ -282,80 +282,51 @@ template {
   color: #242424;
 }
 
-.text-l-bold, .header__link-active {
+.text-l-bold, .materials__card-title {
   font-size: 2rem;
   line-height: 2.6rem;
   font-weight: 700;
 }
 
-.header {
+.materials {
+  justify-content: space-between;
   width: 144rem;
-  margin: 0 auto;
-  justify-content: space-between;
-  padding: 2.25rem 10rem;
+  padding: 0 10rem;
+  max-width: 1440px;
+  margin: 12rem auto 0;
 }
-
-.header__menu {
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
+.materials__title {
+  text-align: left;
 }
-
-.header__links {
+.materials__cards {
   display: flex;
-  margin-left: 12rem;
-  align-items: center;
+  margin-top: 6rem;
   gap: 3.2rem;
-  list-style: none;
 }
-
-.header__link {
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
+.materials__card {
+  border-radius: 2rem;
+  border: 2px solid #c0d5f2;
+  padding: 3.2rem 0;
+  max-width: 49.8rem;
 }
-.header__link-active {
-  text-decoration: none;
-  color: #242424;
-  padding-bottom: 1.6rem;
-  border-bottom: 0.2rem solid #ffb22e;
-}
-
-.header__info {
+.materials__card-section {
+  justify-content: space-between;
   display: flex;
-  margin-right: 3rem;
-  align-items: center;
-  gap: 1.6rem;
+  flex-direction: column;
 }
-
-.header__phone {
-  margin-right: 3rem;
-  font-size: 2rem;
-  line-height: 2.6rem;
+.materials__card-title {
+  padding: 0 2.4rem;
 }
-
-.header__signin {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
+.materials__card-text {
+  padding: 0 2.4rem;
 }
-
-.header__signin-icon {
-  display: block;
-  margin-right: 0.8rem;
+.materials__card-img {
+  width: 100%;
+  margin: 1.6rem 0;
 }
-
-.header__profile {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
+.materials .full-img {
+  margin-bottom: 2.4rem;
 }
-
-.header__profile-icon {
-  display: block;
-  margin-right: 0.8rem;
+.materials .full {
+  max-width: 71rem;
 }

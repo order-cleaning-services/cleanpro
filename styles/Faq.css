@@ -282,80 +282,57 @@ template {
   color: #242424;
 }
 
-.text-l-bold, .header__link-active {
+.text-l-bold {
   font-size: 2rem;
   line-height: 2.6rem;
   font-weight: 700;
 }
 
-.header {
+.faq {
   width: 144rem;
-  margin: 0 auto;
-  justify-content: space-between;
-  padding: 2.25rem 10rem;
+  padding: 0 10rem;
+  max-width: 1440px;
+  margin: 12rem auto;
 }
-
-.header__menu {
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
+.faq__title {
+  font-size: 3.6rem;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 120%; /* 4.32rem */
+  letter-spacing: -0.072rem;
 }
-
-.header__links {
+.faq__questions {
+  margin-top: 6rem;
   display: flex;
-  margin-left: 12rem;
-  align-items: center;
+  flex-wrap: wrap;
   gap: 3.2rem;
-  list-style: none;
 }
-
-.header__link {
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
+.faq__question {
+  width: 100%;
+  border-radius: 2rem;
+  background: #e5f0ff;
 }
-.header__link-active {
-  text-decoration: none;
-  color: #242424;
-  padding-bottom: 1.6rem;
-  border-bottom: 0.2rem solid #ffb22e;
-}
-
-.header__info {
+.faq__question-header {
   display: flex;
-  margin-right: 3rem;
-  align-items: center;
-  gap: 1.6rem;
+  align-items: baseline;
+  cursor: pointer;
+  gap: 1.2rem;
+  padding: 2rem 1.6rem;
 }
-
-.header__phone {
-  margin-right: 3rem;
+.faq__question-title {
   font-size: 2rem;
-  line-height: 2.6rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 130%; /* 2.6rem */
 }
-
-.header__signin {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__signin-icon {
-  display: block;
-  margin-right: 0.8rem;
-}
-
-.header__profile {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__profile-icon {
-  display: block;
-  margin-right: 0.8rem;
+.faq__question-text {
+  font-size: 1.6rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%; /* 2.24rem */
+  background: #ffffff;
+  border: 2px solid #e5f0ff;
+  border-bottom-left-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+  padding: 2rem 4rem;
 }

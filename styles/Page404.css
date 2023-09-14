@@ -282,80 +282,49 @@ template {
   color: #242424;
 }
 
-.text-l-bold, .header__link-active {
+.text-l-bold {
   font-size: 2rem;
   line-height: 2.6rem;
   font-weight: 700;
 }
 
-.header {
-  width: 144rem;
+.page-404 {
+  position: relative;
   margin: 0 auto;
-  justify-content: space-between;
-  padding: 2.25rem 10rem;
+  width: 144rem;
+  height: calc(100vh - 13rem);
+  background: url("./src/images/bg-404.png") 0 0/100% 100% no-repeat;
 }
-
-.header__menu {
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
+.page-404__content {
+  width: 22.8rem;
+  padding-top: 26vh;
+  margin-left: 17vw;
 }
-
-.header__links {
+.page-404__title {
+  font-size: 12.8rem;
+  font-weight: 600;
+  line-height: 12.8rem;
+  display: inline-block;
+}
+.page-404__subtitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 2.24rem;
+  padding-left: 3px;
+  padding-bottom: 3.2rem;
+}
+.page-404__link {
+  box-sizing: border-box;
   display: flex;
-  margin-left: 12rem;
+  justify-content: center;
   align-items: center;
-  gap: 3.2rem;
-  list-style: none;
-}
-
-.header__link {
-  font-size: 2rem;
-  text-decoration: none;
   color: #242424;
-}
-.header__link-active {
+  padding: 1.2rem 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 2.24rem;
   text-decoration: none;
-  color: #242424;
-  padding-bottom: 1.6rem;
-  border-bottom: 0.2rem solid #ffb22e;
-}
-
-.header__info {
-  display: flex;
-  margin-right: 3rem;
-  align-items: center;
-  gap: 1.6rem;
-}
-
-.header__phone {
-  margin-right: 3rem;
-  font-size: 2rem;
-  line-height: 2.6rem;
-}
-
-.header__signin {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__signin-icon {
-  display: block;
-  margin-right: 0.8rem;
-}
-
-.header__profile {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__profile-icon {
-  display: block;
-  margin-right: 0.8rem;
+  background-color: #ffffff;
+  border-radius: 2rem;
+  border: 0.1rem solid #d9d9d9;
 }

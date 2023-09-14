@@ -282,80 +282,45 @@ template {
   color: #242424;
 }
 
-.text-l-bold, .header__link-active {
+.text-l-bold {
   font-size: 2rem;
   line-height: 2.6rem;
   font-weight: 700;
 }
 
-.header {
-  width: 144rem;
-  margin: 0 auto;
-  justify-content: space-between;
-  padding: 2.25rem 10rem;
+.form-transfer__title {
+  font-weight: 400;
+  text-align: left;
+}
+.form-transfer__input-container {
+  padding: 2.6rem 0 0 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  max-width: 39.2rem;
+}
+.form-transfer__date {
+  border: none;
+}
+.form-transfer__date:hover,
+.form-transfer__date :focus,
+.form-transfer__date :active {
+  border: 1px solid #d9d9d9;
+  border-color: #40a9ff;
+  box-shadow: 0px 0px 0px 2px rgba(129, 172, 229, 0.3);
+}
+.form-transfer__date:disabled {
+  border: 1px solid #d9d9d9;
+  background-color: #d9d9d9;
 }
 
-.header__menu {
-  display: flex;
-  justify-content: space-between;
-  list-style: none;
-}
-
-.header__links {
-  display: flex;
-  margin-left: 12rem;
-  align-items: center;
-  gap: 3.2rem;
-  list-style: none;
-}
-
-.header__link {
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-.header__link-active {
-  text-decoration: none;
-  color: #242424;
-  padding-bottom: 1.6rem;
-  border-bottom: 0.2rem solid #ffb22e;
-}
-
-.header__info {
-  display: flex;
-  margin-right: 3rem;
-  align-items: center;
-  gap: 1.6rem;
-}
-
-.header__phone {
-  margin-right: 3rem;
-  font-size: 2rem;
-  line-height: 2.6rem;
-}
-
-.header__signin {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__signin-icon {
-  display: block;
-  margin-right: 0.8rem;
-}
-
-.header__profile {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__profile-icon {
-  display: block;
-  margin-right: 0.8rem;
+.overlay-arrow {
+  font-size: 9px;
+  color: red;
+  position: absolute;
+  right: 5px;
+  bottom: 14px;
+  line-height: 1px;
+  background-color: #fff;
+  pointer-events: none;
 }

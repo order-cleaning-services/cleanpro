@@ -282,80 +282,23 @@ template {
   color: #242424;
 }
 
-.text-l-bold, .header__link-active {
+.text-l-bold {
   font-size: 2rem;
   line-height: 2.6rem;
   font-weight: 700;
 }
 
-.header {
-  width: 144rem;
-  margin: 0 auto;
-  justify-content: space-between;
-  padding: 2.25rem 10rem;
-}
-
-.header__menu {
+.footer-list {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   list-style: none;
+  gap: 2.4rem;
 }
 
-.header__links {
-  display: flex;
-  margin-left: 12rem;
-  align-items: center;
-  gap: 3.2rem;
-  list-style: none;
-}
-
-.header__link {
-  font-size: 2rem;
+.footer-item {
   text-decoration: none;
-  color: #242424;
-}
-.header__link-active {
-  text-decoration: none;
-  color: #242424;
-  padding-bottom: 1.6rem;
-  border-bottom: 0.2rem solid #ffb22e;
-}
-
-.header__info {
-  display: flex;
-  margin-right: 3rem;
-  align-items: center;
-  gap: 1.6rem;
-}
-
-.header__phone {
-  margin-right: 3rem;
-  font-size: 2rem;
-  line-height: 2.6rem;
-}
-
-.header__signin {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__signin-icon {
-  display: block;
-  margin-right: 0.8rem;
-}
-
-.header__profile {
-  display: flex;
-  align-items: center;
-  font-size: 2rem;
-  text-decoration: none;
-  color: #242424;
-}
-
-.header__profile-icon {
-  display: block;
-  margin-right: 0.8rem;
+  color: #163b6c;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 140%;
 }
