@@ -24,7 +24,7 @@ class ServicePackage(models.Model):
         verbose_name='Сумма',
         validators=[MinValueValidator(1, 'Укажите корректную сумму.')]
     )
-    # TODO: лишнее поле
+    # TODO: лишнее поле.
     quantity = models.IntegerField(
         default=0,
         verbose_name='Количество'
@@ -105,7 +105,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Заказ №: {self.id}"
-
 
 
 class Rating(models.Model):

@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.models import User
 from django.core import mail
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -21,6 +22,7 @@ from .serializers import (
     RatingSerializer
 )
 from service.models import Order, Rating
+# TODO: ну надо определиться - или из строки 3, или отсюда. Полагаю - отсюда
 from users.models import User
 
 
@@ -86,8 +88,9 @@ class UserViewSet(UserViewSet):
     )
     def orders(self, request, id):
         """Список заказов пользователя."""
-        queryset = Order.objects.filter(user=id
-            ).select_related('user', 'service_package')
+        queryset = Order.objects.filter(
+            user=id
+        ).select_related('user', 'service_package')
         page = self.paginate_queryset(queryset)
         serializer = GetOrderSerializer(
             page,
@@ -141,12 +144,33 @@ def order_create(request):
     serializer = PostOrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     serializer.save()
-    return Response(request.data, status=status.HTTP_201_CREATED)
+    user = request.user
+    if user.is_authenticated:
+        return Response(request.data, status=status.HTTP_201_CREATED)
+    email = request.data['email']
+    user = User.objects.get(email=email)
+    password = User.objects.make_random_password(
+        # TODO: best practice - избегать магических чисел
+        #       длина пароля также может быть рандомной в пределах допустимого
+        length=8,
+        allowed_chars="abcdefghjkmnpqrstuvwxyz01234567889"
+    )
+    user.set_password(password)
+    user.save()
+    send_mail(
+        # TODO: какое-то сжатое письмо. Добавить информативности.
+        subject='Пароль',
+        message=f'Пароль: {password}',
+        to=(user.email,)
+    )
+    return Response(
+        data=f'Заказ создан. Пароль от учетной записи: {password}',
+        status=status.HTTP_200_OK)
 
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    methods=['get', 'post', 'patch', 'delete']
+    methods = ('get', 'post', 'patch', 'delete')
     serializer_class = GetOrderSerializer
     queryset = Order.objects.all().select_related('user', 'address')
 
@@ -229,7 +253,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
-    methods=['get', 'post', 'patch', 'delete'],
+    methods = ('get', 'post', 'patch', 'delete')
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')

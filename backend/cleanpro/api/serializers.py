@@ -1,10 +1,9 @@
 from rest_framework import serializers
-from django.shortcuts import get_object_or_404
 from users.models import User
-# Советую установить, они проверяют орфографию:
-# https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
-# https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
-# Поправил много чего. Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
+# TODO: Советую установить, они проверяют орфографию:
+#       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
+#       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
+#       Поправил много чего. Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
 from service.models import Order, ServicePackage, Rating, Address
 from phonenumber_field.serializerfields import PhoneNumberField
 
@@ -20,6 +19,15 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'phone',
             'address',
         )
+
+
+# TODO: название класса не отображает истинный смысл
+class TokenSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('password',)
 
 
 class ConfirmMailSerializer(serializers.Serializer):
@@ -42,26 +50,18 @@ class ServicePackageSerializer(serializers.ModelSerializer):
         fields = ('title', 'price')
 
 
-# TODO: добавить dockstring.
-class Service_packageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ServicePackage
-        fields = ('title', 'price')
-
-
 class PostOrderSerializer(serializers.Serializer):
     # TODO: WARNING! ВАЖНО!
-    # Best practice: сериализатор нужен только для валидации и перевода
-    # информации из json в python-типы и обратно. Вся логика взаимодействия
-    # с БД - это работа view-функции. Это место обязательно требует
-    # рефакторинга!
+    #       Best practice: сериализатор нужен только для валидации и перевода
+    #       информации из json в python-типы и обратно. Вся логика
+    #       взаимодействия с БД - это работа view-функции. Это место
+    #       обязательно требует рефакторинга!
     """Сериализатор для создания заказа."""
     # TODO: в полях могут быть пустые значения, и получится 500 на сайте,
-    # так как будет не APIException c кастомным указанием ошибки и кода,
-    # а ValueError от БД, и сайт накроется.
+    #       так как будет не APIException c кастомным указанием ошибки и кода,
+    #       а ValueError от БД, и сайт накроется.
     # TODO: не повторяться, и сделать валидацию через сериализаторы для
-    # моделей User, Address и Order. Этот сериализатор вообще удалить.
+    #       моделей User, Address и Order. Этот сериализатор вообще удалить.
     city = serializers.CharField(
         max_length=256,)
     street = serializers.CharField(
@@ -87,21 +87,33 @@ class PostOrderSerializer(serializers.Serializer):
             street=data['street'],
             house=data['house'],
         )
+        # TODO: подумать, как написать это "хорошо"
+        if 'apartment' in data:
+            address.apartment = data['apartment']
+        if 'floor' in data:
+            address.floor = data['floor']
+        if 'entrance' in data:
+            address.entrance = data['entrance']
+        address.save()
         user, created = User.objects.get_or_create(email=data['email'])
         user.first_name = data['first_name']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
         user.save()
         service = data['service_package']
-        order = Order.objects.create(user=user, service_package=service,
-                                     total_sum=service.price,
-                                     address=user.address,
-                                     cleaning_date=data['cleaning_date'],
-                                     cleaning_time=data['cleaning_time'],
-                                     )
+        order = Order.objects.create(
+            user=user,
+            service_package=service,
+            total_sum=service.price,
+            address=user.address,
+            cleaning_date=data['cleaning_date'],
+            cleaning_time=data['cleaning_time'],
+        )
+        # TODO: зачем возвращать created, и для какого объекта он нужен?
         return order, created
 
     def update(self, instance, validated_data):
+        # TODO: тут не происходит никаких обновлений.
         instance.save()
         return instance
 
@@ -121,14 +133,13 @@ class OrderStatusSerializer(serializers.ModelSerializer):
             'order_status', instance.order_status)
         instance.save()
         return instance
-    
+
 
 # TODO: убрать сериализатор, он в точности повторяет предыдущий.
 class CancelSerializer(serializers.ModelSerializer):
     """Отменить заказ."""
     # Зачем?
     order_status = 'cancelled'
-
 
     class Meta:
         model = Order
@@ -138,7 +149,6 @@ class CancelSerializer(serializers.ModelSerializer):
         instance.order_status = 'cancelled'
         instance.save()
         return instance
-
 
 
 class PaySerializer(serializers.ModelSerializer):
@@ -160,8 +170,8 @@ class AddressSerializer(serializers.ModelSerializer):
     """Сериализатор для представления адреса."""
     class Meta:
         model = Address
+        # TODO: хорошая практика: прописать поля вместо __all__
         fields = '__all__'
-
 
 
 class GetOrderSerializer(serializers.ModelSerializer):
@@ -173,17 +183,15 @@ class GetOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         # TODO: не best practice, указать все поля, это важно с точки зрения
-        # безопасности и читаемости кода. 
+        # безопасности и читаемости кода.
         fields = (
             "__all__"
         )
 
 
-
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления комментария к заказу."""
     comment = serializers.CharField()
-
 
     class Meta:
         model = Order
@@ -212,8 +220,6 @@ class DateTimeSerializer(serializers.ModelSerializer):
         return instance
 
 
-
-
 class RatingSerializer(serializers.ModelSerializer):
     """Сериализатор для представления отзыва на уборку."""
     user = CustomUserSerializer(read_only=True)
@@ -222,4 +228,3 @@ class RatingSerializer(serializers.ModelSerializer):
         fields = '__all__'
         model = Rating
         read_only_fields = ('order',)
-

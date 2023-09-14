@@ -5,8 +5,10 @@ from .views import (
     UserViewSet, OrderViewSet, RatingViewSet,
     order_create, confirm_mail)
 
-# TODO: нарушается DRY
+app_name = 'api'
+
 router = routers.DefaultRouter()
+# TODO: нарушается DRY
 router.register('users', UserViewSet, basename='users')
 router.register('orders', OrderViewSet, basename='orders')
 # TODO: разобраться с рейтингом, как это должно работать и удалить

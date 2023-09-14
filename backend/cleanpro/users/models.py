@@ -1,4 +1,3 @@
-from cleanpro.settings import ADMIN, USER
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator
@@ -6,42 +5,35 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
 from .validators import validate_name, validate_password, validate_email
-from service.models import Address
+from cleanpro.settings import ADMIN, USER
 
 
 class Address(models.Model):
     """Модель адреса."""
     city = models.CharField(
-        # TODO: прописать все магические числа. Везде.
         verbose_name='Город',
-        max_length=25,
+        max_length=50
     )
     street = models.CharField(
         verbose_name='Улица',
-        max_length=150
+        max_length=50
     )
-    house = models.CharField(
-        verbose_name='Дом',
-        max_length=60
+    house = models.IntegerField(
+        verbose_name='Дом'
     )
-    apartment = models.PositiveSmallIntegerField(
+    apartment = models.IntegerField(
         verbose_name='Квартира',
-        default=None,
-        blank=True,
-        null=True,
-        validators=[MaxValueValidator(9999)],
+        validators=[
+            MaxValueValidator(9999, 'Укажите корректный номер квартиры.')
+        ]
     )
-    floor = models.PositiveSmallIntegerField(
+    floor = models.IntegerField(
         verbose_name='Этаж',
-        blank=True,
-        null=True,
-        validators=[MaxValueValidator(200)]
+        validators=[MaxValueValidator(150, 'Укажите корректный этаж.')]
     )
-    entrance = models.PositiveSmallIntegerField(
+    entrance = models.IntegerField(
         verbose_name='Подъезд',
-        blank=True,
-        null=True,
-        validators=[MaxValueValidator(99)]
+        validators=[MaxValueValidator(50, 'Укажите корректный подъезд.')]
     )
 
 
@@ -80,8 +72,9 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     """Модель пользователя."""
 
+    # TODO: что это?
     username = last_name = None
-    first_name =  models.CharField(
+    first_name = models.CharField(
         verbose_name='Имя',
         max_length=60,
         validators=[validate_name]
@@ -89,8 +82,8 @@ class User(AbstractUser):
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
         max_length=50,
-        unique=True,
-        validators=[validate_email]
+        validators=[validate_email],
+        unique=True
     )
     password = models.CharField(
         verbose_name='Пароль',
