@@ -11,13 +11,14 @@
 Запустить docker-compose:
 
 ```
-docker-compose up
+docker-compose up --build
 
 ```
 
 После окончания сборки контейнеров выполнить миграции:
 
 ```
+docker compose exec backend python manage.py makemigrations
 docker compose exec backend python manage.py migrate
 
 ```
@@ -38,16 +39,12 @@ docker compose exec backend cp -r /app/static/. /static/
 Проверить работу проекта возможно по любой из ссылок:
 
 ```
-http://localhost/
-
 http://127.0.0.1/
 ```
 
 **Документация для Cleanpro будет доступна по любой из ссылок**:
 
 ```
-http://localhost/redocs/
-
 http://127.0.0.1/redocs/ 
 ```
 
@@ -55,14 +52,4 @@ http://127.0.0.1/redocs/
 
 SECRET_KEY='django-insecure-^9iei$9fqe84qic^#hbp+$ymq+1o+h7a9jckpa&n64t)ekt(nt'
 
-DB_ENGINE=django.db.backends.postgresql
-
-POSTGRES_PASSWORD=postgres
-
-POSTGRES_USER=cs_user
-
-POSTGRES_DB=cs
-
-DB_HOST=db_cs
-
-DB_PORT=5432
+Остальное можно взять из файла .env.example

@@ -1,15 +1,63 @@
 from rest_framework import serializers
+from drf_base64.fields import Base64ImageField
+from django.shortcuts import get_object_or_404
 from users.models import User
 # TODO: Советую установить, они проверяют орфографию:
 #       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
 #       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
 #       Поправил много чего. Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
-from service.models import Order, ServicePackage, Rating, Address
+from service.models import Order, Rating, Address, ServicesInOrder
+from price.models import CleaningType, Service
 from phonenumber_field.serializerfields import PhoneNumberField
+
+
+class ServiceSerializer(serializers.ModelSerializer):
+    """Выгрузка списка дополнительных услуг."""
+    image = Base64ImageField(read_only=True)
+    measure = serializers.ReadOnlyField(
+        source='measure.title', read_only=True)
+
+    class Meta:
+        model = Service
+        fields = ('id', 'title', 'price', 'measure', 'image')
+
+
+class CleaningTypeSerializer(serializers.ModelSerializer):
+    """Выгрузка списка блоков основных услуг."""
+    service = ServiceSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = CleaningType
+        fields = ('id', 'title', 'coefficient', 'service')
+
+
+class ServicesInOrderSerializer(serializers.ModelSerializer):
+    """Выгрузка списка дополнительных услуг с указанием количества."""
+    id = serializers.ReadOnlyField(source='service.id')
+    title = serializers.ReadOnlyField(source='service.title')
+    measure = serializers.ReadOnlyField(
+        source='service.measure.title')
+    price = serializers.ReadOnlyField(
+        source='service.price')
+    image = Base64ImageField(
+        source='service.image')
+
+    class Meta:
+        model = ServicesInOrder
+        fields = ('id', 'title', 'measure', 'price', 'image', 'amount')
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    """Адрес заказа."""
+    class Meta:
+        model = Address
+        fields = '__all__'
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователей."""
+    address = AddressSerializer(read_only=True)
+
     class Meta:
         model = User
         fields = (
@@ -40,16 +88,6 @@ class ConfirmMailSerializer(serializers.Serializer):
         return value
 
 
-# Прошу ознакомиться с правилами названия классов в Python:
-# https://peps.python.org/pep-0008/#class-names
-class ServicePackageSerializer(serializers.ModelSerializer):
-    # TODO: уточнить назначение сериализатора и точно прописать docstring.
-    """Сериализатор для отображения услуг и их цен."""
-    class Meta:
-        model = ServicePackage
-        fields = ('title', 'price')
-
-
 class PostOrderSerializer(serializers.Serializer):
     # TODO: WARNING! ВАЖНО!
     #       Best practice: сериализатор нужен только для валидации и перевода
@@ -73,16 +111,31 @@ class PostOrderSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=False)
     email = serializers.EmailField()
     phone = PhoneNumberField(required=False, region='RU')
-    service_package = serializers.PrimaryKeyRelatedField(
-        queryset=ServicePackage.objects.all(),)
+    cleaning_type = serializers.PrimaryKeyRelatedField(
+        queryset=CleaningType.objects.all(),)
+    services = serializers.ListField()
     total_sum = serializers.IntegerField(
         default=0)
     cleaning_date = serializers.DateField()
     cleaning_time = serializers.TimeField()
     comment = serializers.CharField(required=False)
 
+    def services_bulk_create(self, order, services):
+        ing_objs = []
+        for item in services:
+            id = item.get('id')
+            amount = item.get('amount')
+            if amount > 0:
+                service = get_object_or_404(Service, id=id)
+                ing_objs.append(
+                    ServicesInOrder(
+                        order=order, service=service, amount=amount
+                    )
+                )
+        return ServicesInOrder.objects.bulk_create(ing_objs)
+
     def create(self, data):
-        address, created = Address.objects.get_or_create(
+        address, _ = Address.objects.get_or_create(
             city=data['city'],
             street=data['street'],
             house=data['house'],
@@ -95,22 +148,22 @@ class PostOrderSerializer(serializers.Serializer):
         if 'entrance' in data:
             address.entrance = data['entrance']
         address.save()
-        user, created = User.objects.get_or_create(email=data['email'])
+        user, _ = User.objects.get_or_create(email=data['email'])
         user.first_name = data['first_name']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
         user.save()
-        service = data['service_package']
         order = Order.objects.create(
             user=user,
-            service_package=service,
-            total_sum=service.price,
+            total_sum=data['total_sum'],
+            cleaning_type=data['cleaning_type'],
             address=user.address,
             cleaning_date=data['cleaning_date'],
             cleaning_time=data['cleaning_time'],
         )
+        self.services_bulk_create(order, data['services'])
         # TODO: зачем возвращать created, и для какого объекта он нужен?
-        return order, created
+        return order
 
     def update(self, instance, validated_data):
         # TODO: тут не происходит никаких обновлений.
@@ -178,7 +231,9 @@ class GetOrderSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
     user = CustomUserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
-    service_package = ServicePackageSerializer(read_only=True)
+    cleaning_type = CleaningTypeSerializer(read_only=True)
+    services = ServicesInOrderSerializer(
+        many=True, source='servicesinorder_set', read_only=True)
 
     class Meta:
         model = Order

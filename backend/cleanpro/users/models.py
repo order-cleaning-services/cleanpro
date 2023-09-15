@@ -25,15 +25,21 @@ class Address(models.Model):
         verbose_name='Квартира',
         validators=[
             MaxValueValidator(9999, 'Укажите корректный номер квартиры.')
-        ]
+        ],
+        null=True,
+        blank=True,
     )
     floor = models.IntegerField(
         verbose_name='Этаж',
-        validators=[MaxValueValidator(150, 'Укажите корректный этаж.')]
+        validators=[MaxValueValidator(150, 'Укажите корректный этаж.')],
+        null=True,
+        blank=True,
     )
     entrance = models.IntegerField(
         verbose_name='Подъезд',
-        validators=[MaxValueValidator(50, 'Укажите корректный подъезд.')]
+        validators=[MaxValueValidator(50, 'Укажите корректный подъезд.')],
+        null=True,
+        blank=True,
     )
 
 
@@ -87,7 +93,10 @@ class User(AbstractUser):
     )
     password = models.CharField(
         verbose_name='Пароль',
-        max_length=16,
+        max_length=256,
+        # # TODO: Пока отключил валидацию, т.к. не могу создать пользователя.
+        # Нужно проверять.
+        # max_length=16,
         validators=[validate_password]
     )
     phone = PhoneNumberField(
