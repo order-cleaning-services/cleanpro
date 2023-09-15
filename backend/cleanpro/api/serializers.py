@@ -82,26 +82,26 @@ class PostOrderSerializer(serializers.Serializer):
     comment = serializers.CharField(required=False)
 
     def create(self, data):
-        address, created = Address.objects.get_or_create(
+        # TODO: best practice - неиспользуемые переменные писать как "_". 
+        address, _ = Address.objects.get_or_create(
             city=data['city'],
             street=data['street'],
             house=data['house'],
         )
-        # TODO: подумать, как написать это "хорошо"
-        if 'apartment' in data:
-            address.apartment = data['apartment']
-        if 'floor' in data:
-            address.floor = data['floor']
-        if 'entrance' in data:
-            address.entrance = data['entrance']
+        for value in ('apartment', 'entrance', 'floor'):
+            if data.get(value):
+                setattr(address, value, value)
         address.save()
+        # TODO: заменить везде dict[value] на dict.get(value)!
+        #       если вдруг в слова не окажется value - сервер упадет,
+        #       что недопустимо!
         user, created = User.objects.get_or_create(email=data['email'])
         user.first_name = data['first_name']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
         user.save()
         service = data['service_package']
-        order = Order.objects.create(
+        order: Order = Order.objects.create(
             user=user,
             service_package=service,
             total_sum=service.price,
