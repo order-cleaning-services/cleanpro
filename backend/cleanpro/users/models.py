@@ -4,7 +4,8 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .validators import validate_name, validate_password, validate_email
+from .validators import (
+    validate_email, validate_name, validate_password, validate_username)
 from cleanpro.settings import ADMIN, USER
 
 
@@ -72,8 +73,10 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     """Модель пользователя."""
 
-    # TODO: что это?
-    username = last_name = None
+    username = models.CharField(
+        verbose_name='Имя пользователя',
+        validators=[validate_username]
+    )
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=60,
