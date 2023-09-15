@@ -1,11 +1,12 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/slices/formEntrySlice'
+import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/formEntry/formEntrySlice'
 import Button from '../Button/Button'
 import InputField from '../InputField/InputField'
+import { formEntrySelectors } from '../../store/formEntry/formEntrySelectors'
 import './FormEntry.scss'
 
 function FormEntry() {
-  const viewForm = useSelector(state => state.formEntrySlice.formView)
+  const viewForm = useSelector(formEntrySelectors.getFormView)
   const dispatch = useDispatch()
 
   const handleEntry = () => dispatch(handleClickEntry())

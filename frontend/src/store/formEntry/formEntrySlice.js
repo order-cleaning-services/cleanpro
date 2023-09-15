@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const formEntrySlice = createSlice({
-  name: 'formEntrySlice',
+  name: 'formEntry',
   initialState: {
     formView: 'registration',
   },

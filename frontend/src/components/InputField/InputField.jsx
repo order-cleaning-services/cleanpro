@@ -1,6 +1,7 @@
+import { forwardRef } from 'react'
 import './InputField.scss'
 
-function InputField({ placeholder = '', size, type = 'text', focus = false, label }) {
+const InputField = forwardRef(({ placeholder = '', size, type = 'text', focus = false, label, ...rest }, ref) => {
   function handleFocus(e) {
     if (focus) e.target.setAttribute('type', 'date')
   }
@@ -14,9 +15,12 @@ function InputField({ placeholder = '', size, type = 'text', focus = false, labe
         placeholder={placeholder}
         type={type}
         onFocus={e => handleFocus(e)}
+        ref={ref}
+        {...rest}
       />
     </div>
   )
-}
+})
 
+InputField.displayName
 export default InputField
