@@ -1,4 +1,4 @@
-import "./ServiceCard.scss"
+import './ServiceCard.scss'
 
 function ServiceCard({ content, img }) {
   return (

@@ -44,7 +44,7 @@ function Calculator() {
   }
 
   return (
-    <section className="calculator__container">
+    <section id="calculator" className="calculator__container">
       <h2>Выберите тип уборки</h2>
       <div className="calculator__wrapper">
         <div className="cleaning-type__container">

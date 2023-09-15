@@ -5,6 +5,9 @@
   flex-direction: column;
   position: relative;
 
+  &__password {
+    margin-top: 1.6rem;
+  }
   &__password::before {
     content: '';
     position: absolute;
@@ -41,6 +44,9 @@
   &:disabled {
     border: 1px solid $border-color;
     background-color: $border-color;
+  }
+  &__error {
+    border-color: $border-color-error;
   }
 }
 .form-input-small {
