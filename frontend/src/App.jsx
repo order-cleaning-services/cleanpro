@@ -9,6 +9,8 @@ function App() {
 
   useEffect(() => {
     dispatch(getUser())
+    // т.к. нет кнопки выйти можно выйти вручную через action
+    // dispatch(logOut())
   }, [])
 
   return (

@@ -8,17 +8,17 @@ function OrderForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <InputField label="Имя" {...register('first_name')} />
-      <InputField label="E-mail" placeholder="example@example.ru" {...register('email')} />
-      <InputField label="Телефон" placeholder="+7 (999) 999-99-99" {...register('phone')} />
-      <InputField label="Город" {...register('city')} />
-      <InputField label="Улица" {...register('street')} />
+      <InputField isValid label="Имя" {...register('first_name')} />
+      <InputField isValid label="E-mail" placeholder="example@example.ru" {...register('email')} />
+      <InputField isValid label="Телефон" placeholder="+7 (999) 999-99-99" {...register('phone')} />
+      <InputField isValid label="Город" {...register('city')} />
+      <InputField isValid label="Улица" {...register('street')} />
       <div className="inputs_wrapper">
-        <InputField size="small" label="Дом" {...register('house')} />
-        <InputField size="small" label="Квартира" {...register('apartment')} />
-        <InputField size="small" label="Подъезд" {...register('entrance')} />
-        <InputField size="small" label="Этаж" {...register('floor')} />
-        <InputField size="small" focus label="Дата" placeholder="__/__/____" {...register('cleaning_date')} />
+        <InputField isValid size="small" label="Дом" {...register('house')} />
+        <InputField isValid size="small" label="Квартира" {...register('apartment')} />
+        <InputField isValid size="small" label="Подъезд" {...register('entrance')} />
+        <InputField isValid size="small" label="Этаж" {...register('floor')} />
+        <InputField isValid size="small" focus label="Дата" placeholder="__/__/____" {...register('cleaning_date')} />
         <div>
           <label>Время</label>
           <select required name="time" className="time-selection" {...register('cleaning_time')}>
