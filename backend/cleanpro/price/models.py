@@ -38,7 +38,9 @@ class Service(models.Model):
     )
     image = models.ImageField(
         upload_to='service_photo/',
-        verbose_name='Фото вида уборки'
+        verbose_name='Фото вида уборки',
+        null=True,
+        blank=True,
     )
     service_type = models.CharField(
         verbose_name='Тип услуги',
