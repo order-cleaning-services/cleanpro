@@ -4,7 +4,7 @@
 
 Клонировать репозиторий и перейти в него в командной строке:
 
-``` git@github.com:order-cleaning-services/cleanpro.git ``` 
+``` git clone git@github.com:order-cleaning-services/cleanpro.git -b backend ``` 
 
 ``` cd cleanpro/ ``` 
 
@@ -78,3 +78,27 @@ EMAIL_SSL_CERTFILE=None
 EMAIL_SSL_KEYFILE=ssl_keyfile
 ### Operation block timeout (sec)
 EMAIL_TIMEOUT=60
+
+**Создание суперпользователя**
+
+После запуска в контейнерах переходим по ссылке http://127.0.0.1/api/users/
+
+Создаем пользователя и потом нужно его сделать супер пользователем для чего нужно провалиться в базу данных.
+
+Для этого в терминале в папке с docker файлом последовательно выполняем следующие команды:
+
+docker compose exec -it db_cs psql -U cs_user -d cs
+
+Потом уже в самой базе данных:
+
+update users_user set is_superuser=True;
+
+update users_user set is_staff=True;
+
+Проверить что все данные изменились можно:
+
+select * from users_user;
+
+Потом можно зайти в админку http://127.0.0.1/admin/
+
+Войти с логином и паролем созданного пользователя и там создать услуги и все остальное.
