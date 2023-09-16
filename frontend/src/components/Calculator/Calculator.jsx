@@ -1,30 +1,42 @@
 import './Calculator.scss'
 import Tab from '../Tab/Tab'
 import Counter from '../Counter/Counter'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import OrderForm from '../OrderForm/OrderForm'
 import Total from '../Total/Total'
 import ExtraServices from '../ExtraServices/ExtraServices'
 import IncludeServices from '../IncludeServices/IncludeServices'
 import { serviceCards } from '../../utils/initialData'
+import { useSelector, useDispatch } from 'react-redux'
+import { calculatorSelectors } from '../../store/calculator/calculatorSelectors'
+import {
+  resetRooms,
+  setCleanType,
+  setRooms,
+  setToilets,
+  setTotal,
+  setWindows,
+} from '../../store/calculator/calculatorSlice'
 
 function Calculator() {
-  const [cleanType, setCleanType] = useState(serviceCards[0].id)
-  const [total, setTotal] = useState(serviceCards[0].price)
-  const [room, setRoom] = useState(1)
-  const [toilet, setToilet] = useState(1)
-  const [window, setWindow] = useState(1)
+  const dispatch = useDispatch()
+
+  const total = useSelector(calculatorSelectors.getTotal)
+  const cleanType = useSelector(calculatorSelectors.getCleanType)
+  const rooms = useSelector(calculatorSelectors.getRooms)
+  const toilets = useSelector(calculatorSelectors.getToilets)
+  const windows = useSelector(calculatorSelectors.getWindows)
 
   const isTypeWindow = serviceCards.filter(card => card.id === cleanType)[0].title === 'Окна'
 
   useEffect(() => {
-    setTotal(serviceCards.filter(card => card.id === cleanType)[0].price)
+    dispatch(setTotal(serviceCards.filter(card => card.id === cleanType)[0].price))
+    dispatch(resetRooms())
   }, [cleanType])
 
   function handleActiveType(id) {
-    setCleanType(id)
-    setRoom(1)
-    setToilet(1)
+    dispatch(setCleanType(id))
+    dispatch(resetRooms())
   }
 
   function isActive(id) {
@@ -51,7 +63,7 @@ function Calculator() {
               <>
                 <div className="amount__container">
                   <p className="text-l">Количество окон</p>
-                  <Counter count={window} min={1} max={10} price={1500} setCount={setWindow} setTotal={setTotal} />
+                  <Counter count={windows} min={1} max={10} price={1500} setCount={setWindows} setTotal={setTotal} />
                 </div>
                 <div className="checkbox__wrapper">
                   <p className="text-l">Панорамные окна</p>
@@ -62,17 +74,17 @@ function Calculator() {
               <>
                 <div className="amount__container">
                   <p className="text-l">Количество комнат</p>
-                  <Counter count={room} min={1} max={5} price={1500} setCount={setRoom} setTotal={setTotal} />
+                  <Counter count={rooms} min={1} max={5} price={1500} setCount={setRooms} setTotal={setTotal} />
                 </div>
                 <div className="amount__container">
                   <p className="amount__title">Количество санузлов</p>
-                  <Counter count={toilet} min={1} max={5} price={1000} setCount={setToilet} setTotal={setTotal} />
+                  <Counter count={toilets} min={1} max={5} price={1000} setCount={setToilets} setTotal={setTotal} />
                 </div>
               </>
             )}
           </div>
           <IncludeServices cleanType={cleanType} />
-          {!isTypeWindow && <ExtraServices setTotal={setTotal} />}
+          {!isTypeWindow && <ExtraServices />}
         </div>
         <div className="calculator-form__wrapper">
           <Total total={total} />

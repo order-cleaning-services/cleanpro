@@ -124,10 +124,10 @@ export const serviceCards = [
 ]
 
 export const extraServices = [
-  { id: 1, title: 'Уборка балкона', price: 1000, maxCount: 5 },
-  { id: 2, title: 'Мытье духовки внутри', price: 450, maxCount: 5 },
-  { id: 3, title: 'Мытье окон', price: 450, maxCount: 5 },
-  { id: 4, title: 'Мытье холодильника', price: 700, maxCount: 5 },
-  { id: 5, title: 'Глажка', price: 500, maxCount: 5 },
-  { id: 6, title: 'Мытье микроволновки', price: 800, maxCount: 5 },
+  { id: 1, title: 'Уборка балкона', price: 1000, maxCount: 5, amount: 0 },
+  { id: 2, title: 'Мытье духовки внутри', price: 450, maxCount: 5, amount: 0 },
+  { id: 3, title: 'Мытье окон', price: 450, maxCount: 5, amount: 0 },
+  { id: 4, title: 'Мытье холодильника', price: 700, maxCount: 5, amount: 0 },
+  { id: 5, title: 'Глажка', price: 500, maxCount: 5, amount: 0 },
+  { id: 6, title: 'Мытье микроволновки', price: 800, maxCount: 5, amount: 0 },
 ]

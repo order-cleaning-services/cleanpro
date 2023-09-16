@@ -4,7 +4,6 @@ import './ProfilePage.scss'
 import OrderCard from '../../components/OrderCard/OrderCard'
 import Footer from '../../components/Footer/Footer'
 
-
 export default function Profile() {
   const [isProfileFormActive, setIsProfileFormActive] = useState(false)
   const toggleFormActive = () => setIsProfileFormActive(!isProfileFormActive)

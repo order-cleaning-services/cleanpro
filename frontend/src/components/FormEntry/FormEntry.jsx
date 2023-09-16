@@ -1,12 +1,15 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/slices/formEntrySlice'
+import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/formEntry/formEntrySlice'
 import { useForm, Controller } from 'react-hook-form'
 import Button from '../Button/Button'
 import InputField from '../InputField/InputField'
+import { formEntrySelectors } from '../../store/formEntry/formEntrySelectors'
 import './FormEntry.scss'
+import { registration, signInUser } from '../../store/auth/authActions'
+import { useEffect } from 'react'
 
 function FormEntry() {
-  const viewForm = useSelector(state => state.formEntrySlice.formView)
+  const viewForm = useSelector(formEntrySelectors.getFormView)
   const dispatch = useDispatch()
   const {
     control,
@@ -27,12 +30,18 @@ function FormEntry() {
   const handleRecovery = () => dispatch(handleClickRecovery())
   const handleRegistration = () => dispatch(handleClickRegistration())
 
+  useEffect(() => {
+    dispatch(handleClickRegistration())
+  }, [])
+
   const onSubmit = (data, e) => {
-    console.log('ok')
+    if (viewForm === 'registration') dispatch(registration(data))
+    if (viewForm === 'entry') dispatch(signInUser(data))
+    //TODO action recovery
+    // if (viewForm === 'recovery')
     e.target.reset()
     reset({ email: '' }, { password: '' })
   }
-
 
   return (
     <section className="form-entry">
