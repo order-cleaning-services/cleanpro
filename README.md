@@ -51,5 +51,30 @@ http://127.0.0.1/redocs/
 **Содержание файла .env (распологаться он должен в одной папке с файлом manage.py)**
 
 SECRET_KEY='django-insecure-^9iei$9fqe84qic^#hbp+$ymq+1o+h7a9jckpa&n64t)ekt(nt'
+CLEANPRO_HOST=cleanpro.com
+DB_ENGINE=django.db.backends.postgresql
+POSTGRES_PASSWORD=postgres
+POSTGRES_USER=cs_user
+POSTGRES_DB=cs
+DB_HOST=db_cs
+DB_PORT=5432
 
-Остальное можно взять из файла .env.example
+# Email settings
+### SMTP-server host.
+EMAIL_HOST=smtp.gmail.com
+### SMTP-server port.
+EMAIL_PORT=587
+### SMTP-server username.
+EMAIL_HOST_USER=cleanpronew2023@gmail.com
+### SMTP-server password.
+EMAIL_HOST_PASSWORD=vcdeidvfygmyufsk
+### True: use TLS connection (safe) with SMTP-server.
+EMAIL_USE_TLS=True
+### True: use SSL connection (protected) with SMTP-server.
+EMAIL_USE_SSL=False
+### If EMAIL_USE_TLS or EMAIL_USE_SSL: optionaly provide a path to sertificates PEM file
+EMAIL_SSL_CERTFILE=None
+### If EMAIL_USE_TLS or EMAIL_USE_SSL: optionaly provide a path to secret code PEM file
+EMAIL_SSL_KEYFILE=ssl_keyfile
+### Operation block timeout (sec)
+EMAIL_TIMEOUT=60
