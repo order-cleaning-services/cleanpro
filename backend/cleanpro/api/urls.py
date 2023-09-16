@@ -3,7 +3,8 @@ from rest_framework import routers
 
 from .views import (
     UserViewSet, OrderViewSet, RatingViewSet,
-    order_create, confirm_mail)
+    order_create, confirm_mail, CleaningTypeViewSet,
+    ServiceViewSet)
 
 app_name = 'api'
 
@@ -14,6 +15,8 @@ router.register('orders', OrderViewSet, basename='orders')
 # TODO: разобраться с рейтингом, как это должно работать и удалить
 #       лишний роутер, так быть не должно
 router.register('ratings', RatingViewSet, basename='ratings')
+router.register('types', CleaningTypeViewSet)
+router.register('services', ServiceViewSet)
 router.register(r'^orders/(?P<order_id>\d+)/rating',
                 RatingViewSet,
                 basename='rating_via_orders')

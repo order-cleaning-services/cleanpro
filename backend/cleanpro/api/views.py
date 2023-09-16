@@ -8,9 +8,12 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 
+from cleanpro.settings import ADDITIONAL_CS
+from price.models import CleaningType, Service
 from .permissions import IsOwnerOrReadOnly, IsOwner
 from .serializers import (
     CancelSerializer,
+    CleaningTypeSerializer,
     CommentSerializer,
     ConfirmMailSerializer,
     CustomUserSerializer,
@@ -19,7 +22,8 @@ from .serializers import (
     OrderStatusSerializer,
     PaySerializer,
     PostOrderSerializer,
-    RatingSerializer
+    RatingSerializer,
+    ServiceSerializer
 )
 from service.models import Order, Rating
 # TODO: ну надо определиться - или из строки 3, или отсюда. Полагаю - отсюда
@@ -74,6 +78,20 @@ def send_mail(subject: str, message: str, to: tuple[str]) -> None:
             connection=conn
         ).send(fail_silently=False)
     return
+
+
+class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получение списка типов основных услуг."""
+    queryset = CleaningType.objects.exclude(type=ADDITIONAL_CS)
+    serializer_class = CleaningTypeSerializer
+    pagination_class = None
+
+
+class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
+    """Получение списка дополнительных услуг."""
+    queryset = Service.objects.filter(service_type=ADDITIONAL_CS)
+    serializer_class = ServiceSerializer
+    pagination_class = None
 
 
 class UserViewSet(UserViewSet):

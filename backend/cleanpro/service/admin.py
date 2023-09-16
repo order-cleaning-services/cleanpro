@@ -1,8 +1,23 @@
 from django.contrib import admin
 
-from .models import Address, Order, Rating, ServicePackage
+from .models import (Order, Rating, ServicesInOrder)
 
-admin.site.register(Order)
+
+class ServicesToOrder(admin.StackedInline):
+    model = ServicesInOrder
+
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'total_sum', 'order_status', 'user',
+                    'comment')
+    list_editable = ('total_sum', 'order_status', 'comment')
+    list_filter = ('order_status',)
+    search_fields = ('comment', )
+    empty_value_display = '-пусто-'
+    inlines = [
+        ServicesToOrder,
+    ]
+
+
+admin.site.register(Order, OrderAdmin)
 admin.site.register(Rating)
-admin.site.register(Address)
-admin.site.register(ServicePackage)
