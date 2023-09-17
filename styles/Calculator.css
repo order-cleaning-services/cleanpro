@@ -1,5 +1,3 @@
-@import '../../assets/styles/colors.scss';
-
 .tab {
   display: flex;
   align-items: center;
@@ -14,19 +12,20 @@
 
 .tab-active {
   font-weight: 700;
-  border-bottom: 2px solid $button-color-blue;
+  border-bottom: 2px solid #81ace5;
 }
 
 .calculator__container {
   width: 144rem;
   margin: 12rem auto;
+  height: -moz-fit-content;
   height: fit-content;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   gap: 6rem;
-  background-color: $background-color-secondary;
+  background-color: #f2f2f2;
   padding: 7.2rem 10rem;
 }
 
@@ -66,11 +65,10 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
-
-  &:has(input) {
-    flex-direction: row;
-    gap: 4.4rem;
-  }
+}
+.rooms-quantity:has(input) {
+  flex-direction: row;
+  gap: 4.4rem;
 }
 
 .amount__container {

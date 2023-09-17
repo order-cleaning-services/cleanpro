@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/slices/formEntrySlice'
+import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/formEntry/formEntrySlice'
 import Button from '../Button/Button'
 import InputField from '../InputField/InputField'
 import './FormEntry.scss'
