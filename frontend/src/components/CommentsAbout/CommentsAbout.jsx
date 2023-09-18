@@ -6,9 +6,9 @@ import { comments } from '../../utils/commentsData'
 import { useState } from 'react'
 
 const CommentsAbout = () => {
-  const [page, setPage] = useState(1)
-  const handleCkick = () => {
-    setPage(page => page + 1)
+  const [count, setCount] = useState(8)
+  const handleClick = () => {
+    setCount(count => count + 4)
   }
 
   return (
@@ -18,7 +18,7 @@ const CommentsAbout = () => {
           <h2 className="comments__title">Отзывы клиентов</h2>
         </div>
         <div className="comments__about">
-          {comments.slice(0, 8 * page).map(c => (
+          {comments.slice(0, count).map(c => (
             <CommentsList
               key={c.id}
               rating={c.rating}
@@ -28,8 +28,8 @@ const CommentsAbout = () => {
             />
           ))}
         </div>
-        {comments.length > comments.slice(0, 8 * page).length && (
-          <button className="comments__show" onClick={handleCkick}>
+        {comments.length > comments.slice(0, count).length && (
+          <button className="comments__show" onClick={handleClick}>
             Посмотреть больше
           </button>
         )}
