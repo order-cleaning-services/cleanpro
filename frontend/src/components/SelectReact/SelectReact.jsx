@@ -52,6 +52,7 @@ function SelectReact() {
   const handleChangeSelect = selectedOption => {
     console.log('handleChange', selectedOption.value)
   }
+
   return (
     <Select
       className="select-time"

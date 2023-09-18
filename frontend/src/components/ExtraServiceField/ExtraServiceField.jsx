@@ -12,7 +12,7 @@ function ExtraServiceField({ title, price, maxCount, index }) {
       <p className="text-m text-grey">
         {price} ₽ / {title === 'Глажка' ? '30 мин' : 'шт.'}
       </p>
-      <Counter min={0} max={maxCount} price={price} count={extra.amount} setCount={setExtra} index={index} />
+      <Counter min={0} max={maxCount} price={price} count={extra?.amount} setCount={setExtra} index={index} />
     </div>
   )
 }

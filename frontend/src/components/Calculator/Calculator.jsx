@@ -6,7 +6,6 @@ import OrderForm from '../OrderForm/OrderForm'
 import Total from '../Total/Total'
 import ExtraServices from '../ExtraServices/ExtraServices'
 import IncludeServices from '../IncludeServices/IncludeServices'
-import { serviceCards } from '../../utils/initialData'
 import { useSelector, useDispatch } from 'react-redux'
 import { calculatorSelectors } from '../../store/calculator/calculatorSelectors'
 import {
@@ -16,6 +15,7 @@ import {
   setToilets,
   setTotal,
   setWindows,
+  setIsPanoramic,
 } from '../../store/calculator/calculatorSlice'
 
 function Calculator() {
@@ -26,13 +26,14 @@ function Calculator() {
   const rooms = useSelector(calculatorSelectors.getRooms)
   const toilets = useSelector(calculatorSelectors.getToilets)
   const windows = useSelector(calculatorSelectors.getWindows)
+  const types = useSelector(calculatorSelectors.getTypes)
 
-  const isTypeWindow = serviceCards.filter(card => card.id === cleanType)[0].title === 'Окна'
+  const isTypeWindow = types.filter(card => card.id === cleanType)[0]?.title === 'Окна'
 
   useEffect(() => {
-    dispatch(setTotal(serviceCards.filter(card => card.id === cleanType)[0].price))
     dispatch(resetRooms())
-  }, [cleanType])
+    dispatch(setTotal(types.filter(card => card.id === cleanType)[0]?.price))
+  }, [cleanType, dispatch])
 
   function handleActiveType(id) {
     dispatch(setCleanType(id))
@@ -51,8 +52,8 @@ function Calculator() {
           <div className="cleaning-type__wrapper">
             <p className="text-l">Тип уборки</p>
             <div className="cleaning-type__tabs">
-              {serviceCards.map(card => (
-                <Tab key={card.id} onChangeType={() => handleActiveType(card.id)} isActive={isActive(card.id)}>
+              {types.map(card => (
+                <Tab key={card.title} onChangeType={() => handleActiveType(card.id)} isActive={isActive(card.id)}>
                   {card.title}
                 </Tab>
               ))}
@@ -67,18 +68,25 @@ function Calculator() {
                 </div>
                 <div className="checkbox__wrapper">
                   <p className="text-l">Панорамные окна</p>
-                  <input type="checkbox" />
+                  <input type="checkbox" onClick={() => dispatch(setIsPanoramic())} />
                 </div>
               </>
             ) : (
               <>
                 <div className="amount__container">
                   <p className="text-l">Количество комнат</p>
-                  <Counter count={rooms} min={1} max={5} price={1500} setCount={setRooms} setTotal={setTotal} />
+                  <Counter
+                    count={rooms}
+                    min={1}
+                    max={5}
+                    price={types[cleanType - 1]?.price}
+                    setCount={setRooms}
+                    setTotal={setTotal}
+                  />
                 </div>
                 <div className="amount__container">
                   <p className="amount__title">Количество санузлов</p>
-                  <Counter count={toilets} min={1} max={5} price={1000} setCount={setToilets} setTotal={setTotal} />
+                  <Counter count={toilets} min={1} max={5} price={600} setCount={setToilets} setTotal={setTotal} />
                 </div>
               </>
             )}
@@ -87,7 +95,7 @@ function Calculator() {
           {!isTypeWindow && <ExtraServices />}
         </div>
         <div className="calculator-form__wrapper">
-          <Total total={total} />
+          <Total total={`${total?.toString().slice(0, -3)} ${total?.toString().slice(-3)}`} />
           <OrderForm />
         </div>
       </div>
