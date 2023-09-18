@@ -8,6 +8,7 @@ class Measure(models.Model):
     title = models.CharField(
         verbose_name='Единица измерения',
         max_length=25,
+        unique=True,
     )
 
     class Meta:
@@ -24,11 +25,12 @@ class Service(models.Model):
     title = models.CharField(
         verbose_name='Название услуги',
         max_length=60,
+        unique=True
     )
     price = models.FloatField(
         verbose_name='Цена услуги за единицу измерения',
         max_length=7,
-        validators=[MinValueValidator(1, 'Укажите корректную сумму.')]
+        validators=(MinValueValidator(1, 'Укажите корректную сумму.'),),
     )
     measure = models.ForeignKey(
         Measure,
@@ -39,11 +41,14 @@ class Service(models.Model):
     image = models.ImageField(
         upload_to='service_photo/',
         verbose_name='Фото вида уборки',
+        # TODO: это временно же?
         null=True,
         blank=True,
     )
     service_type = models.CharField(
         verbose_name='Тип услуги',
+        # TODO: best practice - выносить такое в константы
+        #       https://docs.djangoproject.com/en/4.2/ref/models/fields/#choices
         choices=(
             ('main', 'Основная'),
             ('additional', 'Дополнительная'),
@@ -66,13 +71,14 @@ class CleaningType(models.Model):
     title = models.CharField(
         verbose_name='Название наборов услуг.',
         max_length=25,
+        unique=True,
     )
     coefficient = models.FloatField(
         verbose_name='Коэффициент увеличения цены',
         max_length=3,
-        validators=[
-            MinValueValidator(1, 'Коэффициент не может быть меньше 1')
-        ],
+        validators=(
+            MinValueValidator(1, 'Коэффициент не может быть меньше 1'),
+        ),
     )
     type = models.CharField(
         verbose_name='Тип набора',
@@ -86,7 +92,7 @@ class CleaningType(models.Model):
     service = models.ManyToManyField(
         Service,
         through='ServicesInCleaningtype',
-        through_fields=('cleaning_type', 'service'),
+        through_fields=('cleaning_type', 'service',),
     )
 
     class Meta:
@@ -97,7 +103,7 @@ class CleaningType(models.Model):
         return self.title
 
 
-class ServicesInCleaningtype(models.Model):
+class ServicesInCleaningType(models.Model):
     """Модель перечня услуг в наборах услуг."""
 
     cleaning_type = models.ForeignKey(
@@ -110,3 +116,12 @@ class ServicesInCleaningtype(models.Model):
         on_delete=models.CASCADE,
         verbose_name='Услуга'
     )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=('cleaning_type', 'service',),
+                name='service_in_cleaning_type'),
+        )
+        verbose_name = 'Услуга в наборе'
+        verbose_name_plural = 'Услуги в наборе'
