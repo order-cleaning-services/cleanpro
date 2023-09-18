@@ -3,6 +3,7 @@ import Footer from '../../components/Footer/Footer'
 import About from '../../components/About/About'
 import CleanersList from '../../components/CleanersList/CleanersList'
 import ButtonOrder from '../../components/ButtonOrder/ButtonOrder'
+import CommentsAbout from '../../components/CommentsAbout/CommentsAbout'
 
 function AboutPage() {
   return (
@@ -13,6 +14,7 @@ function AboutPage() {
         <h2 className="about-page__title">Наши клинеры</h2>
         <CleanersList />
       </div>
+      <CommentsAbout />
       <Footer />
       <ButtonOrder height={0} />
     </div>

@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import CommentsList from '../CommentsList/CommentsList'
 import 'swiper/css'
 import './Comments.scss'
-import { comments } from './const'
+import { comments } from '../../utils/commentsData'
 import ButtonsSwiper from '../ButtonsSwiper/ButtonsSwiper'
 import { SwiperSlide } from 'swiper/react'
 
