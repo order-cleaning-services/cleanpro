@@ -8,6 +8,7 @@ class Measure(models.Model):
     title = models.CharField(
         verbose_name='Единица измерения',
         max_length=25,
+        unique=True,
     )
 
     class Meta:
