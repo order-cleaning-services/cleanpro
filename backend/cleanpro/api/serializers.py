@@ -5,7 +5,8 @@ from users.models import User
 # TODO: Советую установить, они проверяют орфографию:
 #       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
 #       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
-#       Поправил много чего. Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
+#       Поправил много чего.
+#       Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
 from service.models import Order, Rating, Address, ServicesInOrder
 from price.models import CleaningType, Service
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -140,15 +141,14 @@ class PostOrderSerializer(serializers.Serializer):
             street=data['street'],
             house=data['house'],
         )
-        # TODO: подумать, как написать это "хорошо"
-        if 'apartment' in data:
-            address.apartment = data['apartment']
-        if 'floor' in data:
-            address.floor = data['floor']
-        if 'entrance' in data:
-            address.entrance = data['entrance']
+        for value in ('apartment', 'entrance', 'floor'):
+            if data.get(value):
+                setattr(address, value, value)
         address.save()
-        user, _ = User.objects.get_or_create(email=data['email'])
+        # TODO: заменить везде dict[value] на dict.get(value)!
+        #       если вдруг в слова не окажется value - сервер упадет,
+        #       что недопустимо!
+        user, created = User.objects.get_or_create(email=data['email'])
         user.first_name = data['first_name']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
