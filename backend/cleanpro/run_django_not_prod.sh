@@ -3,19 +3,22 @@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@ preparing migrations @@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-sleep 5
+
+sleep 2 # In order to make sure that db is ready
 python manage.py makemigrations
 python manage.py migrate
 
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@   collecting static   @@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 python manage.py collectstatic --noinput
 
 # TODO: DELETE ON PRODUCTION!
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@  creating superuser  @@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 if ! python manage.py shell -c "from users.models import User; User.objects.filter(username='admin').exists()" | grep -q "True"; then
     echo "from users.models import User; \
     admin = User.objects.create_superuser('admin@email.com', 'admin'); \
@@ -27,6 +30,13 @@ if ! python manage.py shell -c "from users.models import User; User.objects.filt
 else
     echo "Пользователь 'admin' уже существует"
 fi
+
+# TODO: DELETE ON PRODUCTION!
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+echo @@@@@@@@@@@@@@@@@@@@@@@@  import services  @@@@@@@@@@@@@@@@@@@@@@@@@@
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+python manage.py csv_services_import
 
 # echo @@@@@@@@@@@@@@@@@@@@@@@   loading database   @@@@@@@@@@@@@@@@@@@@@@@@
 # echo pass...
