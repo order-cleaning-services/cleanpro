@@ -115,6 +115,7 @@ class User(AbstractUser):
         blank=True,
         null=True,
     )
+    # TODO: Какой смысл в это вложен? Для роли есть атрибут "is_staff".
     role = models.CharField(
         verbose_name='Роль',
         choices=(
