@@ -27,8 +27,6 @@ export const logOut = createAsyncThunk('auth/logout', async (_, { rejectWithValu
 export const getUser = createAsyncThunk('auth/getUser', async (_, { rejectWithValue }) => {
   try {
     const token = getToken()
-    console.log(token)
-
     const res = await authAPI.getUser(token)
     return res
   } catch (e) {
