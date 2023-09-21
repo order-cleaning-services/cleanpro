@@ -44,7 +44,9 @@ class Command(BaseCommand):
     def handle(self, *args: Any, **options: Any):
         try:
             csv_file: csv.DictReader = csv.DictReader(
-                open(f'{import_path}services.csv', 'r', encoding='utf-8'))
+                open(f'{import_path}services.csv', 'r', encoding='utf-8'),
+                delimiter=';',
+            )
             for row in csv_file:
                 service_to_add: Service = return_service_object(row)
                 if isinstance(service_to_add, Service):
