@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (Order, Rating, ServicesInOrder)
+from .models import Order, Rating, ServicesInOrder
 
 
 class ServicesToOrder(admin.StackedInline):
