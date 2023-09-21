@@ -91,7 +91,7 @@ class CleaningType(models.Model):
     )
     service = models.ManyToManyField(
         Service,
-        through='ServicesInCleaningtype',
+        through='ServicesInCleaningType',
         through_fields=('cleaning_type', 'service',),
     )
 
