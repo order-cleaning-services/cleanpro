@@ -1,24 +1,19 @@
-from rest_framework import serializers
-from drf_base64.fields import Base64ImageField
+import re
+
 from django.shortcuts import get_object_or_404
-from users.models import User
-# TODO: Советую установить, они проверяют орфографию:
-#       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker
-#       https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker-russian
-#       Поправил много чего.
-#       Например, "Adress" -> "Address", "cancell" -> "cancel" и т.д..
-from service.models import Order, Rating, Address, ServicesInOrder
-from price.models import CleaningType, Service
+from drf_base64.fields import Base64ImageField
+from rest_framework import serializers, status
 from phonenumber_field.serializerfields import PhoneNumberField
+
+from price.models import CleaningType, Service
+from service.models import Order, Rating, Address, ServicesInOrder
+from users.models import User
+from users.validators import EMAIL_PATTERN
 
 
 class ServiceSerializer(serializers.ModelSerializer):
-    """Выгрузка списка дополнительных услуг."""
+    """Сериализатор услуг."""
     image = Base64ImageField(read_only=True)
-    # TODO: просьба придерживаться общего код-стайла. Я тоже очень люблю, как
-    #       было тут исходно, но по всему проекту прослеживается иной стиль.
-    #       Неконсистентный код бросается в глаза и выглядит непрофессионально.
-    #       Тренируем навык написания программ в общем стиле!
     measure = serializers.ReadOnlyField(
         source='measure.title',
         read_only=True
@@ -36,7 +31,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 
 class CleaningTypeSerializer(serializers.ModelSerializer):
-    """Выгрузка списка блоков основных услуг."""
+    """Сериализатор набора услуг."""
     service = ServiceSerializer(many=True, read_only=True)
 
     class Meta:
@@ -50,7 +45,7 @@ class CleaningTypeSerializer(serializers.ModelSerializer):
 
 
 class ServicesInOrderSerializer(serializers.ModelSerializer):
-    """Выгрузка списка дополнительных услуг с указанием количества."""
+    """Сериализатор перечня услуг в заказе."""
     id = serializers.ReadOnlyField(source='service.id')
     title = serializers.ReadOnlyField(source='service.title')
     measure = serializers.ReadOnlyField(source='service.measure.title')
@@ -70,27 +65,8 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
-    """Адрес заказа."""
+    """Сериализатор адреса."""
 
-    class Meta:
-        model = Address
-        fields = (
-            'id',
-            'city',
-            'street',
-            'house',
-            'apartment',
-            'floor',
-            'entrance',
-        )
-
-
-# TODO: этот сериализатор был ниже. Я его перенес выше для наглядности.
-#       Пожалуйста, не плодите ненужные и тем более задвоенные сериализаторы.
-#       Комментарии ниже есть и для других.
-#       Особое внимание к PostOrderSerializer. Могу с ним помочь в будущем.
-class AddressSerializer(serializers.ModelSerializer):
-    """Сериализатор для представления адреса."""
     class Meta:
         model = Address
         fields = (
@@ -134,8 +110,14 @@ class ConfirmMailSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         """Производит валидацию поля email."""
-        # TODO: я для поля модели писал regexp - его надо сюда
-        return value
+        # TODO: слишком много валидации повторной, копирует полностью:
+        #       users.validators.validate_password - не хорошо, не DRY
+        if re.fullmatch(EMAIL_PATTERN, value):
+            return value
+        raise serializers.ValidationError(
+            detail='Введите корректный email (например: example@example.ru',
+            code=status.HTTP_400_BAD_REQUEST,
+        )
 
 
 class PostOrderSerializer(serializers.Serializer):
@@ -173,8 +155,6 @@ class PostOrderSerializer(serializers.Serializer):
         for item in services:
             id = item.get('id')
             amount = item.get('amount')
-            # INFO: Вот тут 'amount' если None - привет 500 из-за TypeError.
-            #       Если id None - выдаст 404 исключение.
             # TODO: вопрос! Какая должна быть логика, если хоть у одного адреса
             #       произойдет сбой в присланных данных?
             if id is not None and amount is not None and amount > 0:
@@ -187,20 +167,27 @@ class PostOrderSerializer(serializers.Serializer):
         return ServicesInOrder.objects.bulk_create(ing_objs)
 
     def create(self, data):
-        # TODO: будет 500 при отсутствии какого-либо ключа в data.
+        # TODO: сообщить проверку в сериализатор адреса.
+        for attribute in ('house', 'city', 'street'):
+            if attribute not in data:
+                raise serializers.ValidationError(
+                    data=(
+                        'Заполните все обязательные поля адреса: \n'
+                        '"house", "city", "street"'
+                    ),
+                    code=status.HTTP_400_BAD_REQUEST,
+                )
         address, _ = Address.objects.get_or_create(
             city=data['city'],
             street=data['street'],
             house=data['house'],
         )
-        for value in ('apartment', 'entrance', 'floor'):
-            if data.get(value):
-                setattr(address, value, value)
+        for attribute in ('apartment', 'entrance', 'floor'):
+            value = data.get(attribute)
+            if value is not None:
+                setattr(address, attribute, value)
         address.save()
-        # TODO: заменить везде dict[value] на dict.get(value)!
-        #       если вдруг в слова не окажется value - сервер упадет,
-        #       что недопустимо!
-        user, created = User.objects.get_or_create(email=data['email'])
+        user, _ = User.objects.get_or_create(email=data['email'])
         user.first_name = data['first_name']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
