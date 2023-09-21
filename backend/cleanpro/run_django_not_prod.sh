@@ -1,10 +1,11 @@
 #!/bin/bash
 
+sleep 5 # In order to make sure that db is ready
+
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@ preparing migrations @@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-sleep 2 # In order to make sure that db is ready
 python manage.py makemigrations
 python manage.py migrate
 
