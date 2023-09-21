@@ -22,7 +22,7 @@ export class FetchAPI {
   }
 
   get = async (url, options) => {
-    return await baseFetch(this.API_URL + url, METHODS.GET, options.body)
+    return await baseFetch(this.API_URL + url, METHODS.GET, options?.body)
   }
 
   post = async (url, options) => {
@@ -48,24 +48,31 @@ const baseFetch = async (url, method, body) => {
 
   let bodyFetch = JSON.stringify(body)
 
-  const options =
-    token || method === METHODS.GET
-      ? {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Token ${token}`,
-            'Access-Control-Allow-Credentials': true,
-          },
-          method,
-        }
-      : {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method,
-          credentials: 'include',
-          body: bodyFetch,
-        }
+  const options = token
+    ? {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Token ${token}`,
+          'Access-Control-Allow-Credentials': true,
+        },
+        method,
+      }
+    : method === METHODS.GET
+    ? {
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Credentials': true,
+        },
+        method,
+      }
+    : {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method,
+        credentials: 'include',
+        body: bodyFetch,
+      }
 
   let result
   const response = await fetch(url, options)
@@ -86,4 +93,4 @@ const baseFetch = async (url, method, body) => {
   return result
 }
 
-export default new FetchAPI('http://localhost')
+export default new FetchAPI('http://localhost/api')
