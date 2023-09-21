@@ -4,10 +4,12 @@ WORKDIR /app
 
 RUN pip install gunicorn==20.1.0
 
-COPY requirements.txt .
+COPY . .
 
 RUN pip install -r requirements.txt --no-cache-dir
 
-COPY . .
+RUN apt-get update && \
+    apt-get install -y dos2unix && \
+    dos2unix run_django_not_prod.sh
 
-CMD ["/app/run_django_not_prod.sh"]
+CMD ["bash", "run_django_not_prod.sh"]
