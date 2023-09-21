@@ -15,12 +15,24 @@ from phonenumber_field.serializerfields import PhoneNumberField
 class ServiceSerializer(serializers.ModelSerializer):
     """Выгрузка списка дополнительных услуг."""
     image = Base64ImageField(read_only=True)
+    # TODO: просьба придерживаться общего код-стайла. Я тоже очень люблю, как
+    #       было тут исходно, но по всему проекту прослеживается иной стиль.
+    #       Неконсистентный код бросается в глаза и выглядит непрофессионально.
+    #       Тренируем навык написания программ в общем стиле!
     measure = serializers.ReadOnlyField(
-        source='measure.title', read_only=True)
+        source='measure.title',
+        read_only=True
+    )
 
     class Meta:
         model = Service
-        fields = ('id', 'title', 'price', 'measure', 'image')
+        fields = (
+            'id',
+            'title',
+            'price',
+            'measure',
+            'image',
+        )
 
 
 class CleaningTypeSerializer(serializers.ModelSerializer):
@@ -29,30 +41,67 @@ class CleaningTypeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CleaningType
-        fields = ('id', 'title', 'coefficient', 'service')
+        fields = (
+            'id',
+            'title',
+            'coefficient',
+            'service',
+        )
 
 
 class ServicesInOrderSerializer(serializers.ModelSerializer):
     """Выгрузка списка дополнительных услуг с указанием количества."""
     id = serializers.ReadOnlyField(source='service.id')
     title = serializers.ReadOnlyField(source='service.title')
-    measure = serializers.ReadOnlyField(
-        source='service.measure.title')
-    price = serializers.ReadOnlyField(
-        source='service.price')
-    image = Base64ImageField(
-        source='service.image')
+    measure = serializers.ReadOnlyField(source='service.measure.title')
+    price = serializers.ReadOnlyField(source='service.price')
+    image = Base64ImageField(source='service.image')
 
     class Meta:
         model = ServicesInOrder
-        fields = ('id', 'title', 'measure', 'price', 'image', 'amount')
+        fields = (
+            'id',
+            'title',
+            'measure',
+            'price',
+            'image',
+            'amount',
+        )
 
 
 class AddressSerializer(serializers.ModelSerializer):
     """Адрес заказа."""
+
     class Meta:
         model = Address
-        fields = '__all__'
+        fields = (
+            'id',
+            'city',
+            'street',
+            'house',
+            'apartment',
+            'floor',
+            'entrance',
+        )
+
+
+# TODO: этот сериализатор был ниже. Я его перенес выше для наглядности.
+#       Пожалуйста, не плодите ненужные и тем более задвоенные сериализаторы.
+#       Комментарии ниже есть и для других.
+#       Особое внимание к PostOrderSerializer. Могу с ним помочь в будущем.
+class AddressSerializer(serializers.ModelSerializer):
+    """Сериализатор для представления адреса."""
+    class Meta:
+        model = Address
+        fields = (
+            'id',
+            'city',
+            'street',
+            'house',
+            'apartment',
+            'floor',
+            'entrance',
+        )
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
@@ -101,32 +150,34 @@ class PostOrderSerializer(serializers.Serializer):
     #       а ValueError от БД, и сайт накроется.
     # TODO: не повторяться, и сделать валидацию через сериализаторы для
     #       моделей User, Address и Order. Этот сериализатор вообще удалить.
-    city = serializers.CharField(
-        max_length=256,)
-    street = serializers.CharField(
-        max_length=256,)
+    city = serializers.CharField(max_length=256,)
+    street = serializers.CharField(max_length=256,)
     house = serializers.IntegerField()
-    apartment = serializers.IntegerField(required=False)
-    floor = serializers.IntegerField(required=False)
-    entrance = serializers.IntegerField(required=False)
-    first_name = serializers.CharField(required=False)
+    apartment = serializers.IntegerField(required=False,)
+    floor = serializers.IntegerField(required=False,)
+    entrance = serializers.IntegerField(required=False,)
+    first_name = serializers.CharField(required=False,)
     email = serializers.EmailField()
-    phone = PhoneNumberField(required=False, region='RU')
+    phone = PhoneNumberField(required=False, region='RU',)
     cleaning_type = serializers.PrimaryKeyRelatedField(
-        queryset=CleaningType.objects.all(),)
+        queryset=CleaningType.objects.all(),
+    )
     services = serializers.ListField()
-    total_sum = serializers.IntegerField(
-        default=0)
+    total_sum = serializers.IntegerField(default=0,)
     cleaning_date = serializers.DateField()
     cleaning_time = serializers.TimeField()
-    comment = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False,)
 
     def services_bulk_create(self, order, services):
         ing_objs = []
         for item in services:
             id = item.get('id')
             amount = item.get('amount')
-            if amount > 0:
+            # INFO: Вот тут 'amount' если None - привет 500 из-за TypeError.
+            #       Если id None - выдаст 404 исключение.
+            # TODO: вопрос! Какая должна быть логика, если хоть у одного адреса
+            #       произойдет сбой в присланных данных?
+            if id is not None and amount is not None and amount > 0:
                 service = get_object_or_404(Service, id=id)
                 ing_objs.append(
                     ServicesInOrder(
@@ -136,6 +187,7 @@ class PostOrderSerializer(serializers.Serializer):
         return ServicesInOrder.objects.bulk_create(ing_objs)
 
     def create(self, data):
+        # TODO: будет 500 при отсутствии какого-либо ключа в data.
         address, _ = Address.objects.get_or_create(
             city=data['city'],
             street=data['street'],
@@ -162,7 +214,6 @@ class PostOrderSerializer(serializers.Serializer):
             cleaning_time=data['cleaning_time'],
         )
         self.services_bulk_create(order, data['services'])
-        # TODO: зачем возвращать created, и для какого объекта он нужен?
         return order
 
     def update(self, instance, validated_data):
@@ -174,8 +225,7 @@ class PostOrderSerializer(serializers.Serializer):
 class OrderStatusSerializer(serializers.ModelSerializer):
     """Сериализатор для изменения статуса заказа."""
     # TODO: уточнить необходимость параметра, так как он прописан в модели.
-    order_status = serializers.ChoiceField(
-        choices=Order.STATUS_CHOICES)
+    order_status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
 
     class Meta:
         model = Order
@@ -183,7 +233,9 @@ class OrderStatusSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.order_status = validated_data.get(
-            'order_status', instance.order_status)
+            'order_status',
+            instance.order_status
+        )
         instance.save()
         return instance
 
@@ -191,7 +243,7 @@ class OrderStatusSerializer(serializers.ModelSerializer):
 # TODO: убрать сериализатор, он в точности повторяет предыдущий.
 class CancelSerializer(serializers.ModelSerializer):
     """Отменить заказ."""
-    # Зачем?
+    # TODO: Зачем?
     order_status = 'cancelled'
 
     class Meta:
@@ -204,9 +256,11 @@ class CancelSerializer(serializers.ModelSerializer):
         return instance
 
 
+# TODO: убрать сериализатор, он в точности повторяет предыдущий
+#       и предпредыдущий.
 class PaySerializer(serializers.ModelSerializer):
     """Сериализатор для оплаты заказа."""
-    # Зачем?
+    # TODO: Зачем?
     pay_status = True
 
     class Meta:
@@ -219,34 +273,39 @@ class PaySerializer(serializers.ModelSerializer):
         return instance
 
 
-class AddressSerializer(serializers.ModelSerializer):
-    """Сериализатор для представления адреса."""
-    class Meta:
-        model = Address
-        # TODO: хорошая практика: прописать поля вместо __all__
-        fields = '__all__'
-
-
 class GetOrderSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
     user = CustomUserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
-        many=True, source='servicesinorder_set', read_only=True)
+        source='servicesinorder_set',
+        many=True,
+        read_only=True,
+    )
 
     class Meta:
         model = Order
-        # TODO: не best practice, указать все поля, это важно с точки зрения
-        # безопасности и читаемости кода.
         fields = (
-            "__all__"
+            'id',
+            'user',
+            'total_sum',
+            'comment',
+            'order_status',
+            'cleaning_type',
+            'services',
+            'pay_status',
+            'address',
+            # TODO: вопрос про datetime поле все-еще активен, дублирую тут.
+            'creation_date',
+            'creation_time',
+            'cleaning_date',
+            'cleaning_time'
         )
 
 
 class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор для добавления комментария к заказу."""
-    comment = serializers.CharField()
 
     class Meta:
         model = Order
@@ -264,13 +323,18 @@ class DateTimeSerializer(serializers.ModelSerializer):
     """Сериализатор для переноса времени заказа."""
     class Meta:
         model = Order
+        # TODO: вопрос про datetime поле все-еще активен, дублирую тут.
         fields = ('cleaning_date', 'cleaning_time')
 
     def update(self, instance, validated_data):
         instance.cleaning_date = validated_data.get(
-            'cleaning_date', instance.cleaning_date)
+            'cleaning_date',
+            instance.cleaning_date,
+        )
         instance.cleaning_time = validated_data.get(
-            'cleaning_time', instance.cleaning_time)
+            'cleaning_time',
+            instance.cleaning_time,
+        )
         instance.save()
         return instance
 
@@ -280,6 +344,13 @@ class RatingSerializer(serializers.ModelSerializer):
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
-        fields = '__all__'
+        fields = (
+            'id',
+            'order',
+            'user',
+            'pub_date',
+            'text',
+            'score',
+        )
         model = Rating
         read_only_fields = ('order',)
