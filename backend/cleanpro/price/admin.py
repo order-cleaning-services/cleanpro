@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import (Measure, Service, CleaningType,
-                     ServicesInCleaningtype)
+from .models import Measure, Service, CleaningType, ServicesInCleaningType
 
 
 class MeasureAdmin(admin.ModelAdmin):
@@ -20,7 +19,7 @@ class ServiceAdmin(admin.ModelAdmin):
 
 
 class Services_in_CleaningAdmin(admin.StackedInline):
-    model = ServicesInCleaningtype
+    model = ServicesInCleaningType
     min_num = 1
 
 
