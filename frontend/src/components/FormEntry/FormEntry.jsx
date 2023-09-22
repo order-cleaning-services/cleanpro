@@ -32,7 +32,7 @@ function FormEntry() {
 
   useEffect(() => {
     dispatch(handleClickRegistration())
-  }, [])
+  }, [dispatch])
 
   const onSubmit = (data, e) => {
     if (viewForm === 'registration') dispatch(registration(data))
