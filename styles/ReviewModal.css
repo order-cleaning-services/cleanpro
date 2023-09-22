@@ -1,0 +1,8 @@
+.form-review__title {
+  font-weight: 400;
+}
+.form-review__star-rating {
+  width: 13.2rem;
+  text-align: center;
+  margin: 2rem auto 2rem auto;
+}

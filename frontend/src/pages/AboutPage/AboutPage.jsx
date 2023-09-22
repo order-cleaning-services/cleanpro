@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
-
 import './AboutPage.scss'
 import Footer from '../../components/Footer/Footer'
-import Banner from '../../components/Banner/Banner'
+import About from '../../components/About/About'
+import CleanersList from '../../components/CleanersList/CleanersList'
+import ButtonOrder from '../../components/ButtonOrder/ButtonOrder'
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 
 function AboutPage() {
   const location = useLocation()
@@ -23,26 +24,13 @@ function AboutPage() {
   return (
     <div className="about-page">
       <div className="about-page__wrapper">
-        <h2
-          id="about"
-          className="about-page__title"
-          style={{
-            height: '1000px',
-          }}>
-          О компании
-        </h2>
-        <Banner />
-
-        <h2
-          id="cleaners"
-          className="about-page__title"
-          style={{
-            height: '1000px',
-          }}>
-          Наши клинеры
-        </h2>
+        <h2 className="about-page__title">О компании</h2>
+        <About />
+        <h2 className="about-page__title">Наши клинеры</h2>
+        <CleanersList />
       </div>
       <Footer />
+      <ButtonOrder height={0} />
     </div>
   )
 }

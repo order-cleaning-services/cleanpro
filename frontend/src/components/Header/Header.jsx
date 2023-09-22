@@ -4,9 +4,12 @@ import signin from '../../images/signin.svg'
 import profile from '../../images/profile.svg'
 import './Header.scss'
 import { ROUTES } from '../../constants/constants'
+import { useSelector } from 'react-redux'
+import { authSelectors } from '../../store/auth/authSelectors'
 
-const Header = ({ isLoggedIn }) => {
+const Header = () => {
   const location = useLocation()
+  const isAuth = useSelector(authSelectors.getIsAuth)
 
   return (
     <header className="header">
@@ -26,7 +29,7 @@ const Header = ({ isLoggedIn }) => {
         </ul>
         <div className="header__info">
           <p className="header__phone">+7 (495) 783-99-00</p>
-          {isLoggedIn ? (
+          {isAuth ? (
             <Link className="header__profile" to="/profile">
               <img src={profile} className="header__profile-icon" alt="Иконка профиля" />
               Профиль

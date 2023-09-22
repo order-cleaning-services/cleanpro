@@ -124,12 +124,12 @@ export const serviceCards = [
 ]
 
 export const extraServices = [
-  { id: 1, title: 'Уборка балкона', price: 1000, maxCount: 5 },
-  { id: 2, title: 'Мытье духовки внутри', price: 450, maxCount: 5 },
-  { id: 3, title: 'Мытье окон', price: 450, maxCount: 5 },
-  { id: 4, title: 'Мытье холодильника', price: 700, maxCount: 5 },
-  { id: 5, title: 'Глажка', price: 500, maxCount: 5 },
-  { id: 6, title: 'Мытье микроволновки', price: 800, maxCount: 5 },
+  { id: 1, title: 'Уборка балкона', price: 1000, maxCount: 5, amount: 0 },
+  { id: 2, title: 'Мытье духовки внутри', price: 450, maxCount: 5, amount: 0 },
+  { id: 3, title: 'Мытье окон', price: 450, maxCount: 5, amount: 0 },
+  { id: 4, title: 'Мытье холодильника', price: 700, maxCount: 5, amount: 0 },
+  { id: 5, title: 'Глажка', price: 500, maxCount: 5, amount: 0 },
+  { id: 6, title: 'Мытье микроволновки', price: 800, maxCount: 5, amount: 0 },
 ]
 
-// console.log(serviceCards[4].id)
+export const timeOptions = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
