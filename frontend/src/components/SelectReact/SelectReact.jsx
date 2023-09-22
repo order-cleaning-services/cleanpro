@@ -1,7 +1,9 @@
 import Select from 'react-select'
 import './SelectReact.scss'
+import { useState } from 'react'
 
-function SelectReact() {
+function SelectReact({ time }) {
+  const [userChoice, setUserChoice] = useState('')
   const options = [
     { value: '09:00', label: '09 : 00' },
     { value: '10:00', label: '10 : 00' },
@@ -49,16 +51,19 @@ function SelectReact() {
     },
   }
 
-  const handleChangeSelect = selectedOption => {
-    console.log('handleChange', selectedOption.value)
-  }
+  // const handleChangeSelect = selectedOption => {
+  //   console.log('handleChange', selectedOption.value)
+  // }
+
+
   return (
     <Select
+      name={time}
       className="select-time"
       classNamePrefix="select-time"
       options={options}
       styles={customerStyles}
-      onChange={handleChangeSelect}
+      onChange={choice => setUserChoice(choice.value)}
     />
   )
 }

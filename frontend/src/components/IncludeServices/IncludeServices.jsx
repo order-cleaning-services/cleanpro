@@ -1,16 +1,20 @@
-import { serviceCards } from '../../utils/initialData'
+import { useSelector } from 'react-redux'
 import ServiceCard from '../ServiceCard/ServiceCard'
 import './IncludeServices.scss'
+import { calculatorSelectors } from '../../store/calculator/calculatorSelectors'
 
 function IncludeServices({ cleanType }) {
+  const types = useSelector(calculatorSelectors.getTypes)
+
   return (
     <div className="include-service__container">
       <p className="text-l">Услуги, которые уже включены</p>
       <div className="include-service__cards">
-        {serviceCards
+        {types
           .filter(card => card.id === cleanType)[0]
-          .cards.map(card => (
-            <ServiceCard key={card.content} content={card.content} img={card.img} />
+          ?.service?.filter(card => card.title !== 'Выезд')
+          .map(card => (
+            <ServiceCard key={card.title} content={card.title} img={card.image} />
           ))}
       </div>
     </div>
