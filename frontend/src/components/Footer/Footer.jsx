@@ -50,7 +50,7 @@ const Footer = () => {
         <h4 className="footer__title">Компания</h4>
         {location.pathname === '/' ? (
           <>
-            <Link to={`/about${aboutElementId}`} className="footer__link">
+            <Link to={`/about#${aboutElementId}`} className="footer__link">
               О компании
             </Link>
             <Link to={`/about#${cleanersElementId}`} className="footer__link">
