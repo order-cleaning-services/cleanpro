@@ -20,7 +20,7 @@ echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@  creating superuser  @@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if ! python manage.py shell -c "from users.models import User; User.objects.filter(username='admin').exists()" | grep -q "True"; then
+if ! python manage.py shell -c "from users.models import User; print(User.objects.filter(username='admin').exists())" | grep -q "True"; then
     echo "from users.models import User; \
     admin = User.objects.create_superuser('admin@email.com', 'admin'); \
     admin.username = 'admin'; \
