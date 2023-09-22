@@ -12,7 +12,7 @@ const Comments = () => {
   return (
     <>
       <section className="comments">
-        <div className="comments__wrapper">
+        <div className="comments__wrapper" id="comments">
           <h2 className="comments__title">Отзывы клиентов</h2>
           <Link to="/" className="comments__go">
             Посмотреть все

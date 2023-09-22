@@ -1,10 +1,20 @@
+import { useDispatch } from 'react-redux'
 import InputField from '../InputField/InputField'
 import './OrderForm.scss'
 import { useForm } from 'react-hook-form'
+import { safeOrderForm } from '../../store/calculator/calculatorSlice'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../constants/constants'
+import { timeOptions } from '../../utils/initialData'
 
 function OrderForm() {
   const { register, handleSubmit } = useForm()
-  const onSubmit = data => console.log(data)
+  const dispath = useDispatch()
+  const navigate = useNavigate()
+  const onSubmit = data => {
+    dispath(safeOrderForm(data))
+    navigate(ROUTES.payment)
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -23,9 +33,9 @@ function OrderForm() {
           <label>Время</label>
           <select required name="time" className="time-selection" {...register('cleaning_time')}>
             <option className="option-time" value="0" hidden></option>
-            {Array.from({ length: 8 }, (_, i) => i + 9).map(num => (
+            {timeOptions.map(num => (
               <option className="time-option" value={num} key={num}>
-                {num < 10 ? `0${num}` : num}:00
+                {num}
               </option>
             ))}
           </select>

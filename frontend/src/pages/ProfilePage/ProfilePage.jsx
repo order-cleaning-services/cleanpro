@@ -1,12 +1,23 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ProfileForm from '../../components/ProfileForm/ProfileForm'
 import './ProfilePage.scss'
 import OrderCard from '../../components/OrderCard/OrderCard'
 import Footer from '../../components/Footer/Footer'
+import { useDispatch, useSelector } from 'react-redux'
+import { orderSelectors } from '../../store/order/orderSelectors'
+import { getUserOrders } from '../../store/order/orderActions'
 
 export default function Profile() {
+  const dispatch = useDispatch()
+  const userOrders = useSelector(orderSelectors.getAllOrders)
+
   const [isProfileFormActive, setIsProfileFormActive] = useState(false)
   const toggleFormActive = () => setIsProfileFormActive(!isProfileFormActive)
+
+  useEffect(() => {
+    dispatch(getUserOrders())
+  }, [dispatch])
+
   return (
     <>
       <div className="profile">
@@ -27,8 +38,9 @@ export default function Profile() {
           <ProfileForm />
         ) : (
           <div className="profile__cards">
-            <OrderCard />
-            <OrderCard />
+            {userOrders?.map(order => (
+              <OrderCard key={order.id} order={order} />
+            ))}
           </div>
         )}
       </div>

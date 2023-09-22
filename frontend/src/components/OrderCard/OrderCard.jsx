@@ -9,7 +9,8 @@ import TransferModal from '../Modal/TransferModal/TransferModal'
 import CancelModal from '../Modal/CancelModal/CancelModal'
 import ReviewModal from '../Modal/ReviewModal/ReviewModal'
 
-const OrderCard = () => {
+const OrderCard = ({ order }) => {
+  const { cleaning_date, cleaning_time, address, cleaning_type, services, total_sum } = order
   const [isDetailed, setIsDetailed] = useState(false)
   const toggleInfo = () => setIsDetailed(!isDetailed)
   const [showTransfer, setShowTransfer] = useState(false)
@@ -19,35 +20,15 @@ const OrderCard = () => {
   // Переменные из констант нужно будет переписать в аргументы, получаемые на рендер компонентом
   const isCompleted = false
   const CLEANERS = ['Климова Ольга', 'Плотников Евгений']
-  const DATE = 'Ср, 20.09.2023'
-  const TIME = '12:00-14:00'
-  const ADDRESS = 'г. Москва, ул Дмитриевского, д.1, кв 5, подъезд 3, этаж 8'
-  const OPTIONS = [
-    'Уборка пылесосом',
-    'Влажная уборка полов и плинтусов',
-    'Удаление пыли с осветительных приборов',
-    'Влажная уборка подоконников, радиаторов и труб',
-    'Мойка зеркал и стеклянных поверхностей',
-    'Влажная уборка мебели',
-    'Удаление пыли с бытовой техники',
-    'Вынос мусора',
-    'Удаление пыли с дверных проёмов',
-    'Удаление пыли с предметов интерьера',
-    'Мойка дверных блоков',
-    'Мойка мебели внутри, свободной от вещей',
-    'Мытьё карнизов, кондиционеров, гардин',
-    'Влажная очистка перегородок, антресолей',
-  ]
-  const EXTRA_OPTIONS = []
 
   return (
     <div className={`card ${isCompleted ? 'card_completed' : ''}`}>
       <div className="card__header">
-        <h2 className="card__title">Генеральная уборка</h2>
+        <h2 className="card__title">{cleaning_type.title} уборка</h2>
         <div className="card__header-info">
           <div className="card__status-led"></div>
           <p className="card__status-text">Оплачен</p>
-          <p className="card__cost">5 900 ₽</p>
+          <p className="card__cost">{`${total_sum?.toString().slice(0, -3)} ${total_sum?.toString().slice(-3)}`} ₽</p>
         </div>
       </div>
       <div className="card__content">
@@ -55,12 +36,12 @@ const OrderCard = () => {
           <li className="card__info-line">
             <img className="card__info-line-image" src={calendar} alt="Иконка календаря" />
             <p className="card__info-line-text">
-              {DATE} <span className="card__breaker">&#183;</span> {TIME}
+              {cleaning_date} <span className="card__breaker">&#183;</span> {cleaning_time.slice(0, -3)}
             </p>
           </li>
           <li className="card__info-line">
             <img className="card__info-line-image" src={geo} alt="Иконка геопозиции" />
-            <p className="card__info-line-text">{ADDRESS}</p>
+            <p className="card__info-line-text">{`г. ${address.city}, ул ${address.street}, д.${address.house}, кв ${address.apartment}, подъезд ${address.entrance}, этаж ${address.floor}`}</p>
           </li>
           <li className="card__info-line">
             <img className="card__info-line-image" src={user} alt="Иконка геопозиции" />
@@ -113,10 +94,10 @@ const OrderCard = () => {
               <div className="card__options-column">
                 <h3 className="card__options-title">Основные</h3>
                 <ul className="card__options-list">
-                  {OPTIONS.map(option => {
+                  {cleaning_type.service.map(option => {
                     return (
-                      <li className="card__options-item" key={option}>
-                        {option}
+                      <li className="card__options-item" key={option.id}>
+                        {option.title}
                       </li>
                     )
                   })}
@@ -124,12 +105,12 @@ const OrderCard = () => {
               </div>
               <div className="card__options-column">
                 <h3 className="card__options-title">Дополнительные</h3>
-                {EXTRA_OPTIONS.length > 0 ? (
+                {services.length > 0 ? (
                   <ul className="card__options-list">
-                    {EXTRA_OPTIONS.map(option => {
+                    {services.map(service => {
                       return (
-                        <li className="card__options-item" key={option}>
-                          {option}
+                        <li className="card__options-item" key={service.id}>
+                          {service.title} x {service.amount}
                         </li>
                       )
                     })}

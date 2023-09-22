@@ -1,14 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { extraServices, serviceCards } from '../../utils/initialData'
-
-const initialState = {
-  cleanType: serviceCards[0].id,
-  total: 0,
-  roomsAmount: 1,
-  toiletsAmount: 1,
-  windowsAmount: 1,
-  extra: extraServices,
-}
+import { initialState } from './initialState'
+import { buildGetExtraService, buildGetServiceTypes } from './extraReducers'
 
 const calculatorSlice = createSlice({
   name: 'calculator',
@@ -42,13 +34,33 @@ const calculatorSlice = createSlice({
       state.windowsAmount += action.payload.step
       state.total += action.payload.price
     },
+    setIsPanoramic: state => {
+      state.isPanoramic = !state.isPanoramic
+      state.total = state.isPanoramic ? state.total * 2 : state.total / 2
+    },
     resetRooms: state => {
       state.roomsAmount = initialState.roomsAmount
       state.toiletsAmount = initialState.toiletsAmount
-      state.extra = initialState.extra
+      state.extra.map(extra => (extra.amount = 0))
+    },
+    safeOrderForm: (state, action) => {
+      state.orderForm = action.payload
     },
   },
+  extraReducers: builder => {
+    buildGetServiceTypes(builder)
+    buildGetExtraService(builder)
+  },
 })
-export const { setCleanType, setTotal, setRooms, setToilets, setWindows, setExtra, resetRooms } =
-  calculatorSlice.actions
+export const {
+  setCleanType,
+  setTotal,
+  setRooms,
+  setToilets,
+  setWindows,
+  setIsPanoramic,
+  setExtra,
+  resetRooms,
+  safeOrderForm,
+} = calculatorSlice.actions
 export default calculatorSlice.reducer

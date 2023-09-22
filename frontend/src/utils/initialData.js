@@ -131,3 +131,5 @@ export const extraServices = [
   { id: 5, title: 'Глажка', price: 500, maxCount: 5, amount: 0 },
   { id: 6, title: 'Мытье микроволновки', price: 800, maxCount: 5, amount: 0 },
 ]
+
+export const timeOptions = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00']
