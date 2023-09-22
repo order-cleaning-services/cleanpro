@@ -5,11 +5,17 @@ import geo from '../../images/address.svg'
 import user from '../../images/profile.svg'
 import up from '../../images/chevron-up.svg'
 import down from '../../images/chevron-down.svg'
+import TransferModal from '../Modal/TransferModal/TransferModal'
+import CancelModal from '../Modal/CancelModal/CancelModal'
+import ReviewModal from '../Modal/ReviewModal/ReviewModal'
 
 const OrderCard = ({ order }) => {
   const { cleaning_date, cleaning_time, address, cleaning_type, services, total_sum } = order
   const [isDetailed, setIsDetailed] = useState(false)
   const toggleInfo = () => setIsDetailed(!isDetailed)
+  const [showTransfer, setShowTransfer] = useState(false)
+  const [showCancel, setShowCancel] = useState(false)
+  const [showReview, setShowReview] = useState(false)
 
   // Переменные из констант нужно будет переписать в аргументы, получаемые на рендер компонентом
   const isCompleted = false
@@ -62,13 +68,22 @@ const OrderCard = ({ order }) => {
           )}
           {isCompleted ? (
             <div className="card__control-buttons">
-              <button className="card__control-btn">Оценить</button>
+              <button onClick={() => setShowReview(s => !s)} className="card__control-btn">
+                Оценить
+              </button>
+              <ReviewModal show={showReview} closeModal={() => setShowReview(false)} />
               <button className="card__control-btn">Повторить заказ</button>
             </div>
           ) : (
             <div className="card__control-buttons">
-              <button className="card__control-btn">Перенести</button>
-              <button className="card__control-btn">Отменить</button>
+              <button onClick={() => setShowTransfer(s => !s)} className="card__control-btn">
+                Перенести
+              </button>
+              <TransferModal show={showTransfer} closeModal={() => setShowTransfer(false)} />
+              <button onClick={() => setShowCancel(s => !s)} className="card__control-btn">
+                Отменить
+              </button>
+              <CancelModal show={showCancel} closeModal={() => setShowCancel(false)} />
             </div>
           )}
         </div>
