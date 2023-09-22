@@ -1,6 +1,6 @@
 .comments {
   position: relative;
-  margin: 0 auto;
+  margin: 0 auto 12rem;
   width: 144rem;
   background: #e5f0ff;
   padding: 7.2rem 10rem;
@@ -30,8 +30,14 @@
     letter-spacing: 0em;
   }
 
+  &__go_position {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    margin-top: 3.2rem;
+  }
+
   &__list {
-    list-style: none;
     padding: 0 0 7.2rem;
     margin: 0;
     display: flex;
