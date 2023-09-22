@@ -152,7 +152,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # TODO: это для фронтов, чтобы в локальной сети был доступ к бэку.
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'http://127.0.0.1/',
+    'http://127.0.0.1',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
