@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
 
 USERNAME_PATTERN: str = r'^[0-9A-Za-z]{5,30}$'
-NAME_REGEXP: str = r'([А-ЯЁ][а-яё]+[\-\s]?){3,30}'
+NAME_REGEXP: str = r'^[^ -][А-ЯЁа-яё\-\s]{3,30}$'
 EMAIL_PATTERN: str = r'^(?!\.)[0-9A-Za-z\.]{5,50}@[a-zA-z]+\.[a-zA-z]+$'
 PASS_PATTERN: str = (
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!_@#$%^&+=]).{5,50}$'
