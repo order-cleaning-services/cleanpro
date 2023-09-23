@@ -52,7 +52,7 @@ class Command(BaseCommand):
                 if isinstance(service_to_add, Service):
                     services_data.append(service_to_add)
             Service.objects.bulk_create(services_data)
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             print('File services.csv is not provided. Skip task.')
         except Exception as err:
             raise CommandError(f'Exception has occurred: {err}')
