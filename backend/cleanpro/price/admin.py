@@ -24,9 +24,9 @@ class Services_in_CleaningAdmin(admin.StackedInline):
 
 
 class CleaningTypeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'title', 'coefficient', 'type')
-    list_editable = ('title', 'coefficient', 'type')
-    list_filter = ('coefficient', 'type')
+    list_display = ('pk', 'title', 'coefficient', )
+    list_editable = ('title', 'coefficient', )
+    list_filter = ('coefficient', )
     search_fields = ('title', )
     empty_value_display = '-пусто-'
     inlines = [

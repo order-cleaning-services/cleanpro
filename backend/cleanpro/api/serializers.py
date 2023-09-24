@@ -9,6 +9,7 @@ from price.models import CleaningType, Service
 from service.models import Order, Rating, Address, ServicesInOrder
 from users.models import User
 from users.validators import EMAIL_PATTERN
+from .utils import services_bulk_create, address_create
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -27,6 +28,7 @@ class ServiceSerializer(serializers.ModelSerializer):
             'price',
             'measure',
             'image',
+            'cleaning_time',
         )
 
 
@@ -150,22 +152,6 @@ class PostOrderSerializer(serializers.Serializer):
     cleaning_time = serializers.TimeField()
     comment = serializers.CharField(required=False,)
 
-    def services_bulk_create(self, order, services):
-        ing_objs = []
-        for item in services:
-            id = item.get('id')
-            amount = item.get('amount')
-            # TODO: вопрос! Какая должна быть логика, если хоть у одного адреса
-            #       произойдет сбой в присланных данных?
-            if id is not None and amount is not None and amount > 0:
-                service = get_object_or_404(Service, id=id)
-                ing_objs.append(
-                    ServicesInOrder(
-                        order=order, service=service, amount=amount
-                    )
-                )
-        return ServicesInOrder.objects.bulk_create(ing_objs)
-
     def create(self, data):
         # TODO: сообщить проверку в сериализатор адреса.
         for attribute in ('house', 'city', 'street'):
@@ -200,7 +186,7 @@ class PostOrderSerializer(serializers.Serializer):
             cleaning_date=data['cleaning_date'],
             cleaning_time=data['cleaning_time'],
         )
-        self.services_bulk_create(order, data['services'])
+        services_bulk_create(order, data['services'])
         return order
 
     def update(self, instance, validated_data):
@@ -277,6 +263,7 @@ class GetOrderSerializer(serializers.ModelSerializer):
             'id',
             'user',
             'total_sum',
+            'total_time',
             'comment',
             'order_status',
             'cleaning_type',
@@ -289,6 +276,104 @@ class GetOrderSerializer(serializers.ModelSerializer):
             'cleaning_date',
             'cleaning_time'
         )
+
+
+class CreateServicesInOrderSerializer(serializers.ModelSerializer):
+    """Создание списка дополнительных услуг с указанием количества."""
+    id = serializers.IntegerField()
+    amount = serializers.IntegerField()
+
+    class Meta:
+        model = ServicesInOrder
+        fields = (
+            'id',
+            'amount',
+        )
+
+
+class CreateCustomUserSerializer(serializers.ModelSerializer):
+    """Создание пользователя."""
+
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'first_name',
+            'email',
+            'phone',
+        )
+
+
+class CreateUserAndOrderSerializer(serializers.ModelSerializer):
+    """Создание заказа."""
+    user = CreateCustomUserSerializer()
+    address = AddressSerializer()
+    cleaning_type = serializers.PrimaryKeyRelatedField(
+        queryset=CleaningType.objects.all(),
+    )
+    services = CreateServicesInOrderSerializer(
+        many=True, source='servicesinorder_set')
+
+    class Meta:
+        model = Order
+        exclude = (
+            'pay_status',
+            'order_status',
+        )
+
+    def create(self, validated_data):
+        valid_address = validated_data.pop('address')
+        valid_user = validated_data.pop('user')
+        services = validated_data.pop('servicesinorder_set')
+        address = address_create(valid_address)
+        user, _ = User.objects.get_or_create(
+            email=valid_user.get('email'))
+        user.first_name, = valid_user.get('first_name'),
+        user.address, = address,
+        user.phone, = valid_user.get('phone'),
+        user.save()
+        validated_data['user'] = user
+        validated_data['address'] = user.address
+        order = super().create(validated_data)
+        services_bulk_create(order, services)
+        return order
+
+
+class CreateOrderSerializer(serializers.ModelSerializer):
+    """Создание заказа."""
+    address = AddressSerializer()
+    cleaning_type = serializers.PrimaryKeyRelatedField(
+        queryset=CleaningType.objects.all(),
+    )
+    services = CreateServicesInOrderSerializer(
+        many=True, source='servicesinorder_set')
+
+    class Meta:
+        model = Order
+        exclude = (
+            'user',
+            'pay_status',
+            'order_status',
+        )
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        valid_address = validated_data.pop('address')
+        valid_user = request.user
+        services = validated_data.pop('servicesinorder_set')
+        address = address_create(valid_address)
+        validated_data['user'] = valid_user
+        validated_data['address'] = address
+        order = super().create(validated_data)
+        services_bulk_create(order, services)
+        return order
+
+    def to_representation(self, value):
+        request = self.context['request']
+        return GetOrderSerializer(
+            value,
+            context={'request': request}
+        ).data
 
 
 class CommentSerializer(serializers.ModelSerializer):

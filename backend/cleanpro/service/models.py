@@ -26,6 +26,13 @@ class Order(models.Model):
         verbose_name='Сумма',
         validators=[MinValueValidator(1, 'Укажите корректную итоговую сумму!')]
     )
+    total_time = models.IntegerField(
+        verbose_name='Суммарное время',
+        validators=[MinValueValidator(1, 'Укажите корректное время!')],
+        # TODO: Сделать поле обязательным после перехода на OrderViewSet для создания и работы с заказом.
+        blank=True,
+        null=True,
+    )
     comment = models.TextField(
         verbose_name='Комментарий',
         max_length=250,

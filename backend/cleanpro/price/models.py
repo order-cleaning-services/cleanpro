@@ -21,6 +21,10 @@ class Measure(models.Model):
 
 class Service(models.Model):
     """Модель цен услуг."""
+    SERVICE_TYPE = [
+        ('main', 'Основная'),
+        ('additional', 'Дополнительная'),
+    ]
 
     title = models.CharField(
         verbose_name='Название услуги',
@@ -42,19 +46,19 @@ class Service(models.Model):
         upload_to='service_photo/',
         verbose_name='Фото вида уборки',
         # TODO: это временно же?
+        # TODO: Нет. Вроде у нас будут услуги, которые будут без картинок.
         null=True,
         blank=True,
     )
     service_type = models.CharField(
         verbose_name='Тип услуги',
-        # TODO: best practice - выносить такое в константы
-        #       https://docs.djangoproject.com/en/4.2/ref/models/fields/#choices
-        choices=(
-            ('main', 'Основная'),
-            ('additional', 'Дополнительная'),
-        ),
+        choices=SERVICE_TYPE,
         max_length=11,
         default='main',
+    )
+    cleaning_time = models.IntegerField(
+        verbose_name='Время на услугу',
+        validators=[MinValueValidator(1, 'Укажите корректное время!')],
     )
 
     class Meta:
@@ -79,15 +83,6 @@ class CleaningType(models.Model):
         validators=(
             MinValueValidator(1, 'Коэффициент не может быть меньше 1'),
         ),
-    )
-    type = models.CharField(
-        verbose_name='Тип набора',
-        choices=(
-            ('main', 'Основной'),
-            ('additional', 'Дополнительный'),
-        ),
-        max_length=11,
-        default='main',
     )
     service = models.ManyToManyField(
         Service,
@@ -118,10 +113,11 @@ class ServicesInCleaningType(models.Model):
     )
 
     class Meta:
-        constraints = (
-            models.UniqueConstraint(
-                fields=('cleaning_type', 'service',),
-                name='service_in_cleaning_type'),
-        )
+        # TODO: Удалить. В разных наборах могут быть одинаковые услуги.
+        # constraints = (
+        #     models.UniqueConstraint(
+        #         fields=('cleaning_type', 'service',),
+        #         name='service_in_cleaning_type'),
+        # )
         verbose_name = 'Услуга в наборе'
         verbose_name_plural = 'Услуги в наборе'
