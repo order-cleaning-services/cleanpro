@@ -6,7 +6,6 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from .validators import (
     validate_email, validate_name, validate_password, validate_username)
-from cleanpro.settings import ADMIN, USER
 
 
 class Address(models.Model):
@@ -51,9 +50,9 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, email, password, **extra_fields):
         '''Создает и сохраняет пользователя с полученными почтой и паролем.'''
-        if not email:
-            raise ValueError('Email должен быть предоставлен.')
-        email = self.normalize_email(email)
+        if not email or password:
+            raise ValueError('Укажите email и password.')
+        email = self.normalize_email(email).lower()
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -67,12 +66,6 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Администратор должен иметь поле is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError(
-                'Администратор должен иметь поле is_superuser=True.'
-            )
         return self._create_user(email, password, **extra_fields)
 
 
@@ -82,18 +75,18 @@ class User(AbstractUser):
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=30,
-        validators=[validate_username]
+        validators=(validate_username,),
     )
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=60,
-        validators=[validate_name]
+        validators=(validate_name,),
     )
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
         max_length=50,
-        validators=[validate_email],
-        unique=True
+        validators=(validate_email,),
+        unique=True,
     )
     password = models.CharField(
         verbose_name='Пароль',
@@ -101,11 +94,11 @@ class User(AbstractUser):
         # # TODO: Пока отключил валидацию, т.к. не могу создать пользователя.
         # Нужно проверять.
         # max_length=16,
-        validators=[validate_password]
+        validators=(validate_password),
     )
     phone = PhoneNumberField(
         verbose_name='Номер телефона',
-        region='RU'
+        region='RU',
     )
     address = models.ForeignKey(
         Address,
@@ -114,16 +107,6 @@ class User(AbstractUser):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-    )
-    # TODO: Какой смысл в это вложен? Для роли есть атрибут "is_staff".
-    role = models.CharField(
-        verbose_name='Роль',
-        choices=(
-            (USER, 'Пользователь'),
-            (ADMIN, 'Администратор'),
-        ),
-        max_length=5,
-        default=USER,
     )
 
     objects = UserManager()
@@ -138,8 +121,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
-
-    @property
-    def is_admin(self):
-        self.role == ADMIN
-        return
