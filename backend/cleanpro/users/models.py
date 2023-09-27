@@ -4,8 +4,7 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .validators import (
-    validate_email, validate_name, validate_password, validate_username)
+from .validators import (validate_email, validate_name, validate_password)
 from cleanpro.settings import ADMIN, USER
 
 
@@ -81,11 +80,6 @@ class User(AbstractUser):
 
     username = models.CharField(
         verbose_name='Имя пользователя',
-        max_length=30,
-        validators=[validate_username]
-    )
-    first_name = models.CharField(
-        verbose_name='Имя',
         max_length=60,
         validators=[validate_name]
     )
@@ -97,10 +91,7 @@ class User(AbstractUser):
     )
     password = models.CharField(
         verbose_name='Пароль',
-        max_length=256,
-        # # TODO: Пока отключил валидацию, т.к. не могу создать пользователя.
-        # Нужно проверять.
-        # max_length=16,
+        max_length=50,
         validators=[validate_password]
     )
     phone = PhoneNumberField(

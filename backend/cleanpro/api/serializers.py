@@ -88,7 +88,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id',
-            'first_name',
+            'username',
             'email',
             'phone',
             'address',
@@ -138,7 +138,7 @@ class PostOrderSerializer(serializers.Serializer):
     apartment = serializers.IntegerField(required=False,)
     floor = serializers.IntegerField(required=False,)
     entrance = serializers.IntegerField(required=False,)
-    first_name = serializers.CharField(required=False,)
+    username = serializers.CharField(required=False,)
     email = serializers.EmailField()
     phone = PhoneNumberField(required=False, region='RU',)
     cleaning_type = serializers.PrimaryKeyRelatedField(
@@ -188,7 +188,7 @@ class PostOrderSerializer(serializers.Serializer):
                 setattr(address, attribute, value)
         address.save()
         user, _ = User.objects.get_or_create(email=data['email'])
-        user.first_name = data['first_name']
+        user.first_name = data['username']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
         user.save()
