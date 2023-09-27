@@ -106,11 +106,10 @@ def create_cleaning_type_object(data: dict) -> Optional[CleaningType]:
     )
     if broken_services:
         cleaning_type.delete()
-        error_message = (
+        raise BrokenServicesException(
             f'Can not create "{title}" because some services do not exist: '
             f'{", ".join(broken_services)}'
         )
-        raise BrokenServicesException(error_message)
     return None
 
 
@@ -132,10 +131,15 @@ def read_csv(full_path: str) -> list[dict]:
     """
     # TODO подумать над закрытием файла. Выдает ошибку последующего чтения.
     reader_data: list[dict] = []
-    with open(full_path, mode='r', encoding='utf-8') as file:
-        reader: csv.DictReader = csv.DictReader(file, delimiter=';')
-        for row in reader:
-            reader_data.append(row)
+    try:
+        with open(full_path, mode='r', encoding='utf-8') as file:
+            reader: csv.DictReader = csv.DictReader(file, delimiter=';')
+            for row in reader:
+                reader_data.append(row)
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            f'File "{full_path}" is not provided. Abort task.'
+        )
     return reader_data
 
 
