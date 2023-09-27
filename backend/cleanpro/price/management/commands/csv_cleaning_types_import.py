@@ -114,11 +114,29 @@ def create_cleaning_type_object(data: dict) -> Optional[CleaningType]:
     return None
 
 
-def read_csv(full_path: str) -> csv.DictReader:
-    """Возвращает содержимое файла, указанное в full_path.
+def read_csv(full_path: str) -> list[dict]:
+    """Читает CSV-файл и возвращает его содержимое в виде списка словарей.
     Если файл не существует - вызывает FileNotFoundError."""
+    # TODO: подумать в сторону аннотации, как в Python объектах:
+    """
+    Читает CSV-файл и возвращает его содержимое в виде списка словарей.
+
+    Args:
+        full_path (str): путь к CSV-файлу.
+
+    Returns:
+        list[dict]: список словарей, представляющих строки CSV-файла.
+
+    Raises:
+        FileNotFoundError: если файл не существует.
+    """
     # TODO подумать над закрытием файла. Выдает ошибку последующего чтения.
-    return csv.DictReader(open(full_path, encoding='utf-8'), delimiter=';')
+    reader_data: list[dict] = []
+    with open(full_path, mode='r', encoding='utf-8') as file:
+        reader: csv.DictReader = csv.DictReader(file, delimiter=';')
+        for row in reader:
+            reader_data.append(row)
+    return reader_data
 
 
 class Command(BaseCommand):
@@ -126,16 +144,9 @@ class Command(BaseCommand):
 
     def handle(self, *args: any, **options: any):
         file_path: str = f'{import_path}cleaning_types.csv'
-        try:
-            check_if_services_exists()
-            csv_file: csv.DictReader = read_csv(full_path=file_path)
+        check_if_services_exists()
+        csv_file: list[dict] = read_csv(full_path=file_path)
         # TODO: подключить логгер на перехватах ошибок.
-        except FileNotFoundError:
-            print(f'File "{file_path}" is not provided. Skip task.')
-        except ServicesIsEmptyException as err:
-            print(err)
-        except Exception as err:
-            raise CommandError(f'Exception has occurred: {err}')
         for row in csv_file:
             try:
                 create_cleaning_type_object(data=row)
