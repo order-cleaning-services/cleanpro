@@ -2,6 +2,7 @@ import csv
 from typing import Optional
 
 from django.core.management.base import BaseCommand, CommandError
+from django.db import transaction
 from django.db.models import QuerySet
 
 from price.models import CleaningType, Service, ServicesInCleaningType
@@ -17,6 +18,12 @@ services: QuerySet = Service.objects.all()
 services_dict = {service.title: service for service in services}
 
 
+class BrokenServicesException(Exception):
+    """Ошибка создания в базе данных объектов модели Services."""
+    def __init__(self, message):
+        super().__init__(message)
+
+
 class ServicesIsEmptyException(Exception):
     """Ошибка отсутствия в базе данных объектов модели Services."""
     def __init__(self, message='No single Service object exists. Skip task.'):
@@ -24,7 +31,7 @@ class ServicesIsEmptyException(Exception):
 
 
 def check_if_services_exists() -> None:
-    """вызывает ServicesIsEmptyException, если не существует
+    """Вызывает ServicesIsEmptyException, если не существует
     ни одного объекта модели Services. Иначе - возвращает None."""
     if not services.exists():
         raise ServicesIsEmptyException
@@ -77,12 +84,16 @@ def get_cleaning_type_data(
     return title, float(coefficient), type, services_titles.split('/')
 
 
+@transaction.atomic
 def create_cleaning_type_object(data: dict) -> Optional[CleaningType]:
     """Создает и возвращает объект модели CleaningType в случае сообщения
-    валидных данных данных. Иначе - возвращает None"""
-    title, coefficient, type_, services_titles = (
+    валидных данных данных. Иначе - возвращает None."""
+    cleaning_type_data: Optional[tuple[str, float, str, list[str]]] = (
         get_cleaning_type_data(data=data)
     )
+    if cleaning_type_data is None:
+        return None
+    title, coefficient, type_, services_titles = cleaning_type_data
     # TODO: посмотреть за безопасностью создания объектов в БД
     cleaning_type: CleaningType = CleaningType.objects.create(
         title=title,
@@ -95,11 +106,11 @@ def create_cleaning_type_object(data: dict) -> Optional[CleaningType]:
     )
     if broken_services:
         cleaning_type.delete()
-        # TODO: подключить логгер.
-        print(
-            f'Can not create "{title}" because some services does not exists:'
+        error_message = (
+            f'Can not create "{title}" because some services do not exist: '
             f'{", ".join(broken_services)}'
         )
+        raise BrokenServicesException(error_message)
     return None
 
 
@@ -118,11 +129,18 @@ class Command(BaseCommand):
         try:
             check_if_services_exists()
             csv_file: csv.DictReader = read_csv(full_path=file_path)
-            for row in csv_file:
-                create_cleaning_type_object(data=row)
+        # TODO: подключить логгер на перехватах ошибок.
         except FileNotFoundError:
             print(f'File "{file_path}" is not provided. Skip task.')
         except ServicesIsEmptyException as err:
             print(err)
         except Exception as err:
             raise CommandError(f'Exception has occurred: {err}')
+        for row in csv_file:
+            try:
+                create_cleaning_type_object(data=row)
+            except BrokenServicesException as err:
+                print(err)
+            except Exception as err:
+                raise CommandError(f'Exception has occurred: {err}')
+        return
