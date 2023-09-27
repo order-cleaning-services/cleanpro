@@ -1,3 +1,6 @@
+# TODO: при релизе проверить, что валидация на клиенте
+#       совпадает с валидацией на сервере!
+
 from django.conf import settings
 from django.db import models
 # TODO: ко всем валидаторам приписать пояснения во всех models.py

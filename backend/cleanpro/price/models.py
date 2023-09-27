@@ -1,3 +1,6 @@
+# TODO: при релизе проверить, что валидация на клиенте
+#       совпадает с валидацией на сервере!
+
 from django.db import models
 from django.core.validators import MinValueValidator
 
