@@ -97,7 +97,7 @@ class User(AbstractUser):
         # # TODO: Пока отключил валидацию, т.к. не могу создать пользователя.
         # Нужно проверять.
         # max_length=16,
-        validators=(validate_password),
+        validators=(validate_password,),
     )
     phone = PhoneNumberField(
         verbose_name='Номер телефона',
