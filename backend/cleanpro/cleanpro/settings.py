@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'users',
     'api',
     'service',
+    'core',
     'drf_yasg',
     'price.apps.PriceConfig',
 ]
