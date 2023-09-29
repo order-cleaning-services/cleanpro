@@ -5,16 +5,16 @@ class AuthAPI {
     return FetchAPI.post('/auth/token/login/', { body })
   }
 
-  logout(body) {
-    return FetchAPI.post('/auth/token/logout', { body })
+  logout(token) {
+    return FetchAPI.post('/auth/token/logout', { token })
   }
 
   create(body) {
     return FetchAPI.post('/users/', { body })
   }
 
-  getUser(body) {
-    return FetchAPI.get('/users/me/', { body })
+  getUser(token) {
+    return FetchAPI.get('/users/me/', { token })
   }
 }
 

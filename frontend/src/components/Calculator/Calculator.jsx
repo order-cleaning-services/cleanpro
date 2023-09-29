@@ -33,7 +33,7 @@ function Calculator() {
   useEffect(() => {
     dispatch(resetRooms())
     dispatch(setTotal(types.filter(card => card.id === cleanType)[0]?.price))
-  }, [cleanType, dispatch])
+  }, [cleanType, dispatch, types])
 
   function handleActiveType(id) {
     dispatch(setCleanType(id))
@@ -95,7 +95,7 @@ function Calculator() {
           {!isTypeWindow && <ExtraServices />}
         </div>
         <div className="calculator-form__wrapper">
-          <Total total={`${total?.toString().slice(0, -3)} ${total?.toString().slice(-3)}`} />
+          <Total total={total ? `${total.toString().slice(0, -3)} ${total.toString().slice(-3)}` : 0} />
           <OrderForm />
         </div>
       </div>

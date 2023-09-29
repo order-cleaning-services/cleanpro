@@ -1,8 +1,8 @@
 import FetchApi from '../utils/fetchAPI'
 
 class OrdersApi {
-  getOrders(body) {
-    return FetchApi.get('/orders/', body)
+  getOrders(token) {
+    return FetchApi.get('/orders/', { token })
   }
 
   createOrder(body) {

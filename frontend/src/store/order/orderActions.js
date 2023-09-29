@@ -2,7 +2,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 import { getToken } from '../../utils/tokenActions'
 import ordersAPI from '../../api/ordersAPI'
 
-export const getUserOrders = createAsyncThunk('order/orders', async (body, { rejectWithValue }) => {
+export const getUserOrders = createAsyncThunk('order/orders', async (_, { rejectWithValue }) => {
   try {
     const token = getToken()
     const response = await ordersAPI.getOrders(token)

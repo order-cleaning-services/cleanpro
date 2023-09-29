@@ -12,7 +12,7 @@ export const buildGetServiceTypes = builder =>
       state.types.map(
         type => (type.price = type.service.reduce((acc, current) => acc + current.price, 0) * type.coefficient),
       )
-      state.cleanType = state.types ? state.types[0].id : null
+      state.cleanType = state.types ? state.types[0]?.id : null
       state.cleanTypeError = null
     })
     .addCase(getServiceTypes.rejected, state => {

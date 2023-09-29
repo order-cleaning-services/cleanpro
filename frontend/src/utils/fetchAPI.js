@@ -22,11 +22,11 @@ export class FetchAPI {
   }
 
   get = async (url, options) => {
-    return await baseFetch(this.API_URL + url, METHODS.GET, options?.body)
+    return await baseFetch(this.API_URL + url, METHODS.GET, options)
   }
 
   post = async (url, options) => {
-    return await baseFetch(this.API_URL + url, METHODS.POST, options.body)
+    return await baseFetch(this.API_URL + url, METHODS.POST, options)
   }
 
   delete = async url => {
@@ -34,48 +34,58 @@ export class FetchAPI {
   }
 
   put = async (url, options) => {
-    return await baseFetch(this.API_URL + url, METHODS.PUT, options.body)
+    return await baseFetch(this.API_URL + url, METHODS.PUT, options)
   }
 
   patch = async (url, options) => {
-    return await baseFetch(this.API_URL + url, METHODS.PATCH, options.body)
+    return await baseFetch(this.API_URL + url, METHODS.PATCH, options)
   }
 }
 
-const baseFetch = async (url, method, body) => {
-  let token
-  if (body) token = Object.prototype.hasOwnProperty.call(body, TOKEN_KEY) ? body.auth_token : null
-
+const baseFetch = async (url, method, options = {}) => {
+  const { body = null, token = null } = options
+  console.log(body, token)
   let bodyFetch = JSON.stringify(body)
 
-  const options = token
-    ? {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Token ${token}`,
-          'Access-Control-Allow-Credentials': true,
-        },
-        method,
-      }
-    : method === METHODS.GET
-    ? {
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Credentials': true,
-        },
-        method,
-      }
-    : {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method,
-        credentials: 'include',
-        body: bodyFetch,
-      }
+  const optionsFetch =
+    token && body
+      ? {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token[TOKEN_KEY]}`,
+            'Access-Control-Allow-Credentials': true,
+          },
+          method,
+          body: bodyFetch,
+        }
+      : token && !body
+      ? {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Token ${token[TOKEN_KEY]}`,
+            'Access-Control-Allow-Credentials': true,
+          },
+          method,
+        }
+      : !token && body
+      ? {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method,
+          credentials: 'include',
+          body: bodyFetch,
+        }
+      : {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          method,
+          credentials: 'include',
+        }
 
   let result
-  const response = await fetch(url, options)
+  const response = await fetch(url, optionsFetch)
 
   try {
     result = await response.json()
