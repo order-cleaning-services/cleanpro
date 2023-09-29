@@ -1,7 +1,3 @@
-import os
-
-from django.conf import settings
-
 from cleanpro.settings import DEFAULT_FROM_EMAIL
 
 
