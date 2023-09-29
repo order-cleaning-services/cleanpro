@@ -1,6 +1,16 @@
 #!/bin/bash
 
-sleep 5 # In order to make sure that db is ready
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+echo @@@@@@@@@@@@@@@@@@@@@@@ waiting for database @@@@@@@@@@@@@@@@@@@@@@@@
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+while ! pg_isready -h db_cs -p 5432; do
+    echo "База данных недоступна, ждем 5 секунд..."
+    sleep 5
+done
+
+# Disconnect from Postgres client timeout
+sleep 5
 
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@ preparing migrations @@@@@@@@@@@@@@@@@@@@@@@@
@@ -38,6 +48,8 @@ echo @@@@@@@@@@@@@@@@@@@@@@@@  import services  @@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 python manage.py csv_services_import
+
+echo "Все сервисы импортированы!"
 
 # echo @@@@@@@@@@@@@@@@@@@@@@@   loading database   @@@@@@@@@@@@@@@@@@@@@@@@
 # echo pass...
