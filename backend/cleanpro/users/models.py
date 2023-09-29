@@ -53,7 +53,7 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, email, password, **extra_fields):
         '''Создает и сохраняет пользователя с полученными почтой и паролем.'''
-        if not email or password:
+        if not email or not password:
             raise ValueError('Укажите email и password.')
         email = self.normalize_email(email).lower()
         user = self.model(email=email, **extra_fields)
