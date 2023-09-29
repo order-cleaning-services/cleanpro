@@ -34,7 +34,6 @@ if ! python manage.py shell -c "from users.models import User; print(User.object
     echo "from users.models import User; \
     admin = User.objects.create_superuser('admin@email.com', 'admin'); \
     admin.username = 'admin'; \
-    admin.first_name = 'admin_first'; \
     admin.phone = '+799911122233'; \
     admin.save()" | python manage.py shell
     echo "Создан пользователь 'admin' с паролем 'admin' и адресом электронной почты 'admin@email.com'"
