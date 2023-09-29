@@ -2,7 +2,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
 
-NAME_PATTERN: str = r'([А-ЯЁ][а-яё]+[\-\s]?){3,30}'
+USERNAME_PATTERN: str = r'([А-ЯЁ][а-яё]+[\-\s]?){3,30}'
 EMAIL_PATTERN: str = r'^(?!\.)[0-9A-Za-z\.]{5,50}@[a-zA-z]+\.[a-zA-z]+$'
 PASS_PATTERN: str = (
     r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!_@#$%^&+=]).{5,50}$'
@@ -25,9 +25,9 @@ def validate_password(value):
     )
 
 
-def validate_name(value):
+def validate_username(value):
     """Производит валидацию поля модели для имени."""
-    if re.fullmatch(NAME_PATTERN, value):
+    if re.fullmatch(USERNAME_PATTERN, value):
         return value
     raise ValidationError(
         gettext(

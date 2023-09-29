@@ -188,7 +188,7 @@ class PostOrderSerializer(serializers.Serializer):
                 setattr(address, attribute, value)
         address.save()
         user, _ = User.objects.get_or_create(email=data['email'])
-        user.first_name = data['username']
+        user.username = data['username']
         user.address = Address.objects.get(id=address.id)
         user.phone = data['phone']
         user.save()
