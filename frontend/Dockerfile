@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:16-alpine
 LABEL description="Cleanpro: Frontend" \
       version="1.0" \
       maintainer="Cleanpro team"

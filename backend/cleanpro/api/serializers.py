@@ -9,6 +9,7 @@ from price.models import CleaningType, Service
 from service.models import Order, Rating, Address, ServicesInOrder
 from users.models import User
 from users.validators import EMAIL_PATTERN
+
 from .utils import services_bulk_create, address_create
 
 
@@ -123,6 +124,7 @@ class ConfirmMailSerializer(serializers.Serializer):
 
 
 class PostOrderSerializer(serializers.Serializer):
+    # TODO: Этот сериализатор удалить вместе с order_create
     # TODO: WARNING! ВАЖНО!
     #       Best practice: сериализатор нужен только для валидации и перевода
     #       информации из json в python-типы и обратно. Вся логика
@@ -364,6 +366,8 @@ class CreateOrderSerializer(serializers.ModelSerializer):
         address = address_create(valid_address)
         validated_data['user'] = valid_user
         validated_data['address'] = address
+        request.user.address = address
+        request.user.save()
         order = super().create(validated_data)
         services_bulk_create(order, services)
         return order
