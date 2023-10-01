@@ -1,4 +1,4 @@
-# Time zone settings.py
+# Permission settings.py
 USER: str = 'user'
 ADMIN: str = 'admin'
 ADDITIONAL_CS: str = 'additional'
