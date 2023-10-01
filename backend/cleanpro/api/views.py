@@ -37,7 +37,6 @@ from users.models import User
 # TODO: Добавить URL сайта из переменных окружения с указанием эндпоинта
 
 
-# TODO: аннотировать типы данных. Везде. Абсолютно.
 def send_mail(subject: str, message: str, to: tuple[str]) -> None:
     """Отправляет электронное сообщение.
     "backend=None" означает, что бекенд будет выбран согласно указанному
@@ -92,7 +91,7 @@ class UserViewSet(UserViewSet):
 
 
 @api_view(('POST',))
-def confirm_mail(request):
+def confirm_mail(request: str):
     """Подтвердить электронную почту."""
     serializer = ConfirmMailSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -130,7 +129,7 @@ def confirm_mail(request):
 
 
 @api_view(['POST'])
-def order_create(request):
+def order_create(request: str):
     """Создать заказ."""
     serializer = PostOrderSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
@@ -180,7 +179,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         permission_classes=(IsOwner,),
         url_path='pay',
     )
-    def pay(self, request, pk):
+    def pay(self, request: str, pk: int):
         """Оплатить заказ."""
         order = get_object_or_404(Order, id=pk)
         serializer = PaySerializer(order, request.data)
@@ -207,7 +206,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         #       прописывать url путь.
         url_path='pay',
     )
-    def cancel(self, request, pk):
+    def cancel(self, request: str, pk: int):
         """Отменить заказ."""
         order = get_object_or_404(Order, id=pk)
         # TODO: сериализаторы не предназначены для изменения данных объектов.
@@ -226,7 +225,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         methods=('patch',),
         permission_classes=(permissions.IsAuthenticated, IsOwner),
     )
-    def comment(self, request, pk):
+    def comment(self, request: str, pk: int):
         """Добавить комментарий к заказу."""
         order = get_object_or_404(Order, id=pk)
         serializer = CommentSerializer(order, request.data)
@@ -239,7 +238,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         methods=('patch',),
         permission_classes=(permissions.IsAuthenticated, IsOwner,)
     )
-    def change_datetime(self, request, pk):
+    def change_datetime(self, request: str, pk: int):
         """Перенести заказ."""
         order = get_object_or_404(Order, id=pk)
         serializer = DateTimeSerializer(order, request.data)
@@ -252,7 +251,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         methods=('patch',),
         permission_classes=(permissions.IsAdminUser,)
     )
-    def change_status(self, request, pk):
+    def change_status(self, request: str, pk: int):
         """Изменить статус заказа."""
         order = get_object_or_404(Order, id=pk)
         serializer = OrderStatusSerializer(order, request.data)

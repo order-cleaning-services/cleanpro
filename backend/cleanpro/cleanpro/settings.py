@@ -4,6 +4,18 @@ from pathlib import Path
 from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
 
+from core.email_settings import (
+    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD,
+    EMAIL_USE_TLS, EMAIL_USE_SSL, EMAIL_SSL_CERTFILE, EMAIL_SSL_KEYFILE,
+    EMAIL_TIMEOUT, DEFAULT_FROM_EMAIL
+)
+from core.date_settings import (
+    LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_TZ
+)
+from core.user_settings import (
+    USER, ADMIN, ADDITIONAL_CS
+)
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(os.path.join(BASE_DIR, '.env'), verbose=True)
@@ -104,13 +116,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'ru-RU'
+"""Time zone"""
 
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = LANGUAGE_CODE
 
-USE_I18N = True
+TIME_ZONE = TIME_ZONE
 
-USE_TZ = True
+USE_I18N = USE_I18N
+
+USE_TZ = USE_TZ
+
+"""Media settings"""
 
 STATIC_URL = 'static/'
 
@@ -123,6 +139,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+"""Account settings"""
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
@@ -141,13 +159,13 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
-USER = 'user'
+USER = USER
 
-ADMIN = 'admin'
+ADMIN = ADMIN
 
-ADDITIONAL_CS = 'additional'
+ADDITIONAL_CS = ADDITIONAL_CS
 
-DEFAULT_FROM_EMAIL = 'cleanpronew2023@gmail.com'
+DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # TODO: это для фронтов, чтобы в локальной сети был доступ к бэку.
@@ -163,20 +181,18 @@ CORS_ALLOW_HEADERS = (
     "access-control-allow-credentials",
 )
 
-# TODO: адекватно разделить код на смысловые блоки. Частично вынести в core.
-# Допускается не делать core, а складировать все здесь. Но навести порядок.
 """Email backend data"""
 
-EMAIL_HOST: str = os.getenv('EMAIL_HOST')
-EMAIL_PORT: int = int(os.getenv('EMAIL_PORT'))
-EMAIL_HOST_USER: str = os.getenv('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD: str = os.getenv('EMAIL_HOST_PASSWORD')
-EMAIL_USE_TLS: bool = bool(os.getenv('EMAIL_USE_TLS'))
-EMAIL_USE_SSL: bool = bool(os.getenv('EMAIL_USE_SSL'))
-EMAIL_SSL_CERTFILE: str = os.getenv('EMAIL_SSL_CERTFILE')
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_USE_SSL = EMAIL_USE_SSL
+EMAIL_SSL_CERTFILE = EMAIL_SSL_CERTFILE
 # TODO: проверить SSL_KEYFILE
-EMAIL_SSL_KEYFILE: str = os.getenv('EMAIL_SSL_KEYFILE')
-EMAIL_TIMEOUT: int = int(os.getenv('EMAIL_TIMEOUT'))
+EMAIL_SSL_KEYFILE = EMAIL_SSL_KEYFILE
+EMAIL_TIMEOUT = EMAIL_TIMEOUT
 
 # TODO: при выключении DEBUG будет ошибка, так как SMTP у нас не арендован
 # и не подключен.
