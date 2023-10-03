@@ -28,12 +28,13 @@ def validate_password(value):
 
 def validate_username(value):
     """Производит валидацию поля модели для имени."""
+    """Производит валидацию поля модели для имени."""
     if re.fullmatch(USERNAME_PATTERN, value):
         return value
     raise ValidationError(
         gettext(
             'Укажите корректное имя '
-            '(например: Апполинарий Вальдемарович фон Спасо-Преображенский)'
+            '(например: Апполинарий Вальдемарович фон Спасо-Преображенский).'
         )
     )
 
@@ -43,5 +44,5 @@ def validate_email(value):
     if re.fullmatch(EMAIL_PATTERN, value):
         return value
     raise ValidationError(
-        gettext('Введите корректный email (например: example@example.ru)')
+        gettext('Введите корректный email (например: example@example.ru).')
     )

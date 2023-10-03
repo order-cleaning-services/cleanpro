@@ -7,6 +7,7 @@ from .models import Address, User
 class UserAdmin(admin.ModelAdmin):
     list_display = (
         'username',
+        'username',
         'email',
         'phone',
         'address'
