@@ -19,7 +19,8 @@ ADDRESS_FLOOR_MAX_VAL: int = 150
 ADDRESS_APARTMENT_MAX_VAL: int = 9999
 
 USER_NAME_MAX_LEN: int = 30
-USER_PASS_MAX_LEN: int = 50
+# Do not change, Django hash password with big length!
+USER_PASS_MAX_LEN: int = 512
 USER_PASS_RAND_MAX_LEN: int = 10
 USER_FULL_EMAIL_MAX_LEN: int = 80
 
