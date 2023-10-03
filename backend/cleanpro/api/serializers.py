@@ -206,6 +206,10 @@ class OrderPostSerializer(serializers.ModelSerializer):
         for service in services_data:
             service_id: str = service.get('id')
             amount: str = service.get('amount')
+            if service_id is None or amount is None:
+                raise serializers.ValidationError(
+                    'Укажите id и amount сервиса.'
+                )
             if int(service_id) not in all_services_id or int(amount) <= 0:
                 invalidated_services.append(service_id)
         if invalidated_services:
