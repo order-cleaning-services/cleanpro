@@ -48,6 +48,7 @@ echo @@@@@@@@@@@@@@@@@@@@@@@@  import services  @@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 python manage.py csv_services_import
+python manage.py csv_cleaning_types_import
 
 echo "Все сервисы импортированы!"
 
