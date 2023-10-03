@@ -181,9 +181,9 @@ class OrderPostSerializer(serializers.ModelSerializer):
     def validate_user(self, user_data):
         """Производит валидацию данных о пользователе."""
         invalid_data: list[str] = []
-        username: str = user_data.get('username')
-        email: str = user_data.get('email')
-        phone: str = user_data.get('phone')
+        username: str = user_data.get('username', 'None')
+        email: str = user_data.get('email', 'None')
+        phone: str = user_data.get('phone', 'None')
         if not re.fullmatch(USERNAME_PATTERN, username):
             invalid_data.append("username")
         if not re.fullmatch(EMAIL_PATTERN, email):
