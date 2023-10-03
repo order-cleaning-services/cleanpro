@@ -121,7 +121,7 @@ function OrderForm() {
               required,
               pattern: {
                 value: /([\d]+[/]?[\d]?[А-Яа-яA-Za-z]?){1}/,
-                message: 'Должна быть хоть бы одна цифра',
+                message: 'Должна быть хоть бы одна  цифра',
               },
               maxLength: {
                 value: 60,
