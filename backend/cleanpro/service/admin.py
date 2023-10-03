@@ -8,11 +8,21 @@ class ServicesToOrder(admin.StackedInline):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'total_sum', 'order_status', 'user',
-                    'comment')
-    list_editable = ('total_sum', 'order_status', 'comment')
+    list_display = (
+        'pk',
+        'user',
+        'total_sum',
+        'order_status',
+        'comment',
+        'comment_cancel',
+    )
+    list_editable = (
+        'total_sum',
+        'order_status',
+        'comment',
+    )
     list_filter = ('order_status',)
-    search_fields = ('comment', )
+    search_fields = ('comment',)
     empty_value_display = '-пусто-'
     inlines = [
         ServicesToOrder,
