@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Measure, Service, CleaningType, ServicesInCleaningType
+from .models import CleaningType, Measure, Service, ServicesInCleaningType
 
 
 class MeasureAdmin(admin.ModelAdmin):
@@ -13,7 +13,7 @@ class MeasureAdmin(admin.ModelAdmin):
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ('pk', 'title', 'price', 'measure', 'image', 'service_type')
     list_editable = ('title', 'price', 'measure', 'image', 'service_type')
-    list_filter = ('service_type', )
+    list_filter = ('service_type',)
     search_fields = ('title',)
     empty_value_display = '-пусто-'
 
@@ -24,10 +24,10 @@ class Services_in_CleaningAdmin(admin.StackedInline):
 
 
 class CleaningTypeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'title', 'coefficient', 'type')
-    list_editable = ('title', 'coefficient', 'type')
-    list_filter = ('coefficient', 'type')
-    search_fields = ('title', )
+    list_display = ('pk', 'title', 'coefficient',)
+    list_editable = ('title', 'coefficient',)
+    list_filter = ('coefficient',)
+    search_fields = ('title',)
     empty_value_display = '-пусто-'
     inlines = [
         Services_in_CleaningAdmin,
