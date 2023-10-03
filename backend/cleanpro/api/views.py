@@ -1,8 +1,8 @@
 import string
 
 from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -12,12 +12,14 @@ from rest_framework.response import Response
 
 from cleanpro.settings import ADDITIONAL_CS
 from price.models import CleaningType, Service
-from .permissions import IsOwnerOrReadOnly, IsOwner
+from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
     CancelSerializer,
     CleaningTypeSerializer,
     CommentSerializer,
     ConfirmMailSerializer,
+    CreateOrderSerializer,
+    CreateUserAndOrderSerializer,
     CustomUserSerializer,
     DateTimeSerializer,
     GetOrderSerializer,
@@ -30,7 +32,6 @@ from .serializers import (
 from service.models import Order, Rating
 # TODO: ну надо определиться - или из строки 3, или отсюда. Полагаю - отсюда
 from users.models import User
-
 
 # TODO: создать core для сайта, перенести туда часть настроек из settings.py,
 #       перенести это, сделать там смысловое разделение с указанием блоков.
@@ -84,7 +85,7 @@ def send_mail(subject: str, message: str, to: tuple[str]) -> None:
 
 class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """Получение списка типов основных услуг."""
-    queryset = CleaningType.objects.exclude(type=ADDITIONAL_CS)
+    queryset = CleaningType.objects.all()
     serializer_class = CleaningTypeSerializer
     pagination_class = None
 
@@ -196,11 +197,47 @@ class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = GetOrderSerializer
     queryset = Order.objects.all().select_related('user', 'address',)
 
-    # TODO: 1) зачем?
-    #       2) будет ошибка, что-то типа "сначала надо применить
-    #          метод .is_valid(), а потом только .save"
-    def perform_update(self, serializer):
-        serializer.save()
+    def get_serializer_class(self):
+        if (self.request.method == 'POST'
+                or self.request.method == 'PATCH'
+                or self.request.method == 'PUT'):
+            if not self.request.user.is_authenticated:
+                return CreateUserAndOrderSerializer
+            return CreateOrderSerializer
+        return GetOrderSerializer
+
+    def create(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        user = request.user
+        if not user.is_authenticated:
+            email = request.data['user']['email']
+            user = User.objects.get(email=email)
+            password = User.objects.make_random_password(
+                # TODO: best practice - избегать магических чисел,
+                #       длина пароля также может быть рандомной в пределах допустимого
+                length=8,
+                # INFO: встроенных библиотек Django великое множество.
+                #       запоминаем такое профессиональное решение :)
+                allowed_chars=string.ascii_lowercase + string.digits,
+            )
+            user.set_password(password)
+            user.save()
+            send_mail(
+                # TODO: какое-то сжатое письмо. Добавить информативности.
+                subject='Пароль',
+                message=f'Пароль: {password}',
+                to=(user.email,),
+            )
+            return Response(
+                f'Заказ создан. Пароль от учетной записи: {password}',
+                status=status.HTTP_200_OK, headers=headers
+            )
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     @action(
         detail=True,
