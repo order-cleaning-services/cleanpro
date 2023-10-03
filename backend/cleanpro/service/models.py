@@ -10,14 +10,16 @@ from price.models import CleaningType, Service
 from users.models import Address
 
 
-# https://peps.python.org/pep-0008/#class-names
+ORDER_CANCELLED_STATUS: str = 'cancelled'
+
+
 class Order(models.Model):
     """Модель заказа."""
     STATUS_CHOICES = (
         ('created', 'Создан'),
         ('accepted', 'Принят'),
         ('finished', 'Завершен'),
-        ('cancelled', 'Отменен'),
+        (ORDER_CANCELLED_STATUS, 'Отменен')
     )
     user = models.ForeignKey(
         verbose_name='Заказчик',
@@ -42,6 +44,13 @@ class Order(models.Model):
     comment = models.TextField(
         verbose_name='Комментарий',
         max_length=250,
+        default=None,
+        blank=True,
+        null=True,
+    )
+    comment_cancel = models.CharField(
+        verbose_name='Комментарий отмены',
+        max_length=256,
         default=None,
         blank=True,
         null=True,
@@ -93,6 +102,19 @@ class Order(models.Model):
     )
     cleaning_time = models.TimeField(
         verbose_name='Время уборки',
+    )
+    # INFO! Я НАСТАИВАЮ на Datetime field - посмотрите, какая ерунда уже
+    #       вырисовывается! А могло быть 3 лаконичных поля!
+    cancel_date = models.DateField(
+        verbose_name='Дата отмены заказа',
+        db_index=True,
+        blank=True,
+        null=True,
+    )
+    cancel_time = models.TimeField(
+        verbose_name='Время отмены заказа',
+        blank=True,
+        null=True,
     )
 
     class Meta:
