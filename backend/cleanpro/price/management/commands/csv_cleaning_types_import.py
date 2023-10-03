@@ -67,7 +67,7 @@ def create_services_in_cleaning_types(
 
 def get_cleaning_type_data(
         data: dict
-        ) -> Optional[tuple[str, float, str, list[str]]]:  # noqa E126
+        ) -> Optional[tuple[str, float, list[str]]]:  # noqa E126
     """Проверяет наличие необходимых данных для создания объекта модели
     CleaningType приводит их нужным Python типам и возвращает в следующем
     порядке: title, coefficient, type, services_titles.
@@ -77,11 +77,10 @@ def get_cleaning_type_data(
     if not title or title in cleaning_types_titles:
         return
     coefficient: str = data.get('coefficient')
-    type: str = data.get('type')
     services_titles: str = data.get('services')
-    if not all((coefficient, type, services_titles)):
+    if not all((coefficient, services_titles)):
         return None
-    return title, float(coefficient), type, services_titles.split('/')
+    return title, float(coefficient), services_titles.split('/')
 
 
 @transaction.atomic
