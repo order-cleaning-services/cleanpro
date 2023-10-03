@@ -240,7 +240,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         for attr, max_val in data_int.items():
             if (address_data.get(attr) is None or
                     int(address_data.get(attr)) > max_val):
-                invalid_data.append(f'"{attr}')
+                invalid_data.append(f'{attr}')
         if invalid_data:
             raise serializers.ValidationError(
                 'Убедитесь, что верно заполнены следующие поля: '
