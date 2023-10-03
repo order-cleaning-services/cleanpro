@@ -1,37 +1,34 @@
-import string
+# TODO: аннотировать типы данных. Везде. Абсолютно.
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
-from rest_framework import permissions, status, viewsets
+from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 
 from cleanpro.settings import ADDITIONAL_CS
 from price.models import CleaningType, Service
+from service.models import Order, Rating
+from users.models import User
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
-    CancelSerializer,
     CleaningTypeSerializer,
     CommentSerializer,
-    ConfirmMailSerializer,
-    CreateOrderSerializer,
-    CreateUserAndOrderSerializer,
     CustomUserSerializer,
     DateTimeSerializer,
-    GetOrderSerializer,
+    EmailConfirmSerializer,
+    OrderCancelSerializer,
+    OrderGetSerializer,
+    OrderPostSerializer,
     OrderStatusSerializer,
     PaySerializer,
-    PostOrderSerializer,
     RatingSerializer,
-    ServiceSerializer
+    ServiceSerializer,
 )
-from service.models import Order, Rating
-# TODO: ну надо определиться - или из строки 3, или отсюда. Полагаю - отсюда
-from users.models import User
 
 # TODO: создать core для сайта, перенести туда часть настроек из settings.py,
 #       перенести это, сделать там смысловое разделение с указанием блоков.
@@ -67,7 +64,6 @@ EMAIL_CONFIRM_TEXT: str = (
 )
 
 
-# TODO: аннотировать типы данных. Везде. Абсолютно.
 def send_mail(subject: str, message: str, to: tuple[str]) -> None:
     """Отправляет электронное сообщение.
     "backend=None" означает, что бекенд будет выбран согласно указанному
@@ -113,7 +109,7 @@ class UserViewSet(UserViewSet):
             user=id
         ).select_related('user', 'service_package')
         page = self.paginate_queryset(queryset)
-        serializer = GetOrderSerializer(
+        serializer = OrderGetSerializer(
             page,
             many=True,
             context={'request': request}
@@ -124,7 +120,7 @@ class UserViewSet(UserViewSet):
 @api_view(('POST',))
 def confirm_mail(request):
     """Подтвердить электронную почту."""
-    serializer = ConfirmMailSerializer(data=request.data)
+    serializer = EmailConfirmSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         User,
@@ -159,158 +155,89 @@ def confirm_mail(request):
     )
 
 
-@api_view(['POST'])
-def order_create(request):
-    """Создать заказ."""
-    serializer = PostOrderSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    serializer.save()
-    user = request.user
-    if user.is_authenticated:
-        return Response(request.data, status=status.HTTP_201_CREATED)
-    email = request.data['email']
-    user = User.objects.get(email=email)
-    password = User.objects.make_random_password(
-        # TODO: best practice - избегать магических чисел,
-        #       длина пароля также может быть рандомной в пределах допустимого
-        length=8,
-        # INFO: встроенных библиотек Django великое множество.
-        #       запоминаем такое профессиональное решение :)
-        allowed_chars=string.ascii_lowercase + string.digits,
-    )
-    user.set_password(password)
-    user.save()
-    send_mail(
-        # TODO: какое-то сжатое письмо. Добавить информативности.
-        subject='Пароль',
-        message=f'Пароль: {password}',
-        to=(user.email,),
-    )
-    return Response(
-        data=f'Заказ создан. Пароль от учетной записи: {password}',
-        status=status.HTTP_200_OK)
-
-
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    methods = ('get', 'post', 'patch', 'delete',)
-    serializer_class = GetOrderSerializer
+    methods = ('get', 'post', 'patch',)
     queryset = Order.objects.all().select_related('user', 'address',)
+    # TODO: получается, что сейчас любой пользователь может прочитать
+    #       чужие заказы? Это нужно сделать только для администратора.
+    #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
+    #       А вот POST - для пользователя.
+    # permission_classes = ()
 
     def get_serializer_class(self):
-        if (self.request.method == 'POST'
-                or self.request.method == 'PATCH'
-                or self.request.method == 'PUT'):
-            if not self.request.user.is_authenticated:
-                return CreateUserAndOrderSerializer
-            return CreateOrderSerializer
-        return GetOrderSerializer
+        if self.request.method == 'GET':
+            return OrderGetSerializer
+        else:
+            return OrderPostSerializer
 
-    def create(self, request):
-        serializer = self.get_serializer(data=request.data)
+    def __modify_order(
+            order_id,
+            request: HttpRequest,
+            serializer_class: serializers,
+            ) -> serializers: # NoQa
+        order = get_object_or_404(Order, id=order_id)
+        serializer = serializer_class(order, request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        user = request.user
-        if not user.is_authenticated:
-            email = request.data['user']['email']
-            user = User.objects.get(email=email)
-            password = User.objects.make_random_password(
-                # TODO: best practice - избегать магических чисел,
-                #       длина пароля также может быть рандомной в пределах допустимого
-                length=8,
-                # INFO: встроенных библиотек Django великое множество.
-                #       запоминаем такое профессиональное решение :)
-                allowed_chars=string.ascii_lowercase + string.digits,
-            )
-            user.set_password(password)
-            user.save()
-            send_mail(
-                # TODO: какое-то сжатое письмо. Добавить информативности.
-                subject='Пароль',
-                message=f'Пароль: {password}',
-                to=(user.email,),
-            )
-            return Response(
-                f'Заказ создан. Пароль от учетной записи: {password}',
-                status=status.HTTP_200_OK, headers=headers
-            )
-        return Response(
-            serializer.data, status=status.HTTP_201_CREATED, headers=headers
-        )
+        serializer.save()
+        return serializer
 
     @action(
         detail=True,
-        # TODO: сделать везде через tuple, ускорит код.
         methods=('patch',),
         permission_classes=(IsOwner,),
         url_path='pay',
     )
     def pay(self, request, pk):
         """Оплатить заказ."""
-        order = get_object_or_404(Order, id=pk)
-        serializer = PaySerializer(order, request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer: serializers = self.__modify_order(
+            order_id=pk,
+            request=request,
+            serializer_class=PaySerializer,
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
         methods=('patch',),
-        # TODO: IsOwner "сильнее", чем "IsAuthenticated".
-        #       Убрать "IsAuthenticated" и проверить везде пермишены на
-        #       задвоения.
-        #       Также логическая ошибка: аунтифицированный юзер по первому
-        #       пермишену мог бы удалить любой заказ.
-        #       Если все же нужен хотя бы один - можно ознакомиться с
-        #       необходимым для этого синтаксисом, например:
-        #       https://ufchgu.ru/blog/algebra-logiki-v-pitone-kak-zapisyvajutsja#:~:text=%D0%92%20Python%20%D0%B4%D0%BB%D1%8F%20%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D0%B8%20%D0%BB%D0%BE%D0%B3%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D1%85,%2C%20%C2%AB%D0%BD%D0%B5%20%D1%80%D0%B0%D0%B2%D0%BD%D0%BE%C2%BB%20(!
-        #       (я не уверен, что на 3.9 это так заработает. Возможно нужно
-        #       будет импортировать Optional:
-        #       https://docs-python.ru/standart-library/modul-typing-python/tip-annotatsii-optional-modulja-typing/)
-        permission_classes=(permissions.IsAuthenticated, IsOwner,),
-        # INFO: "явное лучше неявного" (см.код `import this`) - рекомендуется
-        #       прописывать url путь.
-        url_path='pay',
+        permission_classes=(IsOwner,),
+        url_path='cancel',
     )
     def cancel(self, request, pk):
         """Отменить заказ."""
-        order = get_object_or_404(Order, id=pk)
-        # TODO: сериализаторы не предназначены для изменения данных объектов.
-        #       Они нужны только для сериализации и для валидации - это
-        #       общепринятые стандарты разделения отвутственности частей
-        #       сервера. Т.о. убрать вообще сериализатор и перенести
-        #       логику в функцию.
-        # TODO: аналогичная ситуация есть в других функциях.
-        serializer = CancelSerializer(order, request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer: serializers = self.__modify_order(
+            order_id=pk,
+            request=request,
+            serializer_class=OrderCancelSerializer,
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(permissions.IsAuthenticated, IsOwner),
+        permission_classes=(IsOwner),
     )
     def comment(self, request, pk):
         """Добавить комментарий к заказу."""
-        order = get_object_or_404(Order, id=pk)
-        serializer = CommentSerializer(order, request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer: serializers = self.__modify_order(
+            order_id=pk,
+            request=request,
+            serializer_class=CommentSerializer,
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(permissions.IsAuthenticated, IsOwner,)
+        permission_classes=(IsOwner,)
     )
     def change_datetime(self, request, pk):
         """Перенести заказ."""
-        order = get_object_or_404(Order, id=pk)
-        serializer = DateTimeSerializer(order, request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer: serializers = self.__modify_order(
+            order_id=pk,
+            request=request,
+            serializer_class=DateTimeSerializer,
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
@@ -320,10 +247,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     )
     def change_status(self, request, pk):
         """Изменить статус заказа."""
-        order = get_object_or_404(Order, id=pk)
-        serializer = OrderStatusSerializer(order, request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer: serializers = self.__modify_order(
+            order_id=pk,
+            request=request,
+            serializer_class=OrderStatusSerializer,
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
