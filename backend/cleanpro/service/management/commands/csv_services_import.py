@@ -28,8 +28,8 @@ def return_service_object(data: dict) -> Service:
         title=title,
         price=float(data.get('price')),
         measure=measure,
-        service_type = data.get('service_type'),
-        cleaning_time = data.get('cleaning_time'),
+        service_type=data.get('service_type'),
+        cleaning_time=data.get('cleaning_time'),
     )
     file_name: str = f'{import_img_path}{title}.jpg'
     try:
@@ -40,7 +40,6 @@ def return_service_object(data: dict) -> Service:
     services_titles.append(title)
     return service
 
-# TODO: Добавить создание наборов услуг в БД.
 
 class Command(BaseCommand):
     help = 'Loading services from csv.'
