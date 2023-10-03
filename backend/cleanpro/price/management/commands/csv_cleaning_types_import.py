@@ -93,12 +93,11 @@ def create_cleaning_type_object(data: dict) -> Optional[CleaningType]:
     )
     if cleaning_type_data is None:
         return None
-    title, coefficient, type_, services_titles = cleaning_type_data
+    title, coefficient, services_titles = cleaning_type_data
     # TODO: посмотреть за безопасностью создания объектов в БД
     cleaning_type: CleaningType = CleaningType.objects.create(
         title=title,
         coefficient=coefficient,
-        type=type_,
     )
     broken_services = create_services_in_cleaning_types(
         cleaning_type=cleaning_type,
