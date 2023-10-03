@@ -1,8 +1,8 @@
 import string
 
 from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -12,12 +12,14 @@ from rest_framework.response import Response
 
 from cleanpro.settings import ADDITIONAL_CS
 from price.models import CleaningType, Service
-from .permissions import IsOwnerOrReadOnly, IsOwner
+from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
     CancelSerializer,
     CleaningTypeSerializer,
     CommentSerializer,
     ConfirmMailSerializer,
+    CreateOrderSerializer,
+    CreateUserAndOrderSerializer,
     CustomUserSerializer,
     DateTimeSerializer,
     GetOrderSerializer,
@@ -25,14 +27,11 @@ from .serializers import (
     PaySerializer,
     PostOrderSerializer,
     RatingSerializer,
-    ServiceSerializer,
-    CreateOrderSerializer,
-    CreateUserAndOrderSerializer
+    ServiceSerializer
 )
 from service.models import Order, Rating
 # TODO: ну надо определиться - или из строки 3, или отсюда. Полагаю - отсюда
 from users.models import User
-
 
 # TODO: создать core для сайта, перенести туда часть настроек из settings.py,
 #       перенести это, сделать там смысловое разделение с указанием блоков.
@@ -236,7 +235,9 @@ class OrderViewSet(viewsets.ModelViewSet):
                 f'Заказ создан. Пароль от учетной записи: {password}',
                 status=status.HTTP_200_OK, headers=headers
             )
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
     @action(
         detail=True,

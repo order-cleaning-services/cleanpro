@@ -1,4 +1,5 @@
 import re
+
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
 
@@ -18,7 +19,7 @@ def validate_password(value):
         gettext(
             'Введите пароль, который удовлетворяет критериям:\n'
             '    - длина от 5 до 50 символов;\n'
-            '    - включает хотя бы одну цифру (0-9);\n'
+            '    - включат хотя бы одну цифру (0-9);\n'
             '    - включает хотя бы одну прописную букву (a-z);\n'
             '    - включает хотя бы одну заглавную букву (A-Z);\n'
             '    - включает хотя бы один специальный символ (!_@#$%^&+=).'

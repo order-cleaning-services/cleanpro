@@ -4,6 +4,7 @@ from rest_framework import serializers, status
 from price.models import Service
 from service.models import Address, ServicesInOrder
 
+
 def services_bulk_create(order, services):
     ing_objs = []
     for item in services:

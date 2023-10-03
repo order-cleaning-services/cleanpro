@@ -1,5 +1,5 @@
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
 
 
 class Measure(models.Model):
@@ -46,7 +46,7 @@ class Service(models.Model):
         upload_to='service_photo/',
         verbose_name='Фото вида уборки',
         # TODO: это временно же?
-        # TODO: Нет. Вроде у нас будут услуги, которые будут без картинок.
+        # REPLE: Нет. Вроде у нас будут услуги, которые будут без картинок.
         null=True,
         blank=True,
     )
@@ -113,11 +113,5 @@ class ServicesInCleaningType(models.Model):
     )
 
     class Meta:
-        # TODO: Удалить. В разных наборах могут быть одинаковые услуги.
-        # constraints = (
-        #     models.UniqueConstraint(
-        #         fields=('cleaning_type', 'service',),
-        #         name='service_in_cleaning_type'),
-        # )
         verbose_name = 'Услуга в наборе'
         verbose_name_plural = 'Услуги в наборе'

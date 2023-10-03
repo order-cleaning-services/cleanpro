@@ -1,10 +1,10 @@
 from django.conf import settings
-from django.db import models
 # TODO: ко всем валидаторам приписать пояснения во всех models.py
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
-from users.models import Address
 from price.models import CleaningType, Service
+from users.models import Address
 
 
 # https://peps.python.org/pep-0008/#class-names

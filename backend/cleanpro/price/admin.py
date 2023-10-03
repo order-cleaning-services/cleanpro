@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Measure, Service, CleaningType, ServicesInCleaningType
+from .models import CleaningType, Measure, Service, ServicesInCleaningType
 
 
 class MeasureAdmin(admin.ModelAdmin):

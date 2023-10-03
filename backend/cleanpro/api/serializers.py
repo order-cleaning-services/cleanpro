@@ -1,15 +1,14 @@
 import re
 
-from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
-from rest_framework import serializers, status
 from phonenumber_field.serializerfields import PhoneNumberField
+from rest_framework import serializers, status
 
 from price.models import CleaningType, Service
-from service.models import Order, Rating, Address, ServicesInOrder
+from service.models import Address, Order, Rating, ServicesInOrder
 from users.models import User
 from users.validators import EMAIL_PATTERN
-from .utils import services_bulk_create, address_create
+from .utils import address_create, services_bulk_create
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -316,9 +315,16 @@ class CreateUserAndOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        exclude = (
-            'pay_status',
-            'order_status',
+        fields = (
+            'user',
+            'address',
+            'cleaning_type',
+            'services',
+            'total_sum',
+            'total_time',
+            'comment',
+            'cleaning_date',
+            'cleaning_time',
         )
 
     def create(self, validated_data):
@@ -350,10 +356,15 @@ class CreateOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        exclude = (
-            'user',
-            'pay_status',
-            'order_status',
+        fields = (
+            'address',
+            'cleaning_type',
+            'services',
+            'total_sum',
+            'total_time',
+            'comment',
+            'cleaning_date',
+            'cleaning_time',
         )
 
     def create(self, validated_data):
