@@ -1,0 +1,20 @@
+.grid {
+	display: grid;
+	width: 100%;
+	grid-template-columns: 13.2rem repeat(4, 15.3rem) 24.3rem;
+	grid-template-rows: max-content 1fr;
+
+	&__item {
+		padding: 0 1.6rem 0 1.6rem;
+		&:nth-child(6){
+			margin: 0 0 0 3.1rem;
+		}		
+	}
+	&__additional {
+		grid-column-start: 2;
+		grid-column-end: -1;
+		grid-row-start: 1;
+		grid-row-end: -1;
+		margin: 0 1.6rem 0 0;
+	}
+}
