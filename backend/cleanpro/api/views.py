@@ -96,10 +96,19 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
 class UserViewSet(UserViewSet):
     """Список пользователей."""
     serializer_class = CustomUserSerializer
+    http_method_names = ('get', 'post', 'put')
+
+    def create(self, request):
+        """Создание пользователей (без вывода данных)."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)
 
     @action(
         detail=True,
-        url_path='subscribe',
+        url_path='orders',
         methods=('get',),
         permission_classes=(permissions.IsAuthenticated,)
     )
@@ -107,7 +116,7 @@ class UserViewSet(UserViewSet):
         """Список заказов пользователя."""
         queryset = Order.objects.filter(
             user=id
-        ).select_related('user', 'service_package')
+        ).select_related('user', 'cleaning_type', 'address')
         page = self.paginate_queryset(queryset)
         serializer = OrderGetSerializer(
             page,
@@ -115,6 +124,18 @@ class UserViewSet(UserViewSet):
             context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
+
+    @action(
+        detail=False,
+        url_path='me',
+        methods=('get',),
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request):
+        """Личные данные авторизованного пользователя."""
+        instance = request.user
+        serializer = CustomUserSerializer(instance)
+        return Response(serializer.data)
 
 
 @api_view(('POST',))
@@ -175,7 +196,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             order_id,
             request: HttpRequest,
             serializer_class: serializers,
-            ) -> serializers: # NoQa
+            ) -> serializers:  # NoQa
         order = get_object_or_404(Order, id=order_id)
         serializer = serializer_class(order, request.data)
         serializer.is_valid(raise_exception=True)
