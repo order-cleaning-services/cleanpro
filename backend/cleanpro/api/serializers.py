@@ -124,7 +124,7 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
-    user = serializers.DictField(child=serializers.CharField())
+    user = CustomUserSerializer()
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
