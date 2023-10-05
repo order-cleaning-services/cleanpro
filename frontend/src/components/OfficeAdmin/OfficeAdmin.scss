@@ -46,18 +46,24 @@
 	}
 
 	&__field-search {
-		display: flex;
-		justify-content: space-between;
 		margin: 4rem 0 0 0;
 	}
 
 	&__data-search {		
-		display: flex;		
+		display: flex;
+		flex-direction: column;
 	}
 
 	&__search {
+		width: 100%;
 		display: flex;
+		justify-content: space-between;
 		gap: 1.6rem;
+	}
+
+	&__search-flex {
+		display: flex;
+		gap: 4rem;
 	}
 
 	&__filter {

@@ -60,17 +60,21 @@ function OfficeAdmin() {
       <div className="office__field-search">
         <form className="office__data-search">
           <div className="office__search">
-            <Search />
-            <div onClick={handleToggleClick} className="office__filter">
-              <img className="office__filter-icon" src={filter} alt="Фильтр" />
-              <p className="office__filter-text text-m">Фильтры</p>
-              <p className="office__count office__count_style_background">2</p>
+            <div className="office__search-flex">
+              <Search />
+              <div onClick={handleToggleClick} className="office__filter">
+                <img className="office__filter-icon" src={filter} alt="Фильтр" />
+                <p className="office__filter-text text-m">Фильтры</p>
+                <p className="office__count office__count_style_background">2</p>
+              </div>
             </div>
+            <button type="text" className="office__button text-m">
+              Выгрузить данные
+            </button>
           </div>
+          <Filters stateVisible={visibleFieldFilters} />
         </form>
-        <button className="office__button text-m">Выгрузить данные</button>
       </div>
-      <Filters stateVisible={visibleFieldFilters} />
       <div className="office__table">
         <TableTitle />
       </div>
