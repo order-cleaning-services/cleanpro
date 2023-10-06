@@ -1,5 +1,7 @@
 # TODO: при релизе проверить, что валидация на клиенте
 #       совпадает с валидацией на сервере!
+import secrets
+import string
 
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
@@ -9,38 +11,79 @@ from phonenumber_field.modelfields import PhoneNumberField
 
 from .validators import validate_email, validate_username, validate_password
 
+ADDRESS_CITY_MAX_LEN: int = 50
+ADDRESS_STREET_MAX_LEN: int = 50
+ADDRESS_HOUSE_MAX_VAL: int = 999
+ADDRESS_ENTRANCE_MAX_VAL: int = 50
+ADDRESS_FLOOR_MAX_VAL: int = 150
+ADDRESS_APARTMENT_MAX_VAL: int = 9999
+
+USER_NAME_MAX_LEN: int = 30
+# Do not change, Django hash password with big length!
+USER_PASS_MAX_LEN: int = 512
+USER_PASS_RAND_MAX_LEN: int = 10
+USER_FULL_EMAIL_MAX_LEN: int = 80
+
+
+def generate_random_password():
+    characters = string.ascii_letters + string.digits + '!_@#$%^&+='
+    password = ''.join(
+        secrets.choice(characters) for
+        _ in range(USER_PASS_RAND_MAX_LEN)
+    )
+    return password
+
 
 class Address(models.Model):
     """Модель адреса."""
 
     city = models.CharField(
         verbose_name='Город',
-        max_length=50
+        max_length=ADDRESS_CITY_MAX_LEN
     )
     street = models.CharField(
         verbose_name='Улица',
-        max_length=50
+        max_length=ADDRESS_STREET_MAX_LEN
     )
-    house = models.IntegerField(
-        verbose_name='Дом'
-    )
-    apartment = models.IntegerField(
-        verbose_name='Квартира',
+    house = models.PositiveSmallIntegerField(
+        verbose_name='Дом',
         validators=[
-            MaxValueValidator(9999, 'Укажите корректный номер квартиры.')
+            MaxValueValidator(
+                ADDRESS_HOUSE_MAX_VAL,
+                'Укажите корректный номер дома.',
+            )
+        ]
+    )
+    entrance = models.IntegerField(
+        verbose_name='Подъезд',
+        validators=[
+            MaxValueValidator(
+                ADDRESS_ENTRANCE_MAX_VAL,
+                'Укажите корректный подъезд.',
+            )
         ],
         null=True,
         blank=True,
     )
     floor = models.IntegerField(
         verbose_name='Этаж',
-        validators=[MaxValueValidator(150, 'Укажите корректный этаж.')],
+        validators=[
+            MaxValueValidator(
+                ADDRESS_FLOOR_MAX_VAL,
+                'Укажите корректный этаж.',
+            )
+        ],
         null=True,
         blank=True,
     )
-    entrance = models.IntegerField(
-        verbose_name='Подъезд',
-        validators=[MaxValueValidator(50, 'Укажите корректный подъезд.')],
+    apartment = models.IntegerField(
+        verbose_name='Квартира',
+        validators=[
+            MaxValueValidator(
+                ADDRESS_APARTMENT_MAX_VAL,
+                'Укажите корректный номер квартиры.'
+            )
+        ],
         null=True,
         blank=True,
     )
@@ -61,7 +104,7 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, password, **extra_fields):
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, **extra_fields)
@@ -77,18 +120,18 @@ class User(AbstractUser):
 
     username = models.CharField(
         verbose_name='Имя пользователя',
-        max_length=60,
+        max_length=USER_NAME_MAX_LEN,
         validators=(validate_username,)
     )
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
-        max_length=50,
+        max_length=USER_FULL_EMAIL_MAX_LEN,
         validators=(validate_email,),
         unique=True,
     )
     password = models.CharField(
         verbose_name='Пароль',
-        max_length=256,
+        max_length=USER_PASS_MAX_LEN,
         validators=(validate_password,),
     )
     phone = PhoneNumberField(

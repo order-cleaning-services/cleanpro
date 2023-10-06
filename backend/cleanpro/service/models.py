@@ -2,22 +2,24 @@
 #       совпадает с валидацией на сервере!
 
 from django.conf import settings
-from django.db import models
 # TODO: ко всем валидаторам приписать пояснения во всех models.py
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 
-from users.models import Address
 from price.models import CleaningType, Service
+from users.models import Address
 
 
-# https://peps.python.org/pep-0008/#class-names
+ORDER_CANCELLED_STATUS: str = 'cancelled'
+
+
 class Order(models.Model):
     """Модель заказа."""
     STATUS_CHOICES = (
         ('created', 'Создан'),
         ('accepted', 'Принят'),
         ('finished', 'Завершен'),
-        ('cancelled', 'Отменен')
+        (ORDER_CANCELLED_STATUS, 'Отменен')
     )
     user = models.ForeignKey(
         verbose_name='Заказчик',
@@ -29,9 +31,26 @@ class Order(models.Model):
         verbose_name='Сумма',
         validators=[MinValueValidator(1, 'Укажите корректную итоговую сумму!')]
     )
+    total_time = models.IntegerField(
+        verbose_name='Суммарное время',
+        validators=(
+            MinValueValidator(1, 'Укажите корректное время!'),
+        ),
+        # TODO: Сделать поле обязательным после перехода на OrderViewSet
+        #       для создания и работы с заказом.
+        blank=True,
+        null=True,
+    )
     comment = models.TextField(
         verbose_name='Комментарий',
         max_length=250,
+        default=None,
+        blank=True,
+        null=True,
+    )
+    comment_cancel = models.CharField(
+        verbose_name='Комментарий отмены',
+        max_length=256,
         default=None,
         blank=True,
         null=True,
@@ -71,22 +90,35 @@ class Order(models.Model):
     # )
     creation_date = models.DateField(
         verbose_name='Дата создания',
-        auto_now_add=True
+        auto_now_add=True,
     )
     creation_time = models.TimeField(
         verbose_name='Время создания',
-        auto_now_add=True
+        auto_now_add=True,
     )
     cleaning_date = models.DateField(
         verbose_name='Дата уборки',
-        db_index=True
+        db_index=True,
     )
     cleaning_time = models.TimeField(
-        verbose_name='Время уборки'
+        verbose_name='Время уборки',
+    )
+    # INFO! Я НАСТАИВАЮ на Datetime field - посмотрите, какая ерунда уже
+    #       вырисовывается! А могло быть 3 лаконичных поля!
+    cancel_date = models.DateField(
+        verbose_name='Дата отмены заказа',
+        db_index=True,
+        blank=True,
+        null=True,
+    )
+    cancel_time = models.TimeField(
+        verbose_name='Время отмены заказа',
+        blank=True,
+        null=True,
     )
 
     class Meta:
-        ordering = ['-cleaning_date']
+        ordering = ('-cleaning_date',)
 
     def __str__(self):
         return f"Заказ №: {self.id}"
@@ -98,16 +130,16 @@ class ServicesInOrder(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        verbose_name='Заказ'
+        verbose_name='Заказ',
     )
     service = models.ForeignKey(
         Service,
         on_delete=models.CASCADE,
-        verbose_name='Услуга'
+        verbose_name='Услуга',
     )
     amount = models.PositiveIntegerField(
-        validators=[MinValueValidator(0)],
-        verbose_name='Количество'
+        validators=(MinValueValidator(0),),
+        verbose_name='Количество',
     )
 
 
@@ -117,18 +149,18 @@ class Rating(models.Model):
         verbose_name='Название',
         to=Order,
         related_name='ratings',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     user = models.ForeignKey(
         verbose_name='Заказчик',
         to=settings.AUTH_USER_MODEL,
         related_name='ratings',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата отзыва',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
     text = models.TextField(
         verbose_name='Текст отзыва',
@@ -136,11 +168,11 @@ class Rating(models.Model):
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        validators=[
+        validators=(
             MinValueValidator(1),
-            MaxValueValidator(5)
-        ]
+            MaxValueValidator(5),
+        ),
     )
 
     class Meta:
-        ordering = ['-score']
+        ordering = ('-score',)

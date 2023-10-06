@@ -1,8 +1,8 @@
 # TODO: при релизе проверить, что валидация на клиенте
 #       совпадает с валидацией на сервере!
 
-from django.db import models
 from django.core.validators import MinValueValidator
+from django.db import models
 
 
 class Measure(models.Model):
@@ -24,6 +24,10 @@ class Measure(models.Model):
 
 class Service(models.Model):
     """Модель цен услуг."""
+    SERVICE_TYPE = [
+        ('main', 'Основная'),
+        ('additional', 'Дополнительная'),
+    ]
 
     title = models.CharField(
         verbose_name='Название услуги',
@@ -33,7 +37,9 @@ class Service(models.Model):
     price = models.FloatField(
         verbose_name='Цена услуги за единицу измерения',
         max_length=7,
-        validators=(MinValueValidator(1, 'Укажите корректную сумму.'),),
+        validators=(
+            MinValueValidator(1, 'Укажите корректную сумму.'),
+        ),
     )
     measure = models.ForeignKey(
         Measure,
@@ -45,19 +51,21 @@ class Service(models.Model):
         upload_to='service_photo/',
         verbose_name='Фото вида уборки',
         # TODO: это временно же?
+        # REPLE: Нет. Вроде у нас будут услуги, которые будут без картинок.
         null=True,
         blank=True,
     )
     service_type = models.CharField(
         verbose_name='Тип услуги',
-        # TODO: best practice - выносить такое в константы
-        #       https://docs.djangoproject.com/en/4.2/ref/models/fields/#choices
-        choices=(
-            ('main', 'Основная'),
-            ('additional', 'Дополнительная'),
-        ),
+        choices=SERVICE_TYPE,
         max_length=11,
         default='main',
+    )
+    cleaning_time = models.IntegerField(
+        verbose_name='Время на услугу',
+        validators=(
+            MinValueValidator(1, 'Укажите корректное время!'),
+        ),
     )
 
     class Meta:
@@ -83,15 +91,6 @@ class CleaningType(models.Model):
             MinValueValidator(1, 'Коэффициент не может быть меньше 1'),
         ),
     )
-    type = models.CharField(
-        verbose_name='Тип набора',
-        choices=(
-            ('main', 'Основной'),
-            ('additional', 'Дополнительный'),
-        ),
-        max_length=11,
-        default='main',
-    )
     service = models.ManyToManyField(
         Service,
         through='ServicesInCleaningType',
@@ -112,19 +111,14 @@ class ServicesInCleaningType(models.Model):
     cleaning_type = models.ForeignKey(
         CleaningType,
         on_delete=models.CASCADE,
-        verbose_name='Набор услуг'
+        verbose_name='Набор услуг',
     )
     service = models.ForeignKey(
         Service,
         on_delete=models.CASCADE,
-        verbose_name='Услуга'
+        verbose_name='Услуга',
     )
 
     class Meta:
-        constraints = (
-            models.UniqueConstraint(
-                fields=('cleaning_type', 'service',),
-                name='service_in_cleaning_type'),
-        )
         verbose_name = 'Услуга в наборе'
         verbose_name_plural = 'Услуги в наборе'

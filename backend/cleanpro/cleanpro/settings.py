@@ -1,14 +1,10 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
 from corsheaders.defaults import default_headers
+from dotenv import load_dotenv
 
-from core.email_settings import (
-    EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD,
-    EMAIL_USE_TLS, EMAIL_USE_SSL, EMAIL_SSL_CERTFILE, EMAIL_SSL_KEYFILE,
-    EMAIL_TIMEOUT, DEFAULT_FROM_EMAIL
-)
+from core.email_settings import DEFAULT_FROM_EMAIL
 from core.date_settings import (
     LANGUAGE_CODE, TIME_ZONE, USE_I18N, USE_TZ
 )
@@ -81,14 +77,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cleanpro.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': os.getenv('DB_ENGINE'),
+#         'NAME': os.getenv('POSTGRES_DB'),
+#         'USER': os.getenv('POSTGRES_USER'),
+#         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST'),
+#         'PORT': os.getenv('DB_PORT'),
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE'),
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',
     }
 }
 
@@ -159,6 +162,12 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10,
 }
 
+DJOSER = {
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
+    }
+}
+
 USER = USER
 
 ADMIN = ADMIN
@@ -183,16 +192,16 @@ CORS_ALLOW_HEADERS = (
 
 """Email backend data"""
 
-EMAIL_HOST = EMAIL_HOST
-EMAIL_PORT = EMAIL_PORT
-EMAIL_HOST_USER = EMAIL_HOST_USER
-EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
-EMAIL_USE_TLS = EMAIL_USE_TLS
-EMAIL_USE_SSL = EMAIL_USE_SSL
-EMAIL_SSL_CERTFILE = EMAIL_SSL_CERTFILE
+EMAIL_HOST: str = os.getenv('EMAIL_HOST')
+EMAIL_PORT: int = int(os.getenv('EMAIL_PORT'))
+EMAIL_HOST_USER: str = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD: str = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS: bool = bool(os.getenv('EMAIL_USE_TLS'))
+EMAIL_USE_SSL: bool = bool(os.getenv('EMAIL_USE_SSL'))
+EMAIL_SSL_CERTFILE: str = os.getenv('EMAIL_SSL_CERTFILE')
 # TODO: проверить SSL_KEYFILE
-EMAIL_SSL_KEYFILE = EMAIL_SSL_KEYFILE
-EMAIL_TIMEOUT = EMAIL_TIMEOUT
+EMAIL_SSL_KEYFILE: str = os.getenv('EMAIL_SSL_KEYFILE')
+EMAIL_TIMEOUT: int = int(os.getenv('EMAIL_TIMEOUT'))
 
 # TODO: при выключении DEBUG будет ошибка, так как SMTP у нас не арендован
 # и не подключен.

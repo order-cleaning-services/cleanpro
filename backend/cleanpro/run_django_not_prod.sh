@@ -1,6 +1,16 @@
 #!/bin/bash
 
-sleep 5 # In order to make sure that db is ready
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+echo @@@@@@@@@@@@@@@@@@@@@@@ waiting for database @@@@@@@@@@@@@@@@@@@@@@@@
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+while ! pg_isready -h db_cs -p 5432; do
+    echo "База данных недоступна, ждем 5 секунд..."
+    sleep 5
+done
+
+# Disconnect from Postgres client timeout
+sleep 5
 
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@ preparing migrations @@@@@@@@@@@@@@@@@@@@@@@@
@@ -24,7 +34,6 @@ if ! python manage.py shell -c "from users.models import User; print(User.object
     echo "from users.models import User; \
     admin = User.objects.create_superuser('admin@email.com', 'admin'); \
     admin.username = 'admin'; \
-    admin.first_name = 'admin_first'; \
     admin.phone = '+799911122233'; \
     admin.save()" | python manage.py shell
     echo "Создан пользователь 'admin' с паролем 'admin' и адресом электронной почты 'admin@email.com'"
@@ -38,6 +47,9 @@ echo @@@@@@@@@@@@@@@@@@@@@@@@  import services  @@@@@@@@@@@@@@@@@@@@@@@@@@
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 python manage.py csv_services_import
+python manage.py csv_cleaning_types_import
+
+echo "Все сервисы и пакеты услуг импортированы!"
 
 # echo @@@@@@@@@@@@@@@@@@@@@@@   loading database   @@@@@@@@@@@@@@@@@@@@@@@@
 # echo pass...
