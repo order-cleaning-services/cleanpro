@@ -2,9 +2,9 @@
 import AsideAdmin from '../AsideAdmin/AsideAdmin'
 import OfficeAdmin from '../OfficeAdmin/OfficeAdmin'
 import Footer from '../Footer/Footer'
-import './Admin.scss'
+import './AdminPage.scss'
 
-function Admin() {
+function AdminPage() {
   return (
     <>
       <section className="admin">
@@ -16,4 +16,4 @@ function Admin() {
   )
 }
 
-export default Admin
+export default AdminPage

@@ -1,8 +1,8 @@
-import { useSelector } from 'react-redux'
-import { adminSelectors } from '../../store/admin/adminSelectors'
-
 import '../GridAdmin/GridAdmin.scss'
 import './TableTitle.scss'
+
+import { useSelector } from 'react-redux'
+import { adminSelectors } from '../../store/admin/adminSelectors'
 
 function TableTitle() {
   const viewlink = useSelector(adminSelectors.getAdminNavLink)
@@ -13,16 +13,11 @@ function TableTitle() {
       <p className="grid__item">Оформлен</p>
       <p className="grid__item">№ заказа</p>
       <p className="grid__item">Вид услуги</p>
-      {viewTab === 'new' || viewTab === 'completed' || viewTab === 'cancelled' ? (
-        <p className="grid__item">Время уборки</p>
-      ) : (
-        ''
-      )}
-      {viewTab === 'current' ? <p className="grid__item">Дата, время</p> : ''}
-
+      <p className="grid__item">Время уборки</p>
+      <p className="grid__item">Клинер</p>
       <p className="grid__item">Стоимость</p>
-      {viewTab === 'completed' ? <p className="grid__item">Завершен</p> : ''}
-      {viewTab === 'cancelled' ? <p className="grid__item">Отменен</p> : ''}
+      {viewTab === 'completed' ? <p className="grid__item">Завершен</p> : null}
+      {viewTab === 'cancelled' ? <p className="grid__item">Отменен</p> : null}
     </div>
   )
 }

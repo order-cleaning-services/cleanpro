@@ -10,7 +10,6 @@ import {
 
 function AsideAdmin() {
   const getAdminNavLink = useSelector(adminSelectors.getAdminNavLink)
-  console.log(getAdminNavLink)
   const dispatch = useDispatch()
 
   return (

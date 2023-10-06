@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 function SelectReact({ time }) {
   const [userChoice, setUserChoice] = useState('')
+  console.log(userChoice)
   const options = [
     { value: '09:00', label: '09 : 00' },
     { value: '10:00', label: '10 : 00' },
@@ -50,11 +51,6 @@ function SelectReact({ time }) {
       }
     },
   }
-
-  // const handleChangeSelect = selectedOption => {
-  //   console.log('handleChange', selectedOption.value)
-  // }
-
 
   return (
     <Select

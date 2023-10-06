@@ -5,21 +5,21 @@ import './Filters.scss'
 function Filters({ stateVisible }) {
   return (
     <div>
-      {stateVisible === true ? (
+      {stateVisible === true && (
         <div className="filters">
           <div className="filters__dates">
             <div className="filters__registration">
               <p className="filters__title text-m-bold">Дата оформления</p>
               <div className="filters__inputs">
-                <InputFilters placeholder={'c'} />
-                <InputFilters placeholder={'по'} />
+                <InputFilters placeholder="c" />
+                <InputFilters placeholder="по" />
               </div>
             </div>
             <div className="filters__cleaning">
               <p className="filters__title text-m-bold">Дата уборки</p>
               <div className="filters__inputs">
-                <InputFilters placeholder={'c'} />
-                <InputFilters placeholder={'по'} />
+                <InputFilters placeholder="c" />
+                <InputFilters placeholder="по" />
               </div>
             </div>
           </div>
@@ -46,8 +46,8 @@ function Filters({ stateVisible }) {
             <div className="filters__price">
               <p className="filters__title text-m-bold">Стоимость</p>
               <div className="filters__inputs">
-                <InputFilters placeholder={'от'} />
-                <InputFilters placeholder={'до'} />
+                <InputFilters placeholder="от" />
+                <InputFilters placeholder="до" />
               </div>
             </div>
             <div className="filters__extra">
@@ -56,8 +56,6 @@ function Filters({ stateVisible }) {
             </div>
           </div>
         </div>
-      ) : (
-        ''
       )}
     </div>
   )

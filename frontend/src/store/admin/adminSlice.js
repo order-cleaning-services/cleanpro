@@ -1,14 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { initialState } from './initialState'
 
 const adminSlice = createSlice({
   name: 'admin',
-  initialState: {
-    linkView: 'orders',
-    tab: 'new',
-    active: 'active-link',
-    extra: false,
-    dataClient: false,
-  },
+  initialState: initialState,
   reducers: {
     handleClickOrders: state => {
       state.linkView = 'orders'

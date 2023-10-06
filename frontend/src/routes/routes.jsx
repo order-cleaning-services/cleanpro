@@ -7,6 +7,7 @@ import ProfilePage from '../pages/ProfilePage/ProfilePage.jsx'
 import SigninPage from '../pages/SigninPage/SigninPage.jsx'
 import Page404 from '../pages/Page404/Page404.jsx'
 import PaymentPage from '../pages/PaymentPage/PaymentPage.jsx'
+import AdminPage from '../components/AdminPage/AdminPage.jsx'
 
 import { ROUTES } from '../constants/constants.js'
 import RequireAuth from '../hocs/RequireAuth.jsx'
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
       {
         path: ROUTES.about,
         element: <AboutPage />,
+      },
+      {
+        path: ROUTES.admin,
+        element: <AdminPage />,
       },
       {
         path: ROUTES.profile,
