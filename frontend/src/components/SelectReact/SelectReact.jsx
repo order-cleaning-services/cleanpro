@@ -1,7 +1,7 @@
 import Select from 'react-select'
 import './SelectReact.scss'
 import { useState } from 'react'
-import { customerStylesSelect } from '../../constants/constants'
+import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
 import { options } from '../../utils/initialData'
 
 function SelectReact({ time }) {

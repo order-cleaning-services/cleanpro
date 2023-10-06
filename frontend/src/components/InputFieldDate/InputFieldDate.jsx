@@ -1,12 +1,8 @@
 import { forwardRef } from 'react'
-import {
-  // useSelector,
-  useDispatch,
-} from 'react-redux'
-// import { formOrderValidationSelectors } from '../../store/formOrderValidation/formOrderValidationSelectors'
+import { useDispatch } from 'react-redux'
 import { setIsStateDate } from '../../store/formOrderValidation/formOrderValidation'
 
-const InputField = forwardRef(
+const InputFieldDate = forwardRef(
   (
     {
       placeholder = '',
@@ -88,5 +84,5 @@ const InputField = forwardRef(
   },
 )
 
-InputField.displayName = 'InputField'
-export default InputField
+InputFieldDate.displayName = 'InputFieldDate'
+export default InputFieldDate

@@ -6,7 +6,8 @@ import InputFieldDate from '../InputFieldDate/InputFieldDate'
 import Select from 'react-select'
 import { formOrderValidationSelectors } from '../../store/formOrderValidation/formOrderValidationSelectors'
 import { safeOrderForm } from '../../store/calculator/calculatorSlice'
-import { ROUTES, customerStylesSelect } from '../../constants/constants'
+import { ROUTES } from '../../constants/constants'
+import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
 import { options } from '../../utils/initialData'
 import './OrderForm.scss'
 function OrderForm() {
@@ -17,7 +18,6 @@ function OrderForm() {
     reset,
     register,
     handleSubmit,
-
     formState: { errors },
   } = useForm({
     mode: 'onBlur',
@@ -47,7 +47,10 @@ function OrderForm() {
               value: 60,
               message: 'Максимум 60 символов',
             },
-            pattern: /^(?=.{1,40}$)[а-яёА-ЯЁ]+$/,
+            pattern: {
+              value: /^(?=.{1,60}$)[а-яёА-ЯЁ '-]+$/,
+              message: 'Укажите ваше имя. Пример: Апполинарий Вальдемарович фон Спасо-Преображенский',
+            },
           })}
         />
         {errors?.username && <span className="form-entry__error">{errors?.username?.message || 'Ошибка'}</span>}
@@ -66,8 +69,11 @@ function OrderForm() {
               value: 50,
               message: 'Максимум 50 символов',
             },
-            pattern:
-              /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+            pattern: {
+              value:
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+              message: 'Укажите почту. Пример: example@example.ru',
+            },
           })}
         />
         {errors?.email && <span className="form-entry__error">{errors?.email?.message || 'Ошибка'}</span>}
@@ -219,7 +225,6 @@ function OrderForm() {
           <label>Время</label>
           <Select
             styles={customerStylesSelect}
-            placeholder="Select Language"
             className="select-time select-time_style_border"
             classNamePrefix="select-time"
             ref={register('cleaning_time', {
