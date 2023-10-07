@@ -1,7 +1,7 @@
 // import React from 'react';
-import AsideAdmin from '../AsideAdmin/AsideAdmin'
-import OfficeAdmin from '../OfficeAdmin/OfficeAdmin'
-import Footer from '../Footer/Footer'
+import AsideAdmin from '../../components/AsideAdmin/AsideAdmin'
+import OfficeAdmin from '../../components/OfficeAdmin/OfficeAdmin'
+import Footer from '../../components/Footer/Footer'
 import './AdminPage.scss'
 
 function AdminPage() {

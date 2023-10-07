@@ -26,11 +26,6 @@ const Header = () => {
               О компании
             </Link>
           </li>
-          <li>
-            <Link className={`header__link${location.pathname === ROUTES.admin ? '-active' : ''}`} to="/admin">
-              Админ
-            </Link>
-          </li>
         </ul>
         <div className="header__info">
           <p className="header__phone">+7 (495) 783-99-00</p>
