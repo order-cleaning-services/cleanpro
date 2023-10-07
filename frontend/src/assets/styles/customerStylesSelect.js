@@ -1,11 +1,3 @@
-export const ROUTES = {
-  home: '/',
-  about: '/about',
-  profile: '/profile',
-  signin: '/signin',
-  payment: '/payment',
-}
-
 export const customerStylesSelect = {
   control: (styles, { isFocused }) => ({
     ...styles,
