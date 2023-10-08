@@ -8,7 +8,7 @@ from django.db.models import QuerySet
 from price.models import CleaningType, Service, ServicesInCleaningType
 
 
-import_path: str = 'price/management/commands/csv_import/cleaning_types/'
+import_path: str = 'service/management/commands/csv_import/cleaning_types/'
 
 cleaning_types_data: list[CleaningType] = []
 cleaning_types_titles: list[str] = list(
