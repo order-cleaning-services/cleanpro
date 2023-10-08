@@ -29,8 +29,8 @@ CELERY_BEAT_SCHEDULE = {
    'parse_yandex_maps': {
        'task': 'service.tasks.parse_yandex_maps',
        'schedule': (
-           crontab(minute=1, hour=0) if not DEBUG else
-           timedelta(minutes=5)
+           timedelta(minutes=5) if DEBUG else
+           crontab(minute=1, hour=0)
         ),
    },
 }
@@ -42,7 +42,7 @@ CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 
-"""Django core settings."""
+"""Django settings."""
 
 
 DATABASES = {
@@ -123,7 +123,7 @@ EMAIL_SSL_KEYFILE: str = os.getenv('EMAIL_SSL_KEYFILE')
 EMAIL_TIMEOUT: int = int(os.getenv('EMAIL_TIMEOUT'))
 
 
-"""Media and templates."""
+"""Static files settings."""
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
