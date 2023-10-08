@@ -46,14 +46,14 @@ class Order(models.Model):
     )
     comment = models.CharField(
         verbose_name='Комментарий',
-        max_length=256,
+        max_length=512,
         default=None,
         blank=True,
         null=True,
     )
     comment_cancel = models.CharField(
         verbose_name='Комментарий отмены',
-        max_length=256,
+        max_length=512,
         default=None,
         blank=True,
         null=True,
@@ -62,7 +62,7 @@ class Order(models.Model):
         verbose_name='Статус заказа',
         choices=STATUS_CHOICES,
         default='Создан',
-        max_length=256,
+        max_length=512,
     )
     cleaning_type = models.ForeignKey(
         CleaningType,
@@ -159,7 +159,7 @@ class RatingViaMaps(models.Model):
     )
     text = models.CharField(
         verbose_name='Текст отзыва',
-        max_length=250,
+        max_length=512,
     )
     score = models.IntegerField(
         verbose_name='Оценка',
