@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.db.models import QuerySet
 
-from price.models import CleaningType, Service, ServicesInCleaningType
+from service.models import CleaningType, Service, ServicesInCleaningType
 
 
 import_path: str = 'service/management/commands/csv_import/cleaning_types/'

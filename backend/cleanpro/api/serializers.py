@@ -6,8 +6,9 @@ from drf_base64.fields import Base64ImageField
 from rest_framework import serializers, status
 from phonenumber_field.phonenumber import PhoneNumber
 
-from price.models import CleaningType, Service
-from service.models import Order, Rating, Address, ServicesInOrder
+from service.models import (
+    Address, CleaningType, Order, Rating, Service, ServicesInOrder
+)
 from users.models import (
     User,
     generate_random_password,

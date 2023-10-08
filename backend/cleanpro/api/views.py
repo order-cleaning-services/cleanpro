@@ -11,8 +11,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 
 from cleanpro.settings import ADDITIONAL_CS
-from price.models import CleaningType, Service
-from service.models import Order, Rating
+from service.models import CleaningType, Order, Rating, Service
 from users.models import User
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (

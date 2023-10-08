@@ -4,8 +4,7 @@ from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ValidationError
 
-from price.models import Measure
-from service.models import Service
+from service.models import Measure, Service
 
 import_path: str = 'service/management/commands/csv_import/services/'
 import_img_path: str = 'service/management/commands/csv_import/services/res/'
