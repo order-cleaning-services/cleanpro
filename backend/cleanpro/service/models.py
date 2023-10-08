@@ -19,7 +19,7 @@ class Order(models.Model):
         ('created', 'Создан'),
         ('accepted', 'Принят'),
         ('finished', 'Завершен'),
-        (ORDER_CANCELLED_STATUS, 'Отменен')
+        (ORDER_CANCELLED_STATUS, 'Отменен'),
     )
     user = models.ForeignKey(
         verbose_name='Заказчик',
@@ -29,7 +29,9 @@ class Order(models.Model):
     )
     total_sum = models.IntegerField(
         verbose_name='Сумма',
-        validators=[MinValueValidator(1, 'Укажите корректную итоговую сумму!')]
+        validators=[
+            MinValueValidator(1, 'Укажите корректную итоговую сумму!'),
+        ]
     )
     total_time = models.IntegerField(
         verbose_name='Суммарное время',
@@ -59,7 +61,6 @@ class Order(models.Model):
         verbose_name='Статус заказа',
         choices=STATUS_CHOICES,
         default='Создан',
-        # TODO: Без этого не работает
         max_length=256,
     )
     cleaning_type = models.ForeignKey(
@@ -75,7 +76,7 @@ class Order(models.Model):
         verbose_name='Услуги',
     )
     pay_status = models.BooleanField(
-        default=False
+        default=False,
     )
     address = models.ForeignKey(
         verbose_name='Услуги',
@@ -149,7 +150,9 @@ class Rating(models.Model):
         verbose_name='Название',
         to=Order,
         related_name='ratings',
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
     )
     user = models.ForeignKey(
         verbose_name='Заказчик',
