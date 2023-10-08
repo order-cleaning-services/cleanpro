@@ -1,15 +1,14 @@
 from datetime import timedelta
 import os
-from pathlib import Path
 
 from celery.schedules import crontab
 from corsheaders.defaults import default_headers
-from dotenv import load_dotenv
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+from .app_data import (
+    BASE_DIR,
 
-load_dotenv(os.path.join(BASE_DIR, '.env'), verbose=True)
-
+    DB_ENGINE, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER,
+)
 
 """App settings."""
 
@@ -23,16 +22,17 @@ CLEANPRO_YA_MAPS_ID = os.getenv('HOST_YANDEX_MAPS', None)
 
 """Celery settings."""
 
+
 CELERY_TIMEZONE = 'Europe/Moscow'
 
 CELERY_BEAT_SCHEDULE = {
-   'parse_yandex_maps': {
-       'task': 'service.tasks.parse_yandex_maps',
-       'schedule': (
-           timedelta(minutes=5) if DEBUG else
-           crontab(minute=1, hour=0)
+    'parse_yandex_maps': {
+        'task': 'service.tasks.parse_yandex_maps',
+        'schedule': (
+            timedelta(minutes=5) if DEBUG else
+            crontab(minute=1, hour=0)
         ),
-   },
+    },
 }
 
 CELERY_TASK_TRACK_STARTED = True
@@ -47,12 +47,12 @@ CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 DATABASES = {
     'default': {
-        'ENGINE': os.getenv('DB_ENGINE'),
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'ENGINE': DB_ENGINE,
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
@@ -72,11 +72,10 @@ INSTALLED_APPS = [
     'django_password_validators',
     'django_filters',
     'phonenumber_field',
-    'users',
+    'drf_yasg',
     'api',
     'service',
-    'drf_yasg',
-    'price.apps.PriceConfig',
+    'users',
 ]
 
 REST_FRAMEWORK = {
