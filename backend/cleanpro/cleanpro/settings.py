@@ -7,6 +7,8 @@ from corsheaders.defaults import default_headers
 from .app_data import (
     BASE_DIR,
 
+    DEFAULT_FROM_EMAIL,
+    
     DB_ENGINE, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER,
 )
 
@@ -97,7 +99,7 @@ WSGI_APPLICATION = 'cleanpro.wsgi.application'
 """Email settings."""
 
 
-DEFAULT_FROM_EMAIL = 'cleanpronew2023@gmail.com'
+DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL
 
 EMAIL_BACKEND = (
     'django.core.mail.backends.console.EmailBackend' if DEBUG else
