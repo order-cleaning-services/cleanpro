@@ -14,6 +14,9 @@ services:
     env_file:
       - backend/cleanpro/.env
 
+  redis:
+    image: redis:7.2.1-alpine
+
   backend:
     build:
       context: backend/cleanpro
@@ -24,6 +27,7 @@ services:
       - media_cs:/app/media
     depends_on:
       - db_cs
+      - redis
 
   frontend:
     build:
