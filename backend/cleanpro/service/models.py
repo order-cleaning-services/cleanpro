@@ -44,9 +44,9 @@ class Order(models.Model):
         blank=True,
         null=True,
     )
-    comment = models.TextField(
+    comment = models.CharField(
         verbose_name='Комментарий',
-        max_length=250,
+        max_length=256,
         default=None,
         blank=True,
         null=True,
@@ -148,7 +148,7 @@ class ServicesInOrder(models.Model):
 class RatingViaMaps(models.Model):
     """Модель отзыва с Я.Карт."""
 
-    user = models.ForeignKey(
+    username = models.CharField(
         verbose_name='Заказчик',
         max_length=60,
     )
@@ -157,7 +157,7 @@ class RatingViaMaps(models.Model):
         auto_now_add=True,
         db_index=True,
     )
-    text = models.TextField(
+    text = models.CharField(
         verbose_name='Текст отзыва',
         max_length=250,
     )
