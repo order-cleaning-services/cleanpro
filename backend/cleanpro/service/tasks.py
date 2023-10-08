@@ -12,19 +12,17 @@ from django.core.exceptions import ValidationError
 from django.db.models import QuerySet
 from rest_framework import status
 
-
+from cleanpro.app_data import CLEANPRO_YA_MAPS_URL
 from service.models import RatingViaMaps
-
-CLEANPRO_YA_MAPS_URL: str = (
-    'https://yandex.ru/maps-reviews-widget/106240454928?comments'
-)
 
 
 @shared_task
 def parse_yandex_maps():
     response: requests = requests.get(CLEANPRO_YA_MAPS_URL)
     if not response.status_code == status.HTTP_200_OK:
-        raise Exception('Указан неверный URL отзыва.')
+        raise Exception(
+            f'Указан неверный URL отзыва: "{CLEANPRO_YA_MAPS_URL}"'
+        )
     soup: BeautifulSoup = BeautifulSoup(response.text, features="html.parser")
     if not soup:
         raise Exception('Отзывы отсутствуют.')
