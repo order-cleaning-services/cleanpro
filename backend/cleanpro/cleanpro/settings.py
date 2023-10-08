@@ -182,3 +182,9 @@ EMAIL_TIMEOUT: int = int(os.getenv('EMAIL_TIMEOUT'))
 EMAIL_BACKEND = (
     'django.core.mail.backends.console.EmailBackend' if DEBUG else
     'django.core.mail.backends.smtp.EmailBackend')
+
+DJOSER = {
+    'SERIALIZERS': {
+        'user': 'api.serializers.CustomUserSerializer',
+    }
+}

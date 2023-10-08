@@ -36,7 +36,7 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователей."""
-    address = AddressSerializer(read_only=True)
+    address = AddressSerializer()
 
     class Meta:
         model = User
@@ -47,6 +47,73 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'phone',
             'address',
         )
+
+    def validate_address(self, address_data):
+        """Производит валидацию адреса пользователя."""
+        invalid_data: list[str] = []
+        data_char: dict[str, str] = {
+            'city': ADDRESS_CITY_MAX_LEN,
+            'street': ADDRESS_STREET_MAX_LEN,
+        }
+        for attr, max_len in data_char.items():
+            if (address_data.get(attr) is None or
+                    len(address_data.get(attr)) > max_len):
+                invalid_data.append(f'"{attr}')
+        data_int: dict[str, str] = {
+            'house': ADDRESS_HOUSE_MAX_VAL,
+            'entrance': ADDRESS_ENTRANCE_MAX_VAL,
+            'floor': ADDRESS_FLOOR_MAX_VAL,
+            'apartment': ADDRESS_APARTMENT_MAX_VAL,
+        }
+        for attr, max_val in data_int.items():
+            if (address_data.get(attr) is None or
+                    int(address_data.get(attr)) > max_val):
+                invalid_data.append(f'{attr}')
+        if invalid_data:
+            raise serializers.ValidationError(
+                'Убедитесь, что верно заполнены следующие поля: '
+                f'{", ".join(val for val in invalid_data)}.'
+            )
+        return address_data
+
+    def validate_user(self, user_data):
+        """Производит валидацию данных о пользователе."""
+        invalid_data: list[str] = []
+        username: str = user_data.get('username', 'None')
+        email: str = user_data.get('email', 'None')
+        phone: str = user_data.get('phone', 'None')
+        if not re.fullmatch(USERNAME_PATTERN, username):
+            invalid_data.append("username")
+        if not re.fullmatch(EMAIL_PATTERN, email):
+            invalid_data.append("email")
+        if not self.__validate_phone(phone):
+            invalid_data.append("phone")
+        if invalid_data:
+            raise serializers.ValidationError(
+                'Отсутствуют или указаны невалидные данные: '
+                f'{", ".join(invalid_data)}.'
+            )
+        return user_data
+
+    def __get_address(self, address_data) -> Address:
+        address, _ = Address.objects.get_or_create(
+            city=address_data.get('city'),
+            street=address_data.get('street'),
+            house=address_data.get('house'),
+            entrance=address_data.get('entrance'),
+            floor=address_data.get('floor'),
+            apartment=address_data.get('apartment'),
+        )
+        return address
+
+    def update(self, instance, validated_data):
+        """Производит обновление данных о пользователе и его адресе."""
+        address_values = validated_data.pop('address')
+        super().update(instance, validated_data)
+        address: Address = self.__get_address(address_values)
+        instance.address = address
+        instance.save()
+        return instance
 
 
 class EmailConfirmSerializer(serializers.Serializer):
@@ -124,7 +191,7 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
-    user = CustomUserSerializer()
+    user = CustomUserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
