@@ -15,6 +15,7 @@ ORDER_CANCELLED_STATUS: str = 'cancelled'
 
 class Order(models.Model):
     """Модель заказа."""
+
     STATUS_CHOICES = (
         ('created', 'Создан'),
         ('accepted', 'Принят'),
@@ -144,21 +145,12 @@ class ServicesInOrder(models.Model):
     )
 
 
-class Rating(models.Model):
-    """Модель отзыва."""
-    order = models.ForeignKey(
-        verbose_name='Название',
-        to=Order,
-        related_name='ratings',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
+class RatingViaMaps(models.Model):
+    """Модель отзыва с Я.Карт."""
+
     user = models.ForeignKey(
         verbose_name='Заказчик',
-        to=settings.AUTH_USER_MODEL,
-        related_name='ratings',
-        on_delete=models.CASCADE,
+        max_length=60,
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата отзыва',
@@ -178,4 +170,25 @@ class Rating(models.Model):
     )
 
     class Meta:
-        ordering = ('-score',)
+        ordering = ('-id',)
+
+
+class Rating(RatingViaMaps):
+    """
+    Модель отзыва с сайта.
+    Основана на RatingViaMaps, добавляет связи с таблицами Order и User.
+    """
+    order = models.ForeignKey(
+        verbose_name='Название',
+        to=Order,
+        related_name='ratings',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    user = models.ForeignKey(
+        verbose_name='Заказчик',
+        to=settings.AUTH_USER_MODEL,
+        related_name='ratings',
+        on_delete=models.CASCADE,
+    )
