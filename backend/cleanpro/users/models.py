@@ -88,6 +88,18 @@ class Address(models.Model):
         blank=True,
     )
 
+    class Meta:
+        verbose_name = 'Адрес'
+        verbose_name_plural = 'Адреса'
+        ordering = (
+            'city',
+            'street',
+            'house',
+            'entrance',
+            'floor',
+            'apartment',
+        )
+
 
 class UserManager(BaseUserManager):
     '''Менеджер модели пользователя.'''
@@ -140,7 +152,7 @@ class User(AbstractUser):
     )
     address = models.ForeignKey(
         Address,
-        verbose_name='Услуги',
+        verbose_name='Адрес',
         related_name='users',
         on_delete=models.SET_NULL,
         blank=True,
