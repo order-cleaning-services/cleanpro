@@ -1,6 +1,8 @@
+from datetime import timedelta
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
 from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 
@@ -17,6 +19,27 @@ DEBUG = True
 CLEANPRO_HOST = os.getenv('HOST_YANDEX_MAPS', None)
 
 CLEANPRO_YA_MAPS_ID = os.getenv('HOST_YANDEX_MAPS', None)
+
+
+"""Celery settings."""
+
+CELERY_TIMEZONE = 'Europe/Moscow'
+
+CELERY_BEAT_SCHEDULE = {
+   'parse_yandex_maps': {
+       'task': 'service.tasks.parse_yandex_maps',
+       'schedule': (
+           crontab(minute=1, hour=0) if not DEBUG else
+           timedelta(minutes=5)
+        ),
+   },
+}
+
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60
+
+CELERY_BROKER_URL = 'redis://redis:6379/0'
+CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 
 """Django core settings."""
