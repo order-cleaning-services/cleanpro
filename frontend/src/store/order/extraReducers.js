@@ -1,4 +1,4 @@
-import { getUserOrders, createOrder } from './orderActions'
+import { getUserOrders, createOrder, getOrderById } from './orderActions'
 
 export const buildGetUserOrders = builder =>
   builder
@@ -26,6 +26,21 @@ export const buildCreateOrder = builder =>
       state.orderError = null
     })
     .addCase(createOrder.rejected, state => {
+      state.orderStatus = 'error'
+      state.orderError = 'Sorry, something went wrong'
+    })
+
+export const buildRepeatOrder = builder =>
+  builder
+    .addCase(getOrderById.pending, state => {
+      state.orderStatus = 'pending'
+    })
+    .addCase(getOrderById.fulfilled, (state, action) => {
+      state.orderStatus = 'success'
+      state.repeatOrder = action.payload
+      state.orderError = null
+    })
+    .addCase(getOrderById.rejected, state => {
       state.orderStatus = 'error'
       state.orderError = 'Sorry, something went wrong'
     })

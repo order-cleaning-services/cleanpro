@@ -20,3 +20,14 @@ export const createOrder = createAsyncThunk('order/newOrder', async (body, { rej
     return rejectWithValue(e)
   }
 })
+
+export const getOrderById = createAsyncThunk('order/repeatOrder', async (id, { rejectWithValue }) => {
+  try {
+    const token = getToken()
+    const response = await ordersAPI.repeatOrder(token, id)
+    console.log(response)
+    return response
+  } catch (e) {
+    return rejectWithValue(e)
+  }
+})

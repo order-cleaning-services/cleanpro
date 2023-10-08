@@ -87,6 +87,10 @@
     display: flex;
     justify-content: space-between;
 
+    &-link {
+      text-decoration: none;
+    }
+    
     &-btn {
       display: flex;
       align-items: center;

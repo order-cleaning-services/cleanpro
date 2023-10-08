@@ -10,6 +10,8 @@ import { ROUTES } from '../../constants/constants'
 import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
 import { options } from '../../utils/initialData'
 import './OrderForm.scss'
+import { orderSelectors } from '../../store/order/orderSelectors'
+
 function OrderForm() {
   const stateDate = useSelector(formOrderValidationSelectors.getStateDate)
   const dispatch = useDispatch()
@@ -30,6 +32,14 @@ function OrderForm() {
     navigate(ROUTES.payment)
     reset()
   }
+  const name = useSelector(orderSelectors.getName)
+  const email = useSelector(orderSelectors.getEmail)
+  const phone = useSelector(orderSelectors.getPhone)
+  const street = useSelector(orderSelectors.getStreet)
+  const house = useSelector(orderSelectors.getHouse)
+  const entrance = useSelector(orderSelectors.getEntrance)
+  const apartment = useSelector(orderSelectors.getApartment)
+  const floor = useSelector(orderSelectors.getFloor)
 
   const { field } = useController({ name: 'cleaning_time', control })
   const { value: slotValue, onChange: timeOnChange, ...restTimeField } = field
@@ -41,6 +51,7 @@ function OrderForm() {
         <InputField
           isValid
           label="Имя"
+          value={`${name}`}
           {...register('username', {
             required,
             maxLength: {
@@ -63,6 +74,7 @@ function OrderForm() {
           id="input-email"
           label="E-mail"
           placeholder="example@example.ru"
+          value={`${email}`}
           {...register('email', {
             required,
             maxLength: {
@@ -86,6 +98,7 @@ function OrderForm() {
           type="tel"
           label="Телефон"
           placeholder="+7 (999) 999-99-99"
+          value={`${phone}`}
           {...register('phone', {
             required,
             pattern: /(\+7[-_()\s]+|\+7|8\s?[(]{0,1}[0-9]{3}[)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2})/,
@@ -105,6 +118,7 @@ function OrderForm() {
         <InputField
           isValid
           label="Улица"
+          value={`${street}`}
           {...register('street', {
             required,
             maxLength: {
@@ -123,6 +137,7 @@ function OrderForm() {
             isValid
             size="small"
             label="Дом"
+            value={`${house}`}
             {...register('house', {
               required,
               pattern: {
@@ -145,11 +160,12 @@ function OrderForm() {
             type="number"
             size="small"
             label="Квартира"
+            value={`${apartment}`}
             {...register('apartment', {
               required,
               max: {
-                value: 99,
-                message: 'Максимальное значение 99',
+                value: 9999,
+                message: 'Максимальное значение 9999',
               },
               min: {
                 value: 0,
@@ -167,6 +183,7 @@ function OrderForm() {
             type="number"
             size="small"
             label="Подъезд"
+            value={`${entrance}`}
             {...register('entrance', {
               required,
               max: {
@@ -188,6 +205,7 @@ function OrderForm() {
             isValid
             size="small"
             label="Этаж"
+            value={`${floor}`}
             {...register('floor', {
               required,
               max: {

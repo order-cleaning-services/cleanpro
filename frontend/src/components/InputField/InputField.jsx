@@ -1,14 +1,37 @@
 import './InputField.scss'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 
 const InputField = forwardRef(
   (
-    { placeholder = '', size, type = 'text', focus = false, label, name, onChange, isValid, classNameModal, ...rest },
+    {
+      placeholder = '',
+      size,
+      type = 'text',
+      focus = false,
+      label,
+      name,
+      onChange,
+      isValid,
+      classNameModal,
+      value,
+      ...rest
+    },
     ref,
   ) => {
     function handleFocus(e) {
       if (focus) e.target.setAttribute('type', 'date')
     }
+
+    const [myValue, setMyValue] = useState(value)
+    useEffect(() => {
+      setMyValue(value)
+    }, [value])
+
+    const handleCange = e => {
+      setMyValue(e.target.value)
+      onChange(e)
+    }
+
     return (
       <div className={`input__wrapper ${type === 'password' ? 'input__wrapper__password' : ''}`}>
         <label>{label}</label>
@@ -20,9 +43,8 @@ const InputField = forwardRef(
           placeholder={placeholder}
           type={type}
           onFocus={e => handleFocus(e)}
-          onChange={e => {
-            onChange(e)
-          }}
+          onChange={handleCange}
+          value={myValue || ''}
           ref={ref}
           {...rest}
         />

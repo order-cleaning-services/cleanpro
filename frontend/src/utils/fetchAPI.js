@@ -44,7 +44,7 @@ export class FetchAPI {
 
 const baseFetch = async (url, method, options = {}) => {
   const { body = null, token = null } = options
-  console.log(body, token)
+  // console.log(body, token)
   let bodyFetch = JSON.stringify(body)
 
   const optionsFetch =
