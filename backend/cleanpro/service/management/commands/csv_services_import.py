@@ -60,3 +60,4 @@ class Command(BaseCommand):
             print(f'File {filename} is not provided. Skip task.')
         except Exception as err:
             raise CommandError(f'Exception has occurred: {err}')
+        return
