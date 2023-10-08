@@ -2,7 +2,7 @@
 ################################# TOKENS #################################
 ##########################################################################
 
-@admin_token = 38125ac108bb04f6bb04196fbe1b257e11ff5b1b
+@admin_token = ba870c95f7ceb7f97abf466869032ca933ba92aa
 @non_admin_token = d1736a9955ac9cb48d811828cd946aa1517c48f0
 
 
@@ -25,33 +25,34 @@ Content-Type: application/json
 
 ###
 POST {{logout}} HTTP/1.1
-Authorization: Token 
+Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
 
 ### 
 GET {{users}} HTTP/1.1
-Authorization: Token 38125ac108bb04f6bb04196fbe1b257e11ff5b1b
+Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
+
+###
+PUT {{users}}1/ HTTP/1.1
+Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
+Content-Type: application/json
+
+{
+    "username": "Супер администратор",
+    "email": "admin@email.com",
+    "phone": "+79991112233",
+    "address": {
+        "city": "Москва",
+        "street": "Питерская",
+        "house": 14,
+        "entrance": 1,
+        "floor": 150,
+        "apartment": 999
+    }
+}
 
 ### 
 GET {{users_me}} HTTP/1.1
-Authorization: Token 38125ac108bb04f6bb04196fbe1b257e11ff5b1b
-
-### 
-POST {{users}} HTTP/1.1
-Content-Type: application/json
-
-{
-    "email": "example@email.com",
-    "password": "MyPass1!"
-}
-
-###
-POST {{login}} HTTP/1.1
-Content-Type: application/json
-
-{
-    "email": "example@email.com",
-    "password": "MyPass1!"
-}
+Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
 
 ###
 GET {{orders}} HTTP/1.1
