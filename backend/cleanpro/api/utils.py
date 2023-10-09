@@ -1,8 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers, status
 
-from price.models import Service
-from service.models import Address, ServicesInOrder
+from service.models import Address, ServicesInOrder, Service
 
 
 def services_bulk_create(order, services):

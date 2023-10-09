@@ -16,7 +16,7 @@ title;price;cleaning_time;measure;service_type
 Протираем от пыли все предметы интерьера;200;10;комната;main
 Уборка балкона;900;20;комната;additional
 Мытье холодильника;400;15;шт;additional
-Глажка белья;600;30;30мин;additional
+Глажка белья;600;30;мин;additional
 Мытье духовки;300;15;шт;additional
 Мытье микроволновой печи;300;15;шт;additional
 Мытье окон;450;15;шт;additional
