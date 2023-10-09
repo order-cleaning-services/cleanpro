@@ -135,7 +135,7 @@ def confirm_mail(request):
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
     methods = ('get', 'post', 'patch',)
-    queryset = Order.objects.all().select_related('user', 'address',)
+    queryset = Order.objects.select_related('user', 'address',).all()
     # TODO: получается, что сейчас любой пользователь может прочитать
     #       чужие заказы? Это нужно сделать только для администратора.
     #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
@@ -192,7 +192,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(IsOwner),
+        permission_classes=(IsOwner,),
     )
     def comment(self, request, pk):
         """Добавить комментарий к заказу."""

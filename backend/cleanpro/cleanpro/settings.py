@@ -75,6 +75,7 @@ INSTALLED_APPS = [
     'django_filters',
     'phonenumber_field',
     'drf_yasg',
+    'drf_spectacular',
     'api',
     'service',
     'users',
@@ -89,6 +90,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 ROOT_URLCONF = 'cleanpro.urls'
