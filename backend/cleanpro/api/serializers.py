@@ -9,14 +9,21 @@ from phonenumber_field.phonenumber import PhoneNumber
 from service.models import (
     Address, CleaningType, Order, Rating, Service, ServicesInOrder
 )
-from users.models import (
-    User,
-    generate_random_password,
-    ADDRESS_CITY_MAX_LEN, ADDRESS_STREET_MAX_LEN, ADDRESS_HOUSE_MAX_VAL,
-    ADDRESS_ENTRANCE_MAX_VAL, ADDRESS_FLOOR_MAX_VAL,
-    ADDRESS_APARTMENT_MAX_VAL
-)
+from users.models import User, generate_random_password
 from users.validators import EMAIL_PATTERN, USERNAME_PATTERN
+
+
+def get_or_create_address(address_data) -> Address:
+    """Получить или создать объект адреса."""
+    address, _ = Address.objects.get_or_create(
+        city=address_data.get('city'),
+        street=address_data.get('street'),
+        house=address_data.get('house'),
+        entrance=address_data.get('entrance'),
+        floor=address_data.get('floor'),
+        apartment=address_data.get('apartment'),
+    )
+    return address
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -49,24 +56,13 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'address',
         )
 
-    def __get_address(self, address_data) -> Address:
-        """Получить или создать объект адреса."""
-        address, _ = Address.objects.get_or_create(
-            city=address_data.get('city'),
-            street=address_data.get('street'),
-            house=address_data.get('house'),
-            entrance=address_data.get('entrance'),
-            floor=address_data.get('floor'),
-            apartment=address_data.get('apartment'),
-        )
-        return address
-
     def update(self, instance, validated_data):
         """Производит обновление данных о пользователе и его адресе."""
         address_values = validated_data.pop('address')
         super().update(instance, validated_data)
-        address: Address = self.__get_address(address_values)
-        instance.address = address
+        instance.address = get_or_create_address(
+            address_data=address_values
+        )
         instance.save()
         return instance
 
@@ -183,13 +179,16 @@ class OrderGetSerializer(serializers.ModelSerializer):
 class OrderPostSerializer(serializers.ModelSerializer):
     """Сериализатор для создания заказа."""
 
+    # INFO: нельзя использовать CustomUserSerializer по причине того,
+    #       Django будет проверять поля на уникальность и не позволит
+    #       новому пользователю создать заказ.
     user = serializers.DictField(child=serializers.CharField())
     services = serializers.ListField(
         child=serializers.DictField(
             child=serializers.CharField()
         )
     )
-    address = serializers.DictField(child=serializers.CharField())
+    address = AddressSerializer()
 
     class Meta:
         model = Order
@@ -248,40 +247,14 @@ class OrderPostSerializer(serializers.ModelSerializer):
             )
         return services_data
 
-    def validate_address(self, address_data):
-        """Производит валидацию адреса заказа."""
-        invalid_data: list[str] = []
-        data_char: dict[str, str] = {
-            'city': ADDRESS_CITY_MAX_LEN,
-            'street': ADDRESS_STREET_MAX_LEN,
-        }
-        for attr, max_len in data_char.items():
-            if (address_data.get(attr) is None or
-                    len(address_data.get(attr)) > max_len):
-                invalid_data.append(f'"{attr}')
-        data_int: dict[str, str] = {
-            'house': ADDRESS_HOUSE_MAX_VAL,
-            'entrance': ADDRESS_ENTRANCE_MAX_VAL,
-            'floor': ADDRESS_FLOOR_MAX_VAL,
-            'apartment': ADDRESS_APARTMENT_MAX_VAL,
-        }
-        for attr, max_val in data_int.items():
-            if (address_data.get(attr) is None or
-                    int(address_data.get(attr)) > max_val):
-                invalid_data.append(f'{attr}')
-        if invalid_data:
-            raise serializers.ValidationError(
-                'Убедитесь, что верно заполнены следующие поля: '
-                f'{", ".join(val for val in invalid_data)}.'
-            )
-        return address_data
-
     @transaction.atomic
     def create(self, data):
         """Создает новый заказ.
         Если пользователь отсутствует в базе данных - создает нового.
         Если адрес отсутствует в базе данных - создает новый."""
-        address: Address = self.__get_address(data.get('address'))
+        address: Address = get_or_create_address(
+            address_data=data.get('address')
+        )
         user_data = data.get('user', {})
         user: QuerySet = User.objects.filter(email=user_data.get('email'))
         if user:
@@ -323,17 +296,6 @@ class OrderPostSerializer(serializers.ModelSerializer):
         #       пароль в этом месте перед return.
         return new_user
 
-    def __get_address(self, address_data) -> Address:
-        address, _ = Address.objects.get_or_create(
-            city=address_data.get('city'),
-            street=address_data.get('street'),
-            house=address_data.get('house'),
-            entrance=address_data.get('entrance'),
-            floor=address_data.get('floor'),
-            apartment=address_data.get('apartment'),
-        )
-        return address
-
     def __services_bulk_create(self, order, services):
         """Добавляет сервисы в заказ."""
         ing_objs = []
@@ -348,7 +310,8 @@ class OrderPostSerializer(serializers.ModelSerializer):
                     amount=int(amount)
                 )
             )
-        return ServicesInOrder.objects.bulk_create(ing_objs)
+        ServicesInOrder.objects.bulk_create(ing_objs)
+        return
 
     def __validate_phone(self, phone_data):
         """Производит валидацию номера телефона.
