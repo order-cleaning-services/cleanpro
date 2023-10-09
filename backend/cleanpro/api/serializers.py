@@ -29,9 +29,9 @@ class AddressSerializer(serializers.ModelSerializer):
             'city',
             'street',
             'house',
-            'apartment',
             'floor',
             'entrance',
+            'apartment',
         )
 
 
@@ -49,54 +49,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'address',
         )
 
-    def validate_address(self, address_data):
-        """Производит валидацию адреса пользователя."""
-        invalid_data: list[str] = []
-        data_char: dict[str, str] = {
-            'city': ADDRESS_CITY_MAX_LEN,
-            'street': ADDRESS_STREET_MAX_LEN,
-        }
-        for attr, max_len in data_char.items():
-            if (address_data.get(attr) is None or
-                    len(address_data.get(attr)) > max_len):
-                invalid_data.append(f'"{attr}')
-        data_int: dict[str, str] = {
-            'house': ADDRESS_HOUSE_MAX_VAL,
-            'entrance': ADDRESS_ENTRANCE_MAX_VAL,
-            'floor': ADDRESS_FLOOR_MAX_VAL,
-            'apartment': ADDRESS_APARTMENT_MAX_VAL,
-        }
-        for attr, max_val in data_int.items():
-            if (address_data.get(attr) is None or
-                    int(address_data.get(attr)) > max_val):
-                invalid_data.append(f'{attr}')
-        if invalid_data:
-            raise serializers.ValidationError(
-                'Убедитесь, что верно заполнены следующие поля: '
-                f'{", ".join(val for val in invalid_data)}.'
-            )
-        return address_data
-
-    def validate_user(self, user_data):
-        """Производит валидацию данных о пользователе."""
-        invalid_data: list[str] = []
-        username: str = user_data.get('username', 'None')
-        email: str = user_data.get('email', 'None')
-        phone: str = user_data.get('phone', 'None')
-        if not re.fullmatch(USERNAME_PATTERN, username):
-            invalid_data.append("username")
-        if not re.fullmatch(EMAIL_PATTERN, email):
-            invalid_data.append("email")
-        if not self.__validate_phone(phone):
-            invalid_data.append("phone")
-        if invalid_data:
-            raise serializers.ValidationError(
-                'Отсутствуют или указаны невалидные данные: '
-                f'{", ".join(invalid_data)}.'
-            )
-        return user_data
-
     def __get_address(self, address_data) -> Address:
+        """Получить или создать объект адреса."""
         address, _ = Address.objects.get_or_create(
             city=address_data.get('city'),
             street=address_data.get('street'),
@@ -119,6 +73,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
 class EmailConfirmSerializer(serializers.Serializer):
     """Подтвердить электронную почту."""
+
     email = serializers.EmailField()
 
     def validate_email(self, value):
@@ -135,6 +90,7 @@ class EmailConfirmSerializer(serializers.Serializer):
 
 class ServiceSerializer(serializers.ModelSerializer):
     """Сериализатор услуг."""
+
     image = Base64ImageField(read_only=True,)
     measure = serializers.ReadOnlyField(
         source='measure.title',
@@ -155,6 +111,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class CleaningTypeSerializer(serializers.ModelSerializer):
     """Сериализатор набора услуг."""
+
     service = ServiceSerializer(
         many=True,
         read_only=True,
@@ -172,6 +129,7 @@ class CleaningTypeSerializer(serializers.ModelSerializer):
 
 class ServicesInOrderSerializer(serializers.ModelSerializer):
     """Сериализатор перечня услуг в заказе."""
+
     id = serializers.ReadOnlyField(source='service.id')
     title = serializers.ReadOnlyField(source='service.title')
     measure = serializers.ReadOnlyField(source='service.measure.title')
@@ -192,6 +150,7 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
+
     user = CustomUserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
@@ -223,6 +182,7 @@ class OrderGetSerializer(serializers.ModelSerializer):
 
 class OrderPostSerializer(serializers.ModelSerializer):
     """Сериализатор для создания заказа."""
+
     user = serializers.DictField(child=serializers.CharField())
     services = serializers.ListField(
         child=serializers.DictField(
@@ -404,6 +364,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     """Сериализатор для изменения статуса заказа."""
+
     order_status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
 
     class Meta:
@@ -441,6 +402,7 @@ class OrderCancelSerializer(serializers.ModelSerializer):
 #       Сделать один общий сериализатор для PATCH запросов!
 class PaySerializer(serializers.ModelSerializer):
     """Сериализатор для оплаты заказа."""
+
     # TODO: Зачем?
     pay_status = True
 
@@ -471,6 +433,7 @@ class CommentSerializer(serializers.ModelSerializer):
 # PATCH запросов и использования сериализатора для отображения модели.
 class DateTimeSerializer(serializers.ModelSerializer):
     """Сериализатор для переноса времени заказа."""
+
     class Meta:
         model = Order
         # TODO: вопрос про datetime поле все-еще активен, дублирую тут.
@@ -491,6 +454,7 @@ class DateTimeSerializer(serializers.ModelSerializer):
 
 class RatingSerializer(serializers.ModelSerializer):
     """Сериализатор для представления отзыва на уборку."""
+
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
