@@ -1,22 +1,5 @@
 @import '../../assets/styles/colors.scss';
 
-.tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  font-weight: 400;
-  line-height: 2.24rem;
-  padding: 0.4rem 0 1.6rem;
-}
-
-.tab-active {
-  font-weight: 700;
-  border-bottom: 2px solid $button-color-blue;
-}
-
 .calculator__container {
   width: 144rem;
   margin: 12rem auto;
@@ -44,52 +27,8 @@
   gap: 3.2rem;
 }
 
-.cleaning-type__wrapper {
-  display: flex;
-  flex-direction: column;
-  max-width: 75.2rem;
-  gap: 2rem;
-}
-
-.cleaning-type__tabs {
-  display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
 .calculator-form__wrapper {
   width: 39.2rem;
-}
-
-.rooms-quantity {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-
-  &:has(input) {
-    flex-direction: row;
-    gap: 4.4rem;
-  }
-}
-
-.amount__container {
-  display: flex;
-  width: 34.9rem;
-  align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
-}
-
-.amount__title {
-  font-size: 2rem;
-  line-height: 2.6rem;
-}
-
-.checkbox__wrapper {
-  display: flex;
-  gap: 1.2rem;
-  align-items: center;
 }
 
 .calculator-form__wrapper {
