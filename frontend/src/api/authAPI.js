@@ -16,6 +16,10 @@ class AuthAPI {
   getUser(token) {
     return FetchAPI.get('/users/me/', { token })
   }
+
+  updateUser(id, body, token) {
+    return FetchAPI.put(`/users/${id}/`, { body, token })
+  }
 }
 
 export default new AuthAPI()
