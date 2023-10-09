@@ -11,9 +11,7 @@ const ProfileForm = () => {
   const dispatch = useDispatch()
   const {
     register,
-    // control,
     handleSubmit,
-    // clearErrors,
     getFieldState,
     formState: { errors },
   } = useForm({
