@@ -26,7 +26,28 @@ function OrderForm() {
   const required = 'Обязательное поле'
   const navigate = useNavigate()
   const onSubmit = data => {
-    dispatch(safeOrderForm(data))
+    const {
+      username,
+      email,
+      phone,
+      city,
+      street,
+      house,
+      apartment,
+      entrance,
+      floor,
+      cleaning_date,
+      cleaning_time,
+      comment,
+    } = data
+    const body = {
+      user: { username, email, phone },
+      address: { city, street, house, apartment, entrance, floor },
+      cleaning_date,
+      cleaning_time,
+      comment,
+    }
+    dispatch(safeOrderForm(body))
     navigate(ROUTES.payment)
     reset()
   }

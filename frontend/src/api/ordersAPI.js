@@ -6,7 +6,7 @@ class OrdersApi {
   }
 
   createOrder(body) {
-    return FetchApi.post('/order_create/', { body })
+    return FetchApi.post('/orders/', { body })
   }
 }
 

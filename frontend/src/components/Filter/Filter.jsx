@@ -1,4 +1,4 @@
-import './filter.scss'
+import './Filter.scss'
 
 import filter from '../../images/filter.svg'
 
