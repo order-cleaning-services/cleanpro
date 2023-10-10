@@ -31,7 +31,7 @@ CELERY_BEAT_SCHEDULE = {
     'parse_yandex_maps': {
         'task': 'service.tasks.parse_yandex_maps',
         'schedule': (
-            timedelta(minutes=5) if DEBUG else
+            timedelta(minutes=1) if DEBUG else
             crontab(minute=1, hour=0)
         ),
     },
@@ -47,6 +47,13 @@ CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 """Django settings."""
 
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://redis:6379/0',
+    }
+}
+
 DATABASES = {
     'default': {
         'ENGINE': DB_ENGINE,
@@ -57,6 +64,13 @@ DATABASES = {
         'PORT': DB_PORT,
     }
 }
+# TODO: Пока оставить тут, используется для тестов. При релизе - удалить.
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -242,6 +256,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # INFO: следующие 2 строки устанавливают кеширование данных по GET запросу.
+    #       Данный вопрос пока на проработке.
+    # 'django.middleware.cache.UpdateCacheMiddleware',
+    # 'django.middleware.cache.FetchFromCacheMiddleware',
 ]
 
 SECRET_KEY = os.getenv('SECRET_KEY')
