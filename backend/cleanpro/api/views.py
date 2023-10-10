@@ -8,12 +8,14 @@ from djoser.views import UserViewSet
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 
 from cleanpro.app_data import (
     DEFAULT_FROM_EMAIL, EMAIL_CONFIRM_SUBJECT, EMAIL_CONFIRM_TEXT
 )
 from cleanpro.settings import ADDITIONAL_CS
-from service.models import CleaningType, Order, Rating, Service
+from service.models import (CleaningType, Order, Rating, Service)
+from service.signals import get_cached_reviews
 from users.models import User
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
@@ -238,8 +240,26 @@ class RatingViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
     methods = ('get', 'post', 'patch', 'delete')
+    pagination_class = LimitOffsetPagination
+
+    def list(self, request, *args, **kwargs):
+        cached_reviews: list[dict] = get_cached_reviews()
+        limit: int = request.query_params.get('limit')
+        if limit and cached_reviews:
+            try:
+                cached_reviews: list[dict] = cached_reviews[:int(limit)]
+            except ValueError:
+                raise serializers.ValidationError(
+                    detail="Invalid limit value. Limit must be an integer.",
+                    code=status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            data=cached_reviews,
+            status=status.HTTP_200_OK,
+        )
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')
         order = get_object_or_404(Order, id=order_id)
         serializer.save(user=self.request.user, order=order)
+        return
