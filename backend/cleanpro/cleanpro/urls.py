@@ -11,11 +11,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls', namespace='api')),
     path('spectacular/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path(
-        'spectacular/docs/',
-        SpectacularSwaggerView.as_view(url_name='schema'),
-        name='docs',
-    ),
+    path('spectacular/docs/',
+         SpectacularSwaggerView.as_view(url_name='schema'),
+         name='docs',
+         ),
 ]
 
 if settings.DEBUG:
