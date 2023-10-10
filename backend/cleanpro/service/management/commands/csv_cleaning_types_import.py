@@ -1,3 +1,14 @@
+"""
+Команда для импорта объектов модели ServicesInCleaningType из csv файла:
+service/management/commands/csv_import/cleaning_types/cleaning_types.csv
+
+Важно! Предварительно необходимо создать соответствующие объекты
+модели Service в базе данных!
+
+Вызов команды осуществляется из папки с manage.py файлом:
+python manage.ru csv_cleaning_types_import
+"""
+
 import csv
 from typing import Optional
 
