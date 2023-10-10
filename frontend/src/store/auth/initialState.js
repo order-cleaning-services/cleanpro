@@ -13,4 +13,7 @@ export const initialState = {
 
   userStatus: 'initial',
   userError: null,
+
+  userUpdateStatus: 'initial',
+  userUpdateError: null,
 }

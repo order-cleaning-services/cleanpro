@@ -3,7 +3,19 @@ import { forwardRef } from 'react'
 
 const InputField = forwardRef(
   (
-    { placeholder = '', size, type = 'text', focus = false, label, name, onChange, isValid, classNameModal, ...rest },
+    {
+      placeholder = '',
+      size,
+      type = 'text',
+      focus = false,
+      error = null,
+      label,
+      name,
+      onChange,
+      isValid,
+      classNameModal,
+      ...rest
+    },
     ref,
   ) => {
     function handleFocus(e) {
@@ -11,7 +23,7 @@ const InputField = forwardRef(
     }
     return (
       <div className={`input__wrapper ${type === 'password' ? 'input__wrapper__password' : ''}`}>
-        <label>{label}</label>
+        <label htmlFor={name}>{label}</label>
         <input
           name={name}
           className={`form-input ${size === 'small' ? 'form-input-small' : ''} ${
@@ -26,6 +38,7 @@ const InputField = forwardRef(
           ref={ref}
           {...rest}
         />
+        {error && <span className="form-entry__error">{error.message}</span>}
       </div>
     )
   },
