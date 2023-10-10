@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { buildGetUser, buildLogOut, buildRegistration, buildSignInUser } from './extraReducers'
+import { buildGetUser, buildLogOut, buildRegistration, buildSignInUser, buildUpdateUser } from './extraReducers'
 import { initialState } from './initialState'
 
 export const authSlice = createSlice({
@@ -26,6 +26,7 @@ export const authSlice = createSlice({
     buildRegistration(builder)
     buildLogOut(builder)
     buildGetUser(builder)
+    buildUpdateUser(builder)
   },
 })
 

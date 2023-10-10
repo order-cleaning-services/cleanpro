@@ -1,4 +1,4 @@
-import { getUser, logOut, registration, signInUser } from './authActions'
+import { getUser, logOut, registration, signInUser, updateUser } from './authActions'
 
 export const buildSignInUser = builder =>
   builder
@@ -67,4 +67,19 @@ export const buildGetUser = builder =>
       state.isAuth = false
       state.user = null
       state.userError = 'Sorry, something went wrong'
+    })
+
+export const buildUpdateUser = builder =>
+  builder
+    .addCase(updateUser.pending, state => {
+      state.userUpdateStatus = 'pending'
+    })
+    .addCase(updateUser.fulfilled, (state, action) => {
+      state.userUpdateStatus = 'success'
+      state.user = action.payload
+      state.userUpdateError = null
+    })
+    .addCase(updateUser.rejected, state => {
+      state.userUpdateStatus = 'error'
+      state.userUpdateError = 'Sorry, something went wrong'
     })

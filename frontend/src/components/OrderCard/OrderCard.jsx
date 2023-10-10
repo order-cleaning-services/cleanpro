@@ -94,7 +94,7 @@ const OrderCard = ({ order }) => {
               <div className="card__options-column">
                 <h3 className="card__options-title">Основные</h3>
                 <ul className="card__options-list">
-                  {cleaning_type.service.map(option => {
+                  {cleaning_type?.service?.map(option => {
                     return (
                       <li className="card__options-item" key={option.id}>
                         {option.title}
@@ -105,9 +105,9 @@ const OrderCard = ({ order }) => {
               </div>
               <div className="card__options-column">
                 <h3 className="card__options-title">Дополнительные</h3>
-                {services.length > 0 ? (
+                {services?.length > 0 ? (
                   <ul className="card__options-list">
-                    {services.map(service => {
+                    {services?.map(service => {
                       return (
                         <li className="card__options-item" key={service.id}>
                           {service.title} x {service.amount}
