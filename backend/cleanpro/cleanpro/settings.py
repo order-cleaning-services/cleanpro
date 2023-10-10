@@ -8,7 +8,7 @@ from .app_data import (
     BASE_DIR,
 
     DEFAULT_FROM_EMAIL,
-    
+
     DB_ENGINE, DB_HOST, DB_NAME, DB_PASSWORD, DB_PORT, DB_USER,
 )
 
