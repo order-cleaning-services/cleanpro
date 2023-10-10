@@ -1,4 +1,5 @@
 import re
+from djoser.serializers import UserCreateSerializer
 
 from django.db import transaction
 from django.db.models import QuerySet
@@ -32,6 +33,17 @@ class AddressSerializer(serializers.ModelSerializer):
             'apartment',
             'floor',
             'entrance',
+        )
+
+
+class UserCreateSerializer(UserCreateSerializer):
+    """Сериализатор для регистрации пользователей."""
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'password',
         )
 
 

@@ -122,4 +122,5 @@ class UserAdmin(admin.ModelAdmin):
         'username',
         'phone',
     )
+    exclude = ('first_name', 'last_name')
     list_per_page = 50

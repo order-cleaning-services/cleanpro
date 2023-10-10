@@ -5,7 +5,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+# from djoser.views import UserViewSet
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
@@ -16,6 +16,7 @@ from cleanpro.app_data import (
 from cleanpro.settings import ADDITIONAL_CS
 from service.models import CleaningType, Order, Rating, Service
 from users.models import User
+from .mixin import CreateUpdateListSet
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
     CleaningTypeSerializer,
@@ -30,6 +31,7 @@ from .serializers import (
     PaySerializer,
     RatingSerializer,
     ServiceSerializer,
+    UserCreateSerializer,
 )
 
 
@@ -62,9 +64,9 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class UserViewSet(UserViewSet):
+class UserViewSet(CreateUpdateListSet):
     """Список пользователей."""
-    serializer_class = CustomUserSerializer
+    queryset = User.objects.all()
     http_method_names = ('get', 'post', 'put')
 
     def create(self, request):
@@ -96,7 +98,6 @@ class UserViewSet(UserViewSet):
 
     @action(
         detail=False,
-        url_path='me',
         methods=('get',),
         permission_classes=(permissions.IsAuthenticated,)
     )
@@ -105,6 +106,11 @@ class UserViewSet(UserViewSet):
         instance = request.user
         serializer = CustomUserSerializer(instance)
         return Response(serializer.data)
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return UserCreateSerializer
+        return CustomUserSerializer
 
 
 # TODO: обновить эндпоинт, когда придем с Викой к результату.
