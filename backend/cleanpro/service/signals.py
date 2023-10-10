@@ -1,6 +1,7 @@
 """
 Перечень Django-signals приложения Service.
 """
+
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.db.models.signals import post_save
