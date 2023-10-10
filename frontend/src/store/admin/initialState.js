@@ -4,4 +4,5 @@ export const initialState = {
   active: 'active-link',
   extra: false,
   dataClient: false,
+  thisCleaner: {},
 }
