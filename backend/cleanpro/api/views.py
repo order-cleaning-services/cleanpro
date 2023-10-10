@@ -5,7 +5,6 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
-# from djoser.views import UserViewSet
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
