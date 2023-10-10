@@ -2,17 +2,17 @@
 ################################# TOKENS #################################
 ##########################################################################
 
-@admin_token = ba870c95f7ceb7f97abf466869032ca933ba92aa
-@non_admin_token = d1736a9955ac9cb48d811828cd946aa1517c48f0
+@admin_token = 0ec9a2e114394958a354bf038609bbc3593ff166
 
+@login = http://127.0.0.1:80/api/auth/token/login/
+@logout = http://127.0.0.1:80/api/auth/token/logout/
 
-@login = http://127.0.0.1:8000/api/auth/token/login/
-@logout = http://127.0.0.1:8000/api/auth/token/logout/
+@orders = http://127.0.0.1:80/api/orders/
 
-@orders = http://127.0.0.1:8000/api/orders/
+@ratings = http://127.0.0.1:80/api/ratings/
 
-@users = http://127.0.0.1:8000/api/users/
-@users_me = http://127.0.0.1:8000/api/users/me/
+@users = http://127.0.0.1:80/api/users/
+@users_me = http://127.0.0.1:80/api/users/me/
 
 ###
 POST {{login}} HTTP/1.1
@@ -25,15 +25,15 @@ Content-Type: application/json
 
 ###
 POST {{logout}} HTTP/1.1
-Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
+Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
 
 ### 
 GET {{users}} HTTP/1.1
-Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
+Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
 
 ###
 PUT {{users}}1/ HTTP/1.1
-Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
+Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
 Content-Type: application/json
 
 {
@@ -52,7 +52,17 @@ Content-Type: application/json
 
 ### 
 GET {{users_me}} HTTP/1.1
-Authorization: Token ba870c95f7ceb7f97abf466869032ca933ba92aa
+Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
+
+###
+GET {{ratings}} HTTP/1.1
+
+###
+GET {{ratings}}?limit=30 HTTP/1.1
+
+###
+POST {{ratings}} HTTP/1.1
+Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
 
 ###
 GET {{orders}} HTTP/1.1
