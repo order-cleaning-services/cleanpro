@@ -276,11 +276,12 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def __create_new_user(self, user_data, address: Address) -> User:
         """Создает нового пользователя."""
-        new_user = User.objects.create(
+        new_user: User = User.objects.create(
             username=user_data.get('username'),
             email=user_data.get('email'),
+            phone=user_data.get('phone'),
         )
-        password = generate_random_password()
+        password: str = generate_random_password()
         new_user.set_password(password)
         new_user.address: Address = address
         new_user.save()
