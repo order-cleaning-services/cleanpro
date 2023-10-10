@@ -117,9 +117,11 @@ WSGI_APPLICATION = 'cleanpro.wsgi.application'
 
 DEFAULT_FROM_EMAIL = DEFAULT_FROM_EMAIL
 
-EMAIL_BACKEND = (
-    'django.core.mail.backends.console.EmailBackend' if DEBUG else
-    'django.core.mail.backends.smtp.EmailBackend')
+if DEBUG:
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST: str = os.getenv('EMAIL_HOST')
 
