@@ -416,18 +416,30 @@ class DateTimeSerializer(serializers.ModelSerializer):
 
 
 class RatingSerializer(serializers.ModelSerializer):
-    """Сериализатор для представления отзыва на уборку."""
+    """
+    Сериализатор для представления отзыва на уборку на главной странице.
+    """
 
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
         fields = (
             'id',
-            'order',
+            'username',
             'user',
+            # TODO: вместо order должно быть имя клинера.
+            'order',
             'pub_date',
             'text',
             'score',
         )
         model = Rating
-        read_only_fields = ('order',)
+        read_only_fields = (
+            'id',
+            'username',
+        )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop('user', None)
+        return data
