@@ -20,12 +20,12 @@ const ProfileForm = () => {
       username: userData?.username || '',
       email: userData?.email || '',
       phone: userData?.phone || '',
-      city: userData?.address.city || 'Москва',
-      street: userData?.address.street || '',
-      house: userData?.address.house || '',
-      apartment: userData?.address.apartment || '',
-      floor: userData?.address.floor || '',
-      entrance: userData?.address.entrance || '',
+      city: userData?.address?.city || 'Москва',
+      street: userData?.address?.street || '',
+      house: userData?.address?.house || '',
+      apartment: userData?.address?.apartment || '',
+      floor: userData?.address?.floor || '',
+      entrance: userData?.address?.entrance || '',
     },
   })
 
