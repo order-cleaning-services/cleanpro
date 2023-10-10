@@ -1,25 +1,25 @@
-// import { useState } from 'react'
+import { useState } from 'react'
 
-// import './Search.scss'
+import './Search.scss'
 
-// import search from '../../images/search.svg'
+import search from '../../images/search.svg'
 
-// function Search() {
-//   const [searchText, setSearchText] = useState('')
+function Search() {
+  const [searchText, setSearchText] = useState('')
+  console.log(searchText)
+  const handleChange = evt => {
+    setSearchText(evt.target.value)
+  }
 
-//   const handleChange = evt => {
-//     setSearchText(evt.target.value)
-//   }
+  return (
+    <>
+      <div className="search">
+        <input placeholder="Номер заказа" className="search__input" onChange={handleChange} />
+        <button type="submit" className="search__button"></button>
+        <img className="search__input-icon" src={search} alt="Поиск" />
+      </div>
+    </>
+  )
+}
 
-//   return (
-//     <>
-//       <div className="search">
-//         <input placeholder="Номер заказа" className="search__input" onChange={handleChange} />
-//         <button type="submit" className="search__button"></button>
-//         <img className="search__input-icon" src={search} alt="Поиск" />
-//       </div>
-//     </>
-//   )
-// }
-
-// export default Search
+export default Search
