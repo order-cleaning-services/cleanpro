@@ -143,7 +143,7 @@ class OrderGetSerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
-        source='servicesinorder_set',
+        source='services_in_order',
         many=True,
         read_only=True,
     )

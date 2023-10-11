@@ -255,7 +255,7 @@ class ServicesInOrder(models.Model):
     )
     service = models.ForeignKey(
         Service,
-        related_name='orders_with_service',
+        related_name='services_in_order',
         on_delete=models.CASCADE,
         verbose_name='Услуга',
     )
