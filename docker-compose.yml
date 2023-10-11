@@ -8,11 +8,14 @@ volumes:
 services:
 
   db_cs:
-    image: postgres:15
+    image: postgres:15-alpine
     volumes:
       - database_cs:/var/lib/postgresql/data/
     env_file:
       - backend/cleanpro/.env
+
+  redis:
+    image: redis:7.2.1-alpine
 
   backend:
     build:
@@ -24,6 +27,7 @@ services:
       - media_cs:/app/media
     depends_on:
       - db_cs
+      - redis
 
   frontend:
     build:
@@ -35,7 +39,7 @@ services:
       - backend
 
   nginx:
-    image: nginx:1.19.3
+    image: nginx:1.19.3-alpine
     ports:
       - "80:80"
     volumes:

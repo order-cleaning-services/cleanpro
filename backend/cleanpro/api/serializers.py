@@ -6,16 +6,16 @@ from drf_base64.fields import Base64ImageField
 from rest_framework import serializers, status
 from phonenumber_field.phonenumber import PhoneNumber
 
-from price.models import CleaningType, Service
-from service.models import Order, Rating, Address, ServicesInOrder
-from users.models import (
-    User,
-    generate_random_password,
-    ADDRESS_CITY_MAX_LEN, ADDRESS_STREET_MAX_LEN, ADDRESS_HOUSE_MAX_VAL,
-    ADDRESS_ENTRANCE_MAX_VAL, ADDRESS_FLOOR_MAX_VAL,
-    ADDRESS_APARTMENT_MAX_VAL
+from service.models import (
+    Address, CleaningType, Order, Rating, Service, ServicesInOrder
 )
-from users.validators import EMAIL_PATTERN, USERNAME_PATTERN
+from users.models import User, generate_random_password
+from users.validators import (
+    ValidationError,
+    validate_email,
+    EMAIL_PATTERN, USERNAME_PATTERN
+)
+from .utils import get_or_create_address
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -28,15 +28,15 @@ class AddressSerializer(serializers.ModelSerializer):
             'city',
             'street',
             'house',
-            'apartment',
             'floor',
             'entrance',
+            'apartment',
         )
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователей."""
-    address = AddressSerializer(read_only=True)
+    address = AddressSerializer()
 
     class Meta:
         model = User
@@ -48,25 +48,37 @@ class CustomUserSerializer(serializers.ModelSerializer):
             'address',
         )
 
+    def update(self, instance, validated_data):
+        """Производит обновление данных о пользователе и его адресе."""
+        address_values = validated_data.pop('address')
+        super().update(instance, validated_data)
+        instance.address = get_or_create_address(
+            address_data=address_values
+        )
+        instance.save()
+        return instance
+
 
 class EmailConfirmSerializer(serializers.Serializer):
     """Подтвердить электронную почту."""
+
     email = serializers.EmailField()
 
     def validate_email(self, value):
         """Производит валидацию поля email."""
-        # TODO: слишком много валидации повторной, копирует полностью:
-        #       users.validators.validate_password - не хорошо, не DRY
-        if re.fullmatch(EMAIL_PATTERN, value):
-            return value
-        raise serializers.ValidationError(
-            detail='Введите корректный email (например: example@example.ru',
-            code=status.HTTP_400_BAD_REQUEST,
-        )
+        try:
+            validate_email(value)
+        except ValidationError as err:
+            raise serializers.ValidationError(
+                detail=err,
+                code=status.HTTP_400_BAD_REQUEST,
+            )
+        return value
 
 
 class ServiceSerializer(serializers.ModelSerializer):
     """Сериализатор услуг."""
+
     image = Base64ImageField(read_only=True,)
     measure = serializers.ReadOnlyField(
         source='measure.title',
@@ -87,6 +99,7 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class CleaningTypeSerializer(serializers.ModelSerializer):
     """Сериализатор набора услуг."""
+
     service = ServiceSerializer(
         many=True,
         read_only=True,
@@ -104,6 +117,7 @@ class CleaningTypeSerializer(serializers.ModelSerializer):
 
 class ServicesInOrderSerializer(serializers.ModelSerializer):
     """Сериализатор перечня услуг в заказе."""
+
     id = serializers.ReadOnlyField(source='service.id')
     title = serializers.ReadOnlyField(source='service.title')
     measure = serializers.ReadOnlyField(source='service.measure.title')
@@ -124,7 +138,8 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
-    user = CustomUserSerializer()
+
+    user = CustomUserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
@@ -155,13 +170,17 @@ class OrderGetSerializer(serializers.ModelSerializer):
 
 class OrderPostSerializer(serializers.ModelSerializer):
     """Сериализатор для создания заказа."""
+
+    # INFO: нельзя использовать CustomUserSerializer по причине того,
+    #       Django будет проверять поля на уникальность и не позволит
+    #       новому пользователю создать заказ.
     user = serializers.DictField(child=serializers.CharField())
     services = serializers.ListField(
         child=serializers.DictField(
             child=serializers.CharField()
         )
     )
-    address = serializers.DictField(child=serializers.CharField())
+    address = AddressSerializer()
 
     class Meta:
         model = Order
@@ -220,40 +239,14 @@ class OrderPostSerializer(serializers.ModelSerializer):
             )
         return services_data
 
-    def validate_address(self, address_data):
-        """Производит валидацию адреса заказа."""
-        invalid_data: list[str] = []
-        data_char: dict[str, str] = {
-            'city': ADDRESS_CITY_MAX_LEN,
-            'street': ADDRESS_STREET_MAX_LEN,
-        }
-        for attr, max_len in data_char.items():
-            if (address_data.get(attr) is None or
-                    len(address_data.get(attr)) > max_len):
-                invalid_data.append(f'"{attr}')
-        data_int: dict[str, str] = {
-            'house': ADDRESS_HOUSE_MAX_VAL,
-            'entrance': ADDRESS_ENTRANCE_MAX_VAL,
-            'floor': ADDRESS_FLOOR_MAX_VAL,
-            'apartment': ADDRESS_APARTMENT_MAX_VAL,
-        }
-        for attr, max_val in data_int.items():
-            if (address_data.get(attr) is None or
-                    int(address_data.get(attr)) > max_val):
-                invalid_data.append(f'{attr}')
-        if invalid_data:
-            raise serializers.ValidationError(
-                'Убедитесь, что верно заполнены следующие поля: '
-                f'{", ".join(val for val in invalid_data)}.'
-            )
-        return address_data
-
     @transaction.atomic
     def create(self, data):
         """Создает новый заказ.
         Если пользователь отсутствует в базе данных - создает нового.
         Если адрес отсутствует в базе данных - создает новый."""
-        address: Address = self.__get_address(data.get('address'))
+        address: Address = get_or_create_address(
+            address_data=data.get('address')
+        )
         user_data = data.get('user', {})
         user: QuerySet = User.objects.filter(email=user_data.get('email'))
         if user:
@@ -283,28 +276,16 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def __create_new_user(self, user_data, address: Address) -> User:
         """Создает нового пользователя."""
-        new_user = User.objects.create(
+        new_user: User = User.objects.create(
             username=user_data.get('username'),
             email=user_data.get('email'),
+            phone=user_data.get('phone'),
         )
-        password = generate_random_password()
+        password: str = generate_random_password()
         new_user.set_password(password)
         new_user.address: Address = address
         new_user.save()
-        # TODO: подключить сигнал, чтобы отправился совой
-        #       пароль в этом месте перед return.
         return new_user
-
-    def __get_address(self, address_data) -> Address:
-        address, _ = Address.objects.get_or_create(
-            city=address_data.get('city'),
-            street=address_data.get('street'),
-            house=address_data.get('house'),
-            entrance=address_data.get('entrance'),
-            floor=address_data.get('floor'),
-            apartment=address_data.get('apartment'),
-        )
-        return address
 
     def __services_bulk_create(self, order, services):
         """Добавляет сервисы в заказ."""
@@ -320,7 +301,8 @@ class OrderPostSerializer(serializers.ModelSerializer):
                     amount=int(amount)
                 )
             )
-        return ServicesInOrder.objects.bulk_create(ing_objs)
+        ServicesInOrder.objects.bulk_create(ing_objs)
+        return
 
     def __validate_phone(self, phone_data):
         """Производит валидацию номера телефона.
@@ -336,6 +318,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
 class OrderStatusSerializer(serializers.ModelSerializer):
     """Сериализатор для изменения статуса заказа."""
+
     order_status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
 
     class Meta:
@@ -373,6 +356,7 @@ class OrderCancelSerializer(serializers.ModelSerializer):
 #       Сделать один общий сериализатор для PATCH запросов!
 class PaySerializer(serializers.ModelSerializer):
     """Сериализатор для оплаты заказа."""
+
     # TODO: Зачем?
     pay_status = True
 
@@ -403,6 +387,7 @@ class CommentSerializer(serializers.ModelSerializer):
 # PATCH запросов и использования сериализатора для отображения модели.
 class DateTimeSerializer(serializers.ModelSerializer):
     """Сериализатор для переноса времени заказа."""
+
     class Meta:
         model = Order
         # TODO: вопрос про datetime поле все-еще активен, дублирую тут.
@@ -422,17 +407,30 @@ class DateTimeSerializer(serializers.ModelSerializer):
 
 
 class RatingSerializer(serializers.ModelSerializer):
-    """Сериализатор для представления отзыва на уборку."""
+    """
+    Сериализатор для представления отзыва на уборку на главной странице.
+    """
+
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
         fields = (
             'id',
-            'order',
+            'username',
             'user',
+            # TODO: вместо order должно быть имя клинера.
+            'order',
             'pub_date',
             'text',
             'score',
         )
         model = Rating
-        read_only_fields = ('order',)
+        read_only_fields = (
+            'id',
+            'username',
+        )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop('user', None)
+        return data

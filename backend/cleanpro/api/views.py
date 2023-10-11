@@ -1,19 +1,18 @@
 # TODO: аннотировать типы данных. Везде. Абсолютно.
-
-from django.conf import settings
-from django.contrib.auth.tokens import default_token_generator
-from django.core import mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 from rest_framework import permissions, serializers, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 
+from cleanpro.app_data import (
+    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
+)
 from cleanpro.settings import ADDITIONAL_CS
-from price.models import CleaningType, Service
-from service.models import Order, Rating
-from users.models import User
+from service.models import (CleaningType, Order, Rating, Service)
+from service.signals import get_cached_reviews
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
     CleaningTypeSerializer,
@@ -29,54 +28,7 @@ from .serializers import (
     RatingSerializer,
     ServiceSerializer,
 )
-
-# TODO: создать core для сайта, перенести туда часть настроек из settings.py,
-#       перенести это, сделать там смысловое разделение с указанием блоков.
-# TODO: Добавить URL сайта из переменных окружения с указанием эндпоинта
-PASSWORD_RESET_LINK: str = None
-EMAIL_CONFIRM_SUBJECT: str = 'Welcome to CleanPro!'
-EMAIL_CONFIRM_TEXT: str = (
-    'Dear {username},\n'
-    '\n'
-    'Welcome to CleanPro! We are thrilled to have you as part '
-    'of our community.\n'
-    '\n'
-    'You have successfully confirmed your email, and now you have '
-    'full access to your account.\n'
-    '\n'
-    'Below, you will find your account details:\n'
-    '\n'
-    'Username: {username}\n'
-    'Password: {password}\n'
-    '\n'
-    'Please keep this information in a secure place. '
-    'If you ever forget your password, you can reset it by following this '
-    f'link: {PASSWORD_RESET_LINK}''\n'
-    '\n'
-    'If you have any questions or need further assistance, do not hesitate '
-    f'to reach out to us at {settings.DEFAULT_FROM_EMAIL}.''\n'
-    '\n'
-    'Thank you for choosing CleanPro! We hope you enjoy your time with us '
-    'and wish you a pleasant experience.\n'
-    '\n'
-    'Best regards,\n'
-    'The CleanPro Team'
-)
-
-
-def send_mail(subject: str, message: str, to: tuple[str]) -> None:
-    """Отправляет электронное сообщение.
-    "backend=None" означает, что бекенд будет выбран согласно указанному
-    значению в settings.EMAIL_BACKEND."""
-    with mail.get_connection(backend=None, fail_silently=False) as conn:
-        mail.EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=to,
-            connection=conn
-        ).send(fail_silently=False)
-    return
+from .utils import generate_code, send_mail
 
 
 class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -96,10 +48,19 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
 class UserViewSet(UserViewSet):
     """Список пользователей."""
     serializer_class = CustomUserSerializer
+    http_method_names = ('get', 'post', 'put')
+
+    def create(self, request):
+        """Создание пользователей (без вывода данных)."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(status=status.HTTP_201_CREATED, headers=headers)
 
     @action(
         detail=True,
-        url_path='subscribe',
+        url_path='orders',
         methods=('get',),
         permission_classes=(permissions.IsAuthenticated,)
     )
@@ -107,7 +68,7 @@ class UserViewSet(UserViewSet):
         """Список заказов пользователя."""
         queryset = Order.objects.filter(
             user=id
-        ).select_related('user', 'service_package')
+        ).select_related('user', 'cleaning_type', 'address')
         page = self.paginate_queryset(queryset)
         serializer = OrderGetSerializer(
             page,
@@ -116,49 +77,51 @@ class UserViewSet(UserViewSet):
         )
         return self.get_paginated_response(serializer.data)
 
+    @action(
+        detail=False,
+        url_path='me',
+        methods=('get',),
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request):
+        """Личные данные авторизованного пользователя."""
+        instance = request.user
+        serializer = CustomUserSerializer(instance)
+        return Response(serializer.data)
 
-@api_view(('POST',))
-def confirm_mail(request):
-    """Подтвердить электронную почту."""
-    serializer = EmailConfirmSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    user = get_object_or_404(
-        User,
-        email=serializer.validated_data.get('email'),
+    @action(
+        detail=False,
+        url_path='confirm_email',
+        methods=('post',),
+        permission_classes=(permissions.AllowAny,)
     )
-    # TODO: разобраться, с со строкой кода ниже.
-    #       Пароль сам генерируется? Еще и в виде токена? Что это вообще такое?
-    #       Для установки пароля используется метод .set_password()
-    #       Только пользователь сам себе ставит пароль при регистрации.
-    #       Если это попытка а-ля "хешировать" пароль - Django сам это делает.
-    # TODO: адекватная практика на мой взгляд: при регистрации делать
-    #       пользователя с параметром "is.active=False" и при подтверждении
-    #       почты переводить его в состояние "is.active=True".
-    #       Ниже я закомментил этот вариант реализации.
-    user.password = default_token_generator.make_token(user)
-    # TODO: при принятии этого решения - надо переделать регистрацию,
-    #       либо переделать поле модели (что надежнее)
-    #       is_active = models.BooleanField(default=False)
-    # user.is_active = True
-    user.save()
-    send_mail(
-        subject=EMAIL_CONFIRM_SUBJECT,
-        message=EMAIL_CONFIRM_TEXT.format(
-            username=user.username,
-            password=user.password,
-        ),
-        to=(user.email,),
-    )
-    return Response(
-        data="Email has confirmed! Please check you mailbox",
-        status=status.HTTP_200_OK,
-    )
+    def confirm_email(self, request):
+        """
+        Смотрит request.data и проверяет следующие данные:
+            - email: адрес электронной почты.
+
+        Если данные являются валидными, генерирует произвольный
+        код подтверждения электронной почты. Этот код отправляется
+        в JSON клиенту и письмом на указанную электронную почту.
+        """
+        serializer: serializers = EmailConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        confirm_code: str = generate_code()
+        send_mail(
+            subject=EMAIL_CONFIRM_CODE_SUBJECT,
+            message=EMAIL_CONFIRM_CODE_TEXT.format(confirm_code=confirm_code),
+            to=(serializer.validated_data.get('email'),),
+        )
+        return Response(
+            data={"confirm_code": confirm_code},
+            status=status.HTTP_200_OK,
+        )
 
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
     methods = ('get', 'post', 'patch',)
-    queryset = Order.objects.all().select_related('user', 'address',)
+    queryset = Order.objects.select_related('user', 'address',).all()
     # TODO: получается, что сейчас любой пользователь может прочитать
     #       чужие заказы? Это нужно сделать только для администратора.
     #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
@@ -175,7 +138,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             order_id,
             request: HttpRequest,
             serializer_class: serializers,
-            ) -> serializers: # NoQa
+            ) -> serializers:  # NoQa
         order = get_object_or_404(Order, id=order_id)
         serializer = serializer_class(order, request.data)
         serializer.is_valid(raise_exception=True)
@@ -215,7 +178,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(IsOwner),
+        permission_classes=(IsOwner,),
     )
     def comment(self, request, pk):
         """Добавить комментарий к заказу."""
@@ -261,8 +224,26 @@ class RatingViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
     methods = ('get', 'post', 'patch', 'delete')
+    pagination_class = LimitOffsetPagination
+
+    def list(self, request, *args, **kwargs):
+        cached_reviews: list[dict] = get_cached_reviews()
+        limit: int = request.query_params.get('limit')
+        if limit and cached_reviews:
+            try:
+                cached_reviews: list[dict] = cached_reviews[:int(limit)]
+            except ValueError:
+                raise serializers.ValidationError(
+                    detail="Invalid limit value. Limit must be an integer.",
+                    code=status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            data=cached_reviews,
+            status=status.HTTP_200_OK,
+        )
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')
         order = get_object_or_404(Order, id=order_id)
         serializer.save(user=self.request.user, order=order)
+        return

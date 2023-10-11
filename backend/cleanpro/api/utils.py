@@ -1,43 +1,52 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers, status
+"""
+Вспомогательные функции приложения Api.
+"""
+import random
+import string
 
-from price.models import Service
-from service.models import Address, ServicesInOrder
+from django.core import mail
 
-
-def services_bulk_create(order, services):
-    ing_objs = []
-    for item in services:
-        id = item.get('id')
-        amount = item.get('amount')
-        if id is not None and amount is not None and amount > 0:
-            service = get_object_or_404(Service, id=id)
-            ing_objs.append(
-                ServicesInOrder(
-                    order=order, service=service, amount=amount
-                )
-            )
-    return ServicesInOrder.objects.bulk_create(ing_objs)
+from cleanpro.app_data import DEFAULT_FROM_EMAIL, EMAIL_CODE_LENGTH
+from users.models import Address
 
 
-def address_create(data):
-    for attribute in ('house', 'city', 'street'):
-        if attribute not in data:
-            raise serializers.ValidationError(
-                data=(
-                    'Заполните все обязательные поля адреса: \n'
-                    '"house", "city", "street"'
-                ),
-                code=status.HTTP_400_BAD_REQUEST,
-            )
-    address, _ = Address.objects.get_or_create(
-        city=data.get('city'),
-        street=data.get('street'),
-        house=data.get('house'),
+def generate_code():
+    """Генерирует случайный цифро-символьный код."""
+    return ''.join(
+        random.choices(
+            string.ascii_uppercase + string.digits,
+            k=EMAIL_CODE_LENGTH
+        )
     )
-    for attribute in ('apartment', 'entrance', 'floor'):
-        value = data.get(attribute)
-        if value is not None:
-            setattr(address, attribute, value)
-    address.save()
+
+
+def get_or_create_address(address_data) -> Address:
+    """Получить или создать объект адреса."""
+    address, _ = Address.objects.get_or_create(
+        city=address_data.get('city'),
+        street=address_data.get('street'),
+        house=address_data.get('house'),
+        entrance=address_data.get('entrance'),
+        floor=address_data.get('floor'),
+        apartment=address_data.get('apartment'),
+    )
     return address
+
+
+def send_mail(subject: str, message: str, to: tuple[str]) -> None:
+    """
+    Отправляет электронное сообщение списку пользователей в to.
+    Назначает subject темой письма и message текстом.
+
+    "backend=None" означает, что бекенд будет выбран согласно указанному
+    значению в settings.EMAIL_BACKEND.
+    """
+    with mail.get_connection(backend=None, fail_silently=False) as conn:
+        mail.EmailMessage(
+            subject=subject,
+            body=message,
+            from_email=DEFAULT_FROM_EMAIL,
+            to=to,
+            connection=conn
+        ).send(fail_silently=False)
+    return

@@ -31,7 +31,7 @@ const Payment = () => {
         <img src={left} alt="arrow back" />
         Назад
       </Link>
-      <Total total={`${total?.toString().slice(0, -3)} ${total?.toString().slice(-3)}`} />
+      <Total total={total} />
       <div className="payment__info">
         <div className="payment__info-wrapper">
           <img src={calend} alt="" />
@@ -41,11 +41,11 @@ const Payment = () => {
         </div>
         <div className="payment__info-wrapper">
           <img src={geo} alt="" />
-          <p className="payment__text">{` г. ${orderData.city}, ул ${orderData.street}, д.${orderData.house}, кв ${orderData.apartment}, подъезд ${orderData.entrance}, этаж ${orderData.floor}`}</p>
+          <p className="payment__text">{` г. ${orderData.address.city}, ул ${orderData.address.street}, д.${orderData.address.house}, кв ${orderData.address.apartment}, подъезд ${orderData.address.entrance}, этаж ${orderData.address.floor}`}</p>
         </div>
-        <p className="payment__text">{orderData.first_name}</p>
-        <p className="payment__text">{orderData.email}</p>
-        <p className="payment__text">{orderData.phone}</p>
+        <p className="payment__text">{orderData.user.username}</p>
+        <p className="payment__text">{orderData.user.email}</p>
+        <p className="payment__text">{orderData.user.phone}</p>
         {orderData.comment && <p className="payment__text">Комментарий: {orderData.comment}</p>}
       </div>
 

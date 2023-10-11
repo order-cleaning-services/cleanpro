@@ -1,16 +1,7 @@
 export const initialState = {
   orders: [],
   newOrder: null,
-  repeatOrder: {
-    user: { email: '', name: '', phone: '' },
-    address: {
-      apartment: '',
-      street: '',
-      house: '',
-      entrance: '',
-      floor: '',
-    },
-  },
+  repeatOrder: null,
 
   orderStatus: 'initial',
   orderError: null,

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
 import { getToken } from '../../utils/tokenActions'
 import ordersAPI from '../../api/ordersAPI'
+import { setCleanType } from '../calculator/calculatorSlice'
 
 export const getUserOrders = createAsyncThunk('order/orders', async (_, { rejectWithValue }) => {
   try {
@@ -21,11 +22,11 @@ export const createOrder = createAsyncThunk('order/newOrder', async (body, { rej
   }
 })
 
-export const getOrderById = createAsyncThunk('order/repeatOrder', async (id, { rejectWithValue }) => {
+export const getOrderById = createAsyncThunk('order/repeatOrder', async (id, { dispatch, rejectWithValue }) => {
   try {
     const token = getToken()
     const response = await ordersAPI.repeatOrder(token, id)
-    console.log(response)
+    dispatch(setCleanType(response?.cleaning_type?.id))
     return response
   } catch (e) {
     return rejectWithValue(e)

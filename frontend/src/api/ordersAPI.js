@@ -6,11 +6,11 @@ class OrdersApi {
   }
 
   createOrder(body) {
-    return FetchApi.post('/order_create/', { body })
+    return FetchApi.post('/orders/', { body })
   }
 
   repeatOrder(token, id) {
-    return FetchApi.get(`/orders//${id}`, { token, id })
+    return FetchApi.get(`/orders/${id}/`, { token, id })
   }
 }
 
