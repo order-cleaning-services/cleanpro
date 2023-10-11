@@ -11,20 +11,12 @@ from service.models import (
     Address, CleaningType, Order, Rating, Service, ServicesInOrder
 )
 from users.models import User, generate_random_password
-from users.validators import EMAIL_PATTERN, USERNAME_PATTERN
-
-
-def get_or_create_address(address_data) -> Address:
-    """Получить или создать объект адреса."""
-    address, _ = Address.objects.get_or_create(
-        city=address_data.get('city'),
-        street=address_data.get('street'),
-        house=address_data.get('house'),
-        entrance=address_data.get('entrance'),
-        floor=address_data.get('floor'),
-        apartment=address_data.get('apartment'),
-    )
-    return address
+from users.validators import (
+    ValidationError,
+    validate_email,
+    EMAIL_PATTERN, USERNAME_PATTERN
+)
+from .utils import get_or_create_address
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -86,14 +78,14 @@ class EmailConfirmSerializer(serializers.Serializer):
 
     def validate_email(self, value):
         """Производит валидацию поля email."""
-        # TODO: слишком много валидации повторной, копирует полностью:
-        #       users.validators.validate_password - не хорошо, не DRY
-        if re.fullmatch(EMAIL_PATTERN, value):
-            return value
-        raise serializers.ValidationError(
-            detail='Введите корректный email (например: example@example.ru',
-            code=status.HTTP_400_BAD_REQUEST,
-        )
+        try:
+            validate_email(value)
+        except ValidationError as err:
+            raise serializers.ValidationError(
+                detail=err,
+                code=status.HTTP_400_BAD_REQUEST,
+            )
+        return value
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -296,16 +288,15 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def __create_new_user(self, user_data, address: Address) -> User:
         """Создает нового пользователя."""
-        new_user = User.objects.create(
+        new_user: User = User.objects.create(
             username=user_data.get('username'),
             email=user_data.get('email'),
+            phone=user_data.get('phone'),
         )
-        password = generate_random_password()
+        password: str = generate_random_password()
         new_user.set_password(password)
         new_user.address: Address = address
         new_user.save()
-        # TODO: подключить сигнал, чтобы отправился совой
-        #       пароль в этом месте перед return.
         return new_user
 
     def __services_bulk_create(self, order, services):
@@ -428,18 +419,30 @@ class DateTimeSerializer(serializers.ModelSerializer):
 
 
 class RatingSerializer(serializers.ModelSerializer):
-    """Сериализатор для представления отзыва на уборку."""
+    """
+    Сериализатор для представления отзыва на уборку на главной странице.
+    """
 
     user = CustomUserSerializer(read_only=True)
 
     class Meta:
         fields = (
             'id',
-            'order',
+            'username',
             'user',
+            # TODO: вместо order должно быть имя клинера.
+            'order',
             'pub_date',
             'text',
             'score',
         )
         model = Rating
-        read_only_fields = ('order',)
+        read_only_fields = (
+            'id',
+            'username',
+        )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data.pop('user', None)
+        return data

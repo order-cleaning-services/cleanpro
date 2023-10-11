@@ -1,6 +1,5 @@
 # TODO: при релизе проверить, что валидация на клиенте
 #       совпадает с валидацией на сервере!
-
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -275,12 +274,41 @@ class ServicesInOrder(models.Model):
         verbose_name_plural = 'Услуги в заказах'
 
 
-class RatingViaMaps(models.Model):
-    """Модель отзыва с Я.Карт."""
+class Rating(models.Model):
+    """Модель отзывов заказов
+
+    Включает в себя как отзывы по заказам, так и отзывы с Я.Карт.
+
+    При сохранении отзывов с Я.Карт поля user и order не заполняются.
+    При сохранении отзывов по заказам также заполняется поле username.
+
+    Поле username используется для отображении отзыва на главной странице
+    сайта."""
 
     username = models.CharField(
-        verbose_name='Заказчик',
+        verbose_name='Отображаемое имя заказчика',
         max_length=60,
+        blank=True,
+    )
+    user = models.ForeignKey(
+        verbose_name='Заказчик',
+        to=settings.AUTH_USER_MODEL,
+        related_name='ratings',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    from_maps = models.BooleanField(
+        verbose_name='Отзыв с Я.Карт',
+        default=False,
+    )
+    order = models.ForeignKey(
+        verbose_name='Заказа',
+        to=Order,
+        related_name='rating',
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата отзыва',
@@ -301,31 +329,20 @@ class RatingViaMaps(models.Model):
 
     class Meta:
         ordering = ('-id',)
-        verbose_name = 'Отзыв с Я.Карт'
-        verbose_name_plural = 'Отзывы с Я.Карт'
-
-
-class Rating(RatingViaMaps):
-    """
-    Модель отзыва с сайта.
-    Основана на RatingViaMaps, добавляет связи с таблицами Order и User.
-    """
-    order = models.ForeignKey(
-        verbose_name='Название',
-        to=Order,
-        related_name='ratings',
-        on_delete=models.SET_NULL,
-        blank=True,
-        null=True,
-    )
-    user = models.ForeignKey(
-        verbose_name='Заказчик',
-        to=settings.AUTH_USER_MODEL,
-        related_name='ratings',
-        on_delete=models.CASCADE,
-    )
-
-    class Meta:
-        ordering = ('-id',)
         verbose_name = 'Отзыв заказа'
         verbose_name_plural = 'Отзывы заказов'
+
+    def save(self, *args, **kwargs):
+        """
+        Добавляет значение поля username для пользователей,
+        которые оставили отзыв на сайте к заказу.
+        """
+        if self.user:
+            self.username = self.user.username
+        super().save(*args, **kwargs)
+        return
+
+    def __str__(self):
+        return (
+            f'Отзыв {self.username} с оценкой {self.score} от {self.pub_date}.'
+        )

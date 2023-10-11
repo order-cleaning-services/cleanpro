@@ -1,3 +1,15 @@
+"""
+Команда для импорта объектов модели Services из csv файла:
+service/management/commands/csv_import/services/services.csv
+
+Для каждого сервиса предусмотрен импорт изображений, они должны иметь
+наименование сервиса и располагаться в папке 'res':
+service/management/commands/csv_import/services/res/
+
+Вызов команды осуществляется из папки с manage.py файлом:
+python manage.ru csv_services_import
+"""
+
 import csv
 
 from django.core.files import File

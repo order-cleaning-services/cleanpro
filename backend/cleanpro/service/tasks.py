@@ -13,7 +13,8 @@ from django.db.models import QuerySet
 from rest_framework import status
 
 from cleanpro.app_data import CLEANPRO_YA_MAPS_URL
-from service.models import RatingViaMaps
+from service.models import Rating
+from .signals import update_cached_reviews
 
 
 @shared_task
@@ -27,8 +28,8 @@ def parse_yandex_maps():
     if not soup:
         raise Exception('Отзывы отсутствуют.')
     all_comment_elements: ResultSet = soup.find_all('div', class_='comment')
-    all_comments: QuerySet = RatingViaMaps.objects.all()
-    new_comments: list[RatingViaMaps] = []
+    all_comments: QuerySet = Rating.objects.all()
+    new_comments: list[Rating] = []
     for comment in all_comment_elements:
         text: str = comment.find('p', class_='comment__text').text.strip()
         if all_comments.filter(text=text).exists():
@@ -43,8 +44,9 @@ def parse_yandex_maps():
         ]
         try:
             new_comments.append(
-                RatingViaMaps(
+                Rating(
                     username=username,
+                    from_maps=True,
                     # INFO: на картах просто указывается что-то вроде
                     #       "1 января" без указания года. Чтобы не
                     #       усложнять логику - данная задача запускается
@@ -58,5 +60,6 @@ def parse_yandex_maps():
         except ValidationError:
             continue
     if new_comments:
-        RatingViaMaps.objects.bulk_create(new_comments)
+        Rating.objects.bulk_create(new_comments)
+        update_cached_reviews()
     return

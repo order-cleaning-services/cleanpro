@@ -23,6 +23,7 @@ django-password-validators==1.7.1
 django-phone-field==1.8.1
 django-phonenumber-field==7.1.0
 django-phonenumbers==1.0.1
+django-redis==5.4.0
 django-templated-mail==1.1.1
 django-timezone-field==6.0.1
 djangorestframework==3.14.0

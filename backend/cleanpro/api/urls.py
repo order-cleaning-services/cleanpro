@@ -7,7 +7,6 @@ from .views import (
     RatingViewSet,
     ServiceViewSet,
     UserViewSet,
-    confirm_mail,
 )
 
 app_name = 'api'
@@ -28,5 +27,4 @@ for api_path in ROUTER_DATA:
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/', include('djoser.urls.authtoken')),
-    path('confirm_mail/', confirm_mail, name='confirm_mail'),
 ]

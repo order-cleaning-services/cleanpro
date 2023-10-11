@@ -1,20 +1,20 @@
 # TODO: аннотировать типы данных. Везде. Абсолютно.
-
-from django.contrib.auth.tokens import default_token_generator
-from django.core import mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, serializers, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 
 from cleanpro.app_data import (
-    DEFAULT_FROM_EMAIL, EMAIL_CONFIRM_SUBJECT, EMAIL_CONFIRM_TEXT
+    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
 )
 from cleanpro.settings import ADDITIONAL_CS
 from service.models import CleaningType, Order, Rating, Service
 from users.models import User
 from .mixin import CreateUpdateListSet
+from service.models import (CleaningType, Order, Rating, Service)
+from service.signals import get_cached_reviews
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
     CleaningTypeSerializer,
@@ -31,21 +31,7 @@ from .serializers import (
     ServiceSerializer,
     UserCreateSerializer,
 )
-
-
-def send_mail(subject: str, message: str, to: tuple[str]) -> None:
-    """Отправляет электронное сообщение.
-    "backend=None" означает, что бекенд будет выбран согласно указанному
-    значению в settings.EMAIL_BACKEND."""
-    with mail.get_connection(backend=None, fail_silently=False) as conn:
-        mail.EmailMessage(
-            subject=subject,
-            body=message,
-            from_email=DEFAULT_FROM_EMAIL,
-            to=to,
-            connection=conn
-        ).send(fail_silently=False)
-    return
+from .utils import generate_code, send_mail
 
 
 class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -110,31 +96,32 @@ class UserViewSet(CreateUpdateListSet):
             return UserCreateSerializer
         return CustomUserSerializer
 
-
-# TODO: обновить эндпоинт, когда придем с Викой к результату.
-@api_view(('POST',))
-def confirm_mail(request):
-    """Подтвердить электронную почту."""
-    serializer = EmailConfirmSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    user = get_object_or_404(
-        User,
-        email=serializer.validated_data.get('email'),
+    @action(
+        detail=False,
+        url_path='confirm_email',
+        methods=('post',),
+        permission_classes=(permissions.AllowAny,)
     )
-    user.password = default_token_generator.make_token(user)
-    user.save()
-    send_mail(
-        subject=EMAIL_CONFIRM_SUBJECT,
-        message=EMAIL_CONFIRM_TEXT.format(
-            username=user.username,
-            password=user.password,
-        ),
-        to=(user.email,),
-    )
-    return Response(
-        data="Email has confirmed! Please check you mailbox",
-        status=status.HTTP_200_OK,
-    )
+    def confirm_email(self, request):
+        """
+        Смотрит request.data и проверяет следующие данные:
+            - email: адрес электронной почты.
+        Если данные являются валидными, генерирует произвольный
+        код подтверждения электронной почты. Этот код отправляется
+        в JSON клиенту и письмом на указанную электронную почту.
+        """
+        serializer: serializers = EmailConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        confirm_code: str = generate_code()
+        send_mail(
+            subject=EMAIL_CONFIRM_CODE_SUBJECT,
+            message=EMAIL_CONFIRM_CODE_TEXT.format(confirm_code=confirm_code),
+            to=(serializer.validated_data.get('email'),),
+        )
+        return Response(
+            data={"confirm_code": confirm_code},
+            status=status.HTTP_200_OK,
+        )
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -146,6 +133,17 @@ class OrderViewSet(viewsets.ModelViewSet):
     #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
     #       А вот POST - для пользователя.
     # permission_classes = ()
+
+    @action(
+        detail=True,
+        methods=('get',),
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def rating(self, request, pk):
+        order = Order.objects.get(pk=pk)
+        ratings = Rating.objects.filter(order=order)
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -243,8 +241,26 @@ class RatingViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
     methods = ('get', 'post', 'patch', 'delete')
+    pagination_class = LimitOffsetPagination
+
+    def list(self, request, *args, **kwargs):
+        cached_reviews: list[dict] = get_cached_reviews()
+        limit: int = request.query_params.get('limit')
+        if limit and cached_reviews:
+            try:
+                cached_reviews: list[dict] = cached_reviews[:int(limit)]
+            except ValueError:
+                raise serializers.ValidationError(
+                    detail="Invalid limit value. Limit must be an integer.",
+                    code=status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            data=cached_reviews,
+            status=status.HTTP_200_OK,
+        )
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')
         order = get_object_or_404(Order, id=order_id)
         serializer.save(user=self.request.user, order=order)
+        return

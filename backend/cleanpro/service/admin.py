@@ -1,11 +1,10 @@
 from django.contrib import admin
 
+from cleanpro.app_data import ADMIN_LIST_PER_PAGE
 from .models import (
-    CleaningType, Measure, Order, Rating, RatingViaMaps, Service,
+    CleaningType, Measure, Order, Rating, Service,
     ServicesInCleaningType, ServicesInOrder
 )
-
-ADMIN_LIST_PER_PAGE: int = 15
 
 
 class ServicesInCleaningTypeInline(admin.StackedInline):
@@ -209,7 +208,9 @@ class RatingAdmin(admin.ModelAdmin):
     Атрибуты:
         - list_display (tuple) - список полей для отображения в интерфейсе:
             - ID отзыва (pk)
+            - отображаемое имя заказчика (username)
             - ID заказчика (user)
+            - получен ли отзыв с Я.Карт (from_maps)
             - ID заказа (order)
             - дата публикации (pub_date)
             - текст отзыва (text)
@@ -225,55 +226,27 @@ class RatingAdmin(admin.ModelAdmin):
     """
     list_display = (
         'pk',
+        'username',
         'user',
+        'from_maps',
         'order',
         'pub_date',
         'text',
         'score',
     )
     list_editable = (
-        'text',
-        'score',
-    )
-    list_filter = ('score',)
-    search_fields = ('user',)
-    list_per_page = ADMIN_LIST_PER_PAGE
-
-
-@admin.register(RatingViaMaps)
-class RatingViaMapsAdmin(admin.ModelAdmin):
-    """
-    Переопределяет административный интерфейс Django для модели RatingViaMaps.
-
-    Атрибуты:
-        - list_display (tuple) - список полей для отображения в интерфейсе:
-            - ID отзыва (pk)
-            - имя пользователя Я.Карт (username)
-            - дата публикации (pub_date)
-            - текст отзыва (text)
-            - оценка заказа (score)
-        - list_editable (tuple) - список полей для изменения в интерфейсе:
-            - текст отзыва (text)
-            - оценка заказа (score)
-        - list_filter (tuple) - список фильтров:
-            - оценка заказа (score)
-        - search_fields (tuple) - список полей для поиска объектов:
-            - имя пользователя Я.Карт (username)
-        - list_per_page (int) - количество объектов на одной странице
-    """
-    list_display = (
-        'pk',
         'username',
-        'pub_date',
         'text',
         'score',
     )
-    list_editable = (
-        'text',
+    list_filter = (
+        'from_maps',
         'score',
     )
-    list_filter = ('score',)
-    search_fields = ('username',)
+    search_fields = (
+        'username',
+        'user',
+    )
     list_per_page = ADMIN_LIST_PER_PAGE
 
 
