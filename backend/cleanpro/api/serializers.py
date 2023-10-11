@@ -251,6 +251,9 @@ class OrderPostSerializer(serializers.ModelSerializer):
         user: QuerySet = User.objects.filter(email=user_data.get('email'))
         if user:
             user: User = user.first()
+            self.__check_user_data(
+                address=address, user=user, user_data=user_data
+            )
         else:
             user: User = self.__create_new_user(
                 user_data=user_data,
@@ -273,6 +276,23 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return {'Статус': 'Заказ создан.'}
+
+    def __check_user_data(
+            self, address: Address, user: User, user_data: dict
+            ) -> None: # noqa E125
+        """
+        Проверяет данные пользователя:
+            - если отсутствует значения полей username / phone: присваиваются
+              соответствующие данные из user_data
+            - если отсутствует ссылка на адрес: присваивается объект Address
+        """
+        if not user.phone:
+            user.phone = user_data.get('phone')
+        if not user.username:
+            user.username = user_data.get('username')
+        user.address = address if user.address is None else user.address
+        user.save()
+        return
 
     def __create_new_user(self, user_data, address: Address) -> User:
         """Создает нового пользователя."""
