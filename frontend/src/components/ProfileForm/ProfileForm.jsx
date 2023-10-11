@@ -35,12 +35,8 @@ const ProfileForm = () => {
     dispatch(updateUser(body))
   }
 
-  function onError(errors) {
-    console.log(errors)
-  }
-
   return (
-    <form className="profile-form" id="profile-form" onSubmit={handleSubmit(onSubmit, onError)}>
+    <form className="profile-form" id="profile-form" onSubmit={handleSubmit(onSubmit)}>
       <div className="profile-form__section">
         <h3 className="profile-form__subheading">Контактная информация</h3>
         <div className="profile-form__inputs-block profile-form__inputs-block_contacts">
@@ -54,7 +50,7 @@ const ProfileForm = () => {
               },
               required: 'Заполните поле имя',
             })}
-            error={errors?.first_name}
+            error={errors?.username}
             isValid={!getFieldState('username').invalid}
           />
           <InputField
