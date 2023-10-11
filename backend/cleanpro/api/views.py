@@ -4,6 +4,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
+from django_filters import rest_framework as filters
 from djoser.views import UserViewSet
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action, api_view
@@ -13,22 +14,32 @@ from cleanpro.app_data import (
     DEFAULT_FROM_EMAIL, EMAIL_CONFIRM_SUBJECT, EMAIL_CONFIRM_TEXT
 )
 from cleanpro.settings import ADDITIONAL_CS
-from service.models import CleaningType, Order, Rating, Service
+from service.models import CleaningType, Measure, Order, Rating, Service
 from users.models import User
-from .permissions import IsOwner, IsOwnerOrReadOnly
+from .filters import FilterService
+from .permissions import (
+    IsAdminOnly,
+    IsAdminOrIsOwner,
+    IsAdminOrReadOnly,
+    IsOwner,
+    IsOwnerOrReadOnly,
+)
 from .serializers import (
-    CleaningTypeSerializer,
+    CreateCleaningTypeSerializer,
+    CreateServiceSerializer,
     CommentSerializer,
     CustomUserSerializer,
     DateTimeSerializer,
     EmailConfirmSerializer,
+    GetCleaningTypeSerializer,
+    GetServiceSerializer,
+    MeasureSerializer,
     OrderCancelSerializer,
     OrderGetSerializer,
     OrderPostSerializer,
     OrderStatusSerializer,
     PaySerializer,
     RatingSerializer,
-    ServiceSerializer,
 )
 
 
@@ -47,18 +58,58 @@ def send_mail(subject: str, message: str, to: tuple[str]) -> None:
     return
 
 
-class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    """Получение списка типов основных услуг."""
+class MeasureViewSet(viewsets.ModelViewSet):
+    """Работа с единицами измерения услуг."""
+    queryset = Measure.objects.all()
+    serializer_class = MeasureSerializer
+    permission_classes = (
+        permissions.IsAuthenticated,
+        IsAdminOrReadOnly,
+    )
+    pagination_class = None
+    http_method_names = ('get', 'post', 'put')
+
+
+class CleaningTypeViewSet(viewsets.ModelViewSet):
+    """Работа с типами услуг."""
     queryset = CleaningType.objects.all()
-    serializer_class = CleaningTypeSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = None
+    http_method_names = ('get', 'post', 'put')
+
+    def get_serializer_class(self):
+        if (
+            self.request.method == 'GET' and
+            not self.request.user.is_staff
+        ):
+            return GetCleaningTypeSerializer
+        else:
+            return CreateCleaningTypeSerializer
 
 
-class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
-    """Получение списка дополнительных услуг."""
-    queryset = Service.objects.filter(service_type=ADDITIONAL_CS)
-    serializer_class = ServiceSerializer
-    pagination_class = None
+class ServiceViewSet(viewsets.ModelViewSet):
+    """Работа с услугами."""
+    queryset = Service.objects.all()
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = FilterService
+    http_method_names = ('get', 'post', 'put')
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            self.pagination_class = None
+            return self.queryset.filter(service_type=ADDITIONAL_CS)
+        else:
+            return self.queryset
+
+    def get_serializer_class(self):
+        if (
+            self.request.method == 'GET' and
+            not self.request.user.is_staff
+        ):
+            return GetServiceSerializer
+        else:
+            return CreateServiceSerializer
 
 
 class UserViewSet(UserViewSet):
@@ -78,7 +129,9 @@ class UserViewSet(UserViewSet):
         detail=True,
         url_path='orders',
         methods=('get',),
-        permission_classes=(permissions.IsAuthenticated,)
+        permission_classes=(
+            IsAdminOnly,
+        )
     )
     def orders(self, request, id):
         """Список заказов пользователя."""
@@ -134,13 +187,27 @@ def confirm_mail(request):
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    methods = ('get', 'post', 'patch',)
+    http_method_names = ('get', 'post', 'patch',)
     queryset = Order.objects.select_related('user', 'address',).all()
     # TODO: получается, что сейчас любой пользователь может прочитать
     #       чужие заказы? Это нужно сделать только для администратора.
     #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
     #       А вот POST - для пользователя.
     # permission_classes = ()
+
+    def get_permissions(self):
+        if not self.request.method == 'POST':
+            self.permission_classes = (
+                permissions.IsAuthenticated,
+                IsAdminOrIsOwner,
+            )
+        return super().get_permissions()
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return self.queryset.filter(user=self.request.user)
+        else:
+            return self.queryset
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -237,7 +304,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
-    methods = ('get', 'post', 'patch', 'delete')
+    http_method_names = ('get', 'post', 'patch', 'delete')
 
     def perform_create(self, serializer):
         order_id = self.kwargs.get('order_id')

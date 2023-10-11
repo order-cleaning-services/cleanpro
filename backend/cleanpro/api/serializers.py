@@ -3,12 +3,11 @@ import re
 from django.db import transaction
 from django.db.models import QuerySet
 from drf_base64.fields import Base64ImageField
-from rest_framework import serializers, status
 from phonenumber_field.phonenumber import PhoneNumber
+from rest_framework import serializers, status
 
-from service.models import (
-    Address, CleaningType, Order, Rating, Service, ServicesInOrder
-)
+from service.models import (Address, CleaningType, Measure, Order, Rating,
+                            Service, ServicesInOrder)
 from users.models import User, generate_random_password
 from users.validators import EMAIL_PATTERN, USERNAME_PATTERN
 
@@ -84,10 +83,21 @@ class EmailConfirmSerializer(serializers.Serializer):
         )
 
 
-class ServiceSerializer(serializers.ModelSerializer):
-    """Сериализатор услуг."""
+class MeasureSerializer(serializers.ModelSerializer):
+    """Сериализатор единиц измерения"""
 
-    image = Base64ImageField(read_only=True,)
+    class Meta:
+        model = Measure
+        fields = (
+            'id',
+            'title',
+        )
+
+
+class GetServiceSerializer(serializers.ModelSerializer):
+    """Сериализатор услуг"""
+
+    image = Base64ImageField(read_only=True)
     measure = serializers.ReadOnlyField(
         source='measure.title',
         read_only=True,
@@ -105,10 +115,37 @@ class ServiceSerializer(serializers.ModelSerializer):
         )
 
 
-class CleaningTypeSerializer(serializers.ModelSerializer):
+class CreateServiceSerializer(serializers.ModelSerializer):
+    """Сериализатор создания и изменения услуг"""
+
+    image = Base64ImageField(allow_null=True)
+    measure = serializers.PrimaryKeyRelatedField(
+        queryset=Measure.objects.all()
+    )
+
+    class Meta:
+        model = Service
+        fields = (
+            'id',
+            'title',
+            'price',
+            'measure',
+            'image',
+            'service_type',
+            'cleaning_time',
+        )
+
+    def to_representation(self, value):
+        representation = super().to_representation(value)
+
+        representation['measure'] = value.measure.title
+        return representation
+
+
+class GetCleaningTypeSerializer(serializers.ModelSerializer):
     """Сериализатор набора услуг."""
 
-    service = ServiceSerializer(
+    service = GetServiceSerializer(
         many=True,
         read_only=True,
     )
@@ -121,6 +158,45 @@ class CleaningTypeSerializer(serializers.ModelSerializer):
             'coefficient',
             'service',
         )
+
+
+class CreateCleaningTypeSerializer(serializers.ModelSerializer):
+    """Сериализатор создания и изменения наборов услуг"""
+
+    service = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Service.objects.all(),
+    )
+
+    class Meta:
+        model = CleaningType
+        fields = (
+            'id',
+            'title',
+            'coefficient',
+            'service',
+        )
+
+    def create(self, validated_data):
+        services = validated_data.pop('service')
+        cleaning_type = super().create(validated_data)
+        cleaning_type.service.set(services)
+        return cleaning_type
+
+    def update(self, instance, validated_data):
+        services = validated_data.pop('service')
+        super().update(instance, validated_data)
+        if services:
+            instance.service.set(services)
+        instance.save()
+        return instance
+
+    def to_representation(self, value):
+        request = self.context['request']
+        return GetCleaningTypeSerializer(
+            value,
+            context={'request': request}
+        ).data
 
 
 class ServicesInOrderSerializer(serializers.ModelSerializer):
@@ -149,7 +225,7 @@ class OrderGetSerializer(serializers.ModelSerializer):
 
     user = CustomUserSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
-    cleaning_type = CleaningTypeSerializer(read_only=True)
+    cleaning_type = GetCleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
         source='servicesinorder_set',
         many=True,
@@ -287,6 +363,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         new_user = User.objects.create(
             username=user_data.get('username'),
             email=user_data.get('email'),
+            phone=user_data.get('phone'),
         )
         password = generate_random_password()
         new_user.set_password(password)
