@@ -8,6 +8,10 @@ class OrdersApi {
   createOrder(body) {
     return FetchApi.post('/orders/', { body })
   }
+
+  repeatOrder(token, id) {
+    return FetchApi.get(`/orders/${id}/`, { token, id })
+  }
 }
 
 export default new OrdersApi()

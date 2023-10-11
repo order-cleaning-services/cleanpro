@@ -84,6 +84,14 @@ function FormEntry() {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                   message: 'Введите Email. Пример: example@example.ru',
                 },
+                maxLength: {
+                  value: 30,
+                  message: 'Недопустимая длина',
+                },
+                minLength: {
+                  value: 5,
+                  message: 'Введите Email. Пример: example@example.ru',
+                },
               }}
               render={({ field: { onChange } }) => (
                 <InputField
@@ -104,7 +112,7 @@ function FormEntry() {
                   rules={{
                     required: { value: true, message: 'Заполните все поля.' },
                     pattern: {
-                      value: /[0-9a-zA-Z!@#$%^&*]{8,16}$/,
+                      value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z\d]).{8,16}$/,
                       message:
                         'Пароль должен включать в себя заглавные, прописные буквы, символы и цифры, и иметь не менее 8 и не более 16 символов.',
                     },

@@ -16,17 +16,6 @@ const ProfileForm = () => {
     formState: { errors },
   } = useForm({
     mode: 'onChange',
-    defaultValues: {
-      username: userData?.username || '',
-      email: userData?.email || '',
-      phone: userData?.phone || '',
-      city: userData?.address?.city || 'Москва',
-      street: userData?.address?.street || '',
-      house: userData?.address?.house || '',
-      apartment: userData?.address?.apartment || '',
-      floor: userData?.address?.floor || '',
-      entrance: userData?.address?.entrance || '',
-    },
   })
 
   function onSubmit(data) {
@@ -42,6 +31,7 @@ const ProfileForm = () => {
         <div className="profile-form__inputs-block profile-form__inputs-block_contacts">
           <InputField
             label="Имя"
+            value={userData?.username || ''}
             {...register('username', {
               pattern: {
                 value:
@@ -55,6 +45,7 @@ const ProfileForm = () => {
           />
           <InputField
             label="E-mail"
+            value={userData?.email || ''}
             {...register('email', {
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -67,6 +58,7 @@ const ProfileForm = () => {
           />
           <InputField
             label="Телефон"
+            value={userData?.phone || ''}
             {...register('phone', {
               pattern: {
                 value: /^((\+7)[- ]?)?(\(?\d{3}\)?[- ]?)?[\d\- ]{10}$/i,
@@ -83,14 +75,15 @@ const ProfileForm = () => {
         <h3 className="profile-form__subheading">Адрес</h3>
         <div className="profile-form__inputs-block profile-form__inputs-block_address">
           <InputField
-            disabled
             label="Город"
-            {...register('city', { required: 'Заполните поле город' })}
+            value="Москва"
+            {...register('city')}
             error={errors?.city}
             isValid={!getFieldState('city').invalid}
           />
           <InputField
             label="Улица"
+            value={userData?.address?.street || ''}
             {...register('street', { required: 'Укажите адрес. Пример: ул. Цветочная' })}
             error={errors?.street}
             isValid={!getFieldState('street').invalid}
@@ -98,6 +91,7 @@ const ProfileForm = () => {
           <div className="profile-form__small-iputs-wrapper">
             <InputField
               label="Дом"
+              value={userData?.address?.house || ''}
               size="small"
               {...register('house', { required: 'Укажите номер дома. Пример: д. 15, Лит. С' })}
               error={errors?.house}
@@ -105,6 +99,7 @@ const ProfileForm = () => {
             />
             <InputField
               label="Квартира"
+              value={userData?.address?.apartment || ''}
               size="small"
               {...register('apartment', { minLength: 1, maxLength: { value: 4, message: 'Не более 4х знаков' } })}
               error={errors?.apartment}
@@ -114,6 +109,7 @@ const ProfileForm = () => {
           <div className="profile-form__small-iputs-wrapper">
             <InputField
               label="Подъезд"
+              value={userData?.address?.entrance || ''}
               size="small"
               {...register('entrance', { minLength: 0, maxLength: { value: 2, message: 'Не более 2х знаков' } })}
               error={errors?.entrance}
@@ -121,6 +117,7 @@ const ProfileForm = () => {
             />
             <InputField
               label="Этаж"
+              value={userData?.address?.floor || ''}
               size="small"
               {...register('floor', { minLength: 0, maxLength: { value: 2, message: 'Не более 2х знаков' } })}
               error={errors?.floor}

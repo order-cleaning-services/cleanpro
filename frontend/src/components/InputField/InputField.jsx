@@ -1,5 +1,5 @@
 import './InputField.scss'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 
 const InputField = forwardRef(
   (
@@ -14,6 +14,7 @@ const InputField = forwardRef(
       onChange,
       isValid,
       classNameModal,
+      value,
       ...rest
     },
     ref,
@@ -21,6 +22,17 @@ const InputField = forwardRef(
     function handleFocus(e) {
       if (focus) e.target.setAttribute('type', 'date')
     }
+
+    const [myValue, setMyValue] = useState(value)
+    useEffect(() => {
+      setMyValue(value)
+    }, [value])
+
+    const handleCange = e => {
+      setMyValue(e.target.value)
+      onChange(e)
+    }
+
     return (
       <div className={`input__wrapper ${type === 'password' ? 'input__wrapper__password' : ''}`}>
         <label htmlFor={name}>{label}</label>
@@ -32,13 +44,12 @@ const InputField = forwardRef(
           placeholder={placeholder}
           type={type}
           onFocus={e => handleFocus(e)}
-          onChange={e => {
-            onChange(e)
-          }}
+          onChange={handleCange}
+          value={myValue || ''}
           ref={ref}
           {...rest}
         />
-        {error && <span className="form-entry__error">{error.message}</span>}
+        {error && <span className="form-entry__error">{error.message || 'Ошибка'}</span>}
       </div>
     )
   },

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { initialState } from './initialState'
-import { buildGetUserOrders, buildCreateOrder } from './extraReducers'
+import { buildGetUserOrders, buildCreateOrder, buildRepeatOrder } from './extraReducers'
 
 const orderSlice = createSlice({
   name: 'order',
@@ -9,12 +9,19 @@ const orderSlice = createSlice({
     setOrders: (state, action) => {
       state.orders = action.payload
     },
+    setOrderbyId: (state, action) => {
+      state.repeatOrder = action.payload
+    },
+    resetRepeatedOrder: state => {
+      state.repeatOrder = initialState.repeatOrder
+    },
   },
   extraReducers: builder => {
     buildGetUserOrders(builder)
     buildCreateOrder(builder)
+    buildRepeatOrder(builder)
   },
 })
 
-export const { setOrders } = orderSlice.actions
+export const { setOrders, resetRepeatedOrder } = orderSlice.actions
 export default orderSlice.reducer

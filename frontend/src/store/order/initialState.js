@@ -1,6 +1,7 @@
 export const initialState = {
   orders: [],
   newOrder: null,
+  repeatOrder: null,
 
   orderStatus: 'initial',
   orderError: null,
