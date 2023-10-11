@@ -192,7 +192,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def services_list(self, obj):
         services = [
-            f'{service} ({service.orders_with_service.get(order=obj).amount})'
+            f'{service} ({service.services_in_order.get(order=obj).amount})'
             for service in obj.services.all()
         ]
         return ',\n'.join(services)
