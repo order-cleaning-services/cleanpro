@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from cleanpro.app_data import ADMIN_LIST_PER_PAGE
 from .models import Address, User
 
 
@@ -71,7 +72,7 @@ class AddressAdmin(admin.ModelAdmin):
         'floor',
         'apartment',
     )
-    list_per_page = 50
+    list_per_page = ADMIN_LIST_PER_PAGE
 
 
 @admin.register(User)
@@ -122,4 +123,4 @@ class UserAdmin(admin.ModelAdmin):
         'username',
         'phone',
     )
-    list_per_page = 50
+    list_per_page = ADMIN_LIST_PER_PAGE

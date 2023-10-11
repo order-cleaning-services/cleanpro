@@ -34,6 +34,8 @@ DB_NAME = os.getenv('POSTGRES_DB')
 """Models data."""
 
 
+ADMIN_LIST_PER_PAGE: int = 15
+
 ORDER_CANCELLED_STATUS: str = 'cancelled'
 
 REVIEW_CACHED_KEY: str = 'review_cached_key'

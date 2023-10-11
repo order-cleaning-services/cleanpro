@@ -1,11 +1,10 @@
 from django.contrib import admin
 
+from cleanpro.app_data import ADMIN_LIST_PER_PAGE
 from .models import (
     CleaningType, Measure, Order, Rating, Service,
     ServicesInCleaningType, ServicesInOrder
 )
-
-ADMIN_LIST_PER_PAGE: int = 15
 
 
 class ServicesInCleaningTypeInline(admin.StackedInline):
