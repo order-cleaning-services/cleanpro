@@ -11,15 +11,14 @@ from cleanpro.app_data import (
 )
 from cleanpro.settings import ADDITIONAL_CS
 from service.models import CleaningType, Order, Rating, Service
+from service.signals import get_cached_reviews
 from users.models import User
 from .mixin import CreateUpdateListSet
-from service.models import (CleaningType, Order, Rating, Service)
-from service.signals import get_cached_reviews
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
     CleaningTypeSerializer,
     CommentSerializer,
-    CustomUserSerializer,
+    UserGetSerializer,
     DateTimeSerializer,
     EmailConfirmSerializer,
     OrderCancelSerializer,
@@ -50,16 +49,12 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
 
 class UserViewSet(CreateUpdateListSet):
     """Список пользователей."""
-    queryset = User.objects.all()
-    http_method_names = ('get', 'post', 'put')
+    queryset = User.objects.select_related('address').all()
 
-    def create(self, request):
-        """Создание пользователей (без вывода данных)."""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(status=status.HTTP_201_CREATED, headers=headers)
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserCreateSerializer
+        return UserGetSerializer
 
     @action(
         detail=True,
@@ -88,13 +83,8 @@ class UserViewSet(CreateUpdateListSet):
     def me(self, request):
         """Личные данные авторизованного пользователя."""
         instance = request.user
-        serializer = CustomUserSerializer(instance)
+        serializer = UserGetSerializer(instance)
         return Response(serializer.data)
-
-    def get_serializer_class(self):
-        if self.action == 'create':
-            return UserCreateSerializer
-        return CustomUserSerializer
 
     @action(
         detail=False,

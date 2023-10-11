@@ -46,7 +46,7 @@ class UserCreateSerializer(UserCreateSerializer):
         )
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class UserGetSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователей."""
     address = AddressSerializer()
 
@@ -151,7 +151,7 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
 
-    user = CustomUserSerializer(read_only=True)
+    user = UserGetSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
@@ -423,7 +423,7 @@ class RatingSerializer(serializers.ModelSerializer):
     Сериализатор для представления отзыва на уборку на главной странице.
     """
 
-    user = CustomUserSerializer(read_only=True)
+    user = UserGetSerializer(read_only=True)
 
     class Meta:
         fields = (
