@@ -1,0 +1,21 @@
+.card-service {
+	background-color: #fff;
+	border-radius: .8rem;
+	margin: 1.2rem 0 0 0;
+	padding: 2rem 0;
+	border: 2px solid #fff;
+	transition: all .2s ease;
+
+	&__img {
+		width: 9.4rem;
+		height: 6rem;
+		border-radius: .8rem;
+		object-fit: cover;
+	}
+
+	&__edit {
+		width: 4rem;
+		height: 4rem;
+		margin: 0 0 0 3.6rem;
+	}	
+}

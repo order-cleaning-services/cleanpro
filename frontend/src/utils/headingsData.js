@@ -3,6 +3,8 @@ import {
   handleClickCurrent,
   handleClickCompleted,
   handleClickСancelled,
+  handleClickCleaners,
+  handleClickPackages,
 } from '../store/admin/adminSlice'
 
 export const headings = [
@@ -33,5 +35,21 @@ export const headings = [
     count: '7',
     handleClick: handleClickСancelled(),
     handleTab: 'cancelled',
+  },
+]
+export const headingsServices = [
+  {
+    id: 1,
+    title: 'Услуги',
+    count: '',
+    handleClick: handleClickCleaners(),
+    handleTab: 'services',
+  },
+  {
+    id: 2,
+    title: 'Пакеты услуг',
+    count: '',
+    handleClick: handleClickPackages(),
+    handleTab: 'packages',
   },
 ]

@@ -143,3 +143,9 @@ export const options = [
   { value: '15:00', label: '15 : 00' },
   { value: '16:00', label: '16 : 00' },
 ]
+
+export const unit = [
+  { value: 'комната', label: 'комната' },
+  { value: 'шт', label: 'шт' },
+  { value: '30 мин', label: '30 мин' },
+]

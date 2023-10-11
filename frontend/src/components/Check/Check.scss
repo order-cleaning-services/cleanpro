@@ -1,0 +1,9 @@
+.check {
+	&:not(:last-child){
+		padding: 0 0 .8rem 0;
+	}
+
+	&__input {
+		margin: 0 .8rem 0 .5rem;
+	}
+}

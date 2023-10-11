@@ -1,10 +1,8 @@
 import Select from 'react-select'
 import './SelectReact.scss'
 import { useState } from 'react'
-import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
-import { options } from '../../utils/initialData'
 
-function SelectReact({ time }) {
+function SelectReact({ time, options, styles }) {
   const [userChoice, setUserChoice] = useState('')
   console.log(userChoice)
   return (
@@ -13,7 +11,7 @@ function SelectReact({ time }) {
       className="select-time"
       classNamePrefix="select-time"
       options={options}
-      styles={customerStylesSelect}
+      styles={styles}
       onChange={choice => setUserChoice(choice.value)}
     />
   )

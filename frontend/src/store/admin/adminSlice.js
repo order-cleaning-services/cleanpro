@@ -29,6 +29,12 @@ const adminSlice = createSlice({
     handleClickСancelled: state => {
       state.tab = 'cancelled'
     },
+    handleClickCleaners: state => {
+      state.tab = 'services'
+    },
+    handleClickPackages: state => {
+      state.tab = 'packages'
+    },
   },
 })
 
@@ -41,5 +47,7 @@ export const {
   handleClickCurrent,
   handleClickCompleted,
   handleClickСancelled,
+  handleClickCleaners,
+  handleClickPackages,
 } = adminSlice.actions
 export default adminSlice.reducer

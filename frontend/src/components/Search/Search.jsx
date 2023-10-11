@@ -4,7 +4,7 @@ import './Search.scss'
 
 import search from '../../images/search.svg'
 
-function Search() {
+function Search({ placeholder }) {
   const [searchText, setSearchText] = useState('')
   console.log(searchText)
 
@@ -15,7 +15,7 @@ function Search() {
   return (
     <>
       <div className="search">
-        <input placeholder="Номер заказа" className="search__input" onChange={handleChange} />
+        <input placeholder={placeholder} className="search__input" onChange={handleChange} />
         <button type="submit" className="search__button"></button>
         <img className="search__input-icon" src={search} alt="Поиск" />
       </div>

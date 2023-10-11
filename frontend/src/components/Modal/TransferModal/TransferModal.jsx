@@ -5,6 +5,8 @@ import SelectReact from '../../SelectReact/SelectReact'
 import Button from '../../Button/Button'
 import ButtonClose from '../../ButtonClose/ButtonClose'
 import { createPortal } from 'react-dom'
+import { options } from '../../../utils/initialData'
+import { customerStylesSelect } from '../../../assets/styles/customerStylesSelect'
 
 function TransferModal({ show, closeModal }) {
   function handleSubmit(e) {
@@ -35,7 +37,7 @@ function TransferModal({ show, closeModal }) {
                 />
                 <div className="form-transfer__select">
                   <label>Время</label>
-                  <SelectReact time="time" />
+                  <SelectReact styles={customerStylesSelect} time="time" options={options} />
                 </div>
               </div>
               <Button buttonText="Перенести" buttonClassName="button button__modal-indent" />

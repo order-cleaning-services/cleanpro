@@ -9,7 +9,7 @@ function TableTitle() {
   const viewTab = useSelector(adminSelectors.getAdminTab)
 
   return (
-    <div className={`table-title ${viewlink === 'statistics' ? 'visible-table-element' : ''}  grid`}>
+    <div className={`table-title ${viewlink === 'orders' ? '' : 'visible-table-element'}  grid`}>
       <p className="grid__item">Оформлен</p>
       <p className="grid__item">№ заказа</p>
       <p className="grid__item">Вид услуги</p>

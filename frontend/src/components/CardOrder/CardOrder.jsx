@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { adminSelectors } from '../../store/admin/adminSelectors'
 
 import AdditionalInfoAdmin from '../AdditionalInfoAdmin/AdditionalinfoAdmin'
+import ButtonAdmin from '../ButtonAdmin/ButtonAdmin'
 
 function CardOrder() {
   const viewTab = useSelector(adminSelectors.getAdminTab)
@@ -28,14 +29,14 @@ function CardOrder() {
         <div className="grid__item text-m-bold card-order__complete">
           {viewTab === 'new' && (
             <>
-              <button className="card-order__button text-m-bold">Принять</button>
+              <ButtonAdmin text="Принять" />
               <div className="card-order__close">+</div>
             </>
           )}
 
           {viewTab === 'current' && (
             <>
-              <button className="card-order__button text-m-bold">Завершить</button>
+              <ButtonAdmin text="Завершить" />
               <div className="card-order__close">+</div>
             </>
           )}
