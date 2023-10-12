@@ -452,6 +452,7 @@ class RatingSerializer(serializers.ModelSerializer):
         )
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data.pop('user', None)
+        data: dict = super().to_representation(instance)
+        for field in ('user', 'order'):
+            data.pop(field, None)
         return data
