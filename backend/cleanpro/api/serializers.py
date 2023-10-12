@@ -143,7 +143,7 @@ class OrderGetSerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
-        source='servicesinorder_set',
+        source='services_in_order',
         many=True,
         read_only=True,
     )
@@ -262,6 +262,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         order, is_created = Order.objects.get_or_create(
             user=user,
             total_sum=data.get('total_sum'),
+            comment=data.get('comment'),
             cleaning_type=data.get('cleaning_type'),
             address=address,
             cleaning_date=data.get('cleaning_date'),
