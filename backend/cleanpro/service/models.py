@@ -1,5 +1,8 @@
 # TODO: при релизе проверить, что валидация на клиенте
 #       совпадает с валидацией на сервере!
+
+from datetime import datetime, timedelta
+
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -141,7 +144,18 @@ class Order(models.Model):
         verbose_name='Заказчик',
         to=settings.AUTH_USER_MODEL,
         related_name='orders',
-        on_delete=models.CASCADE,
+        # TODO: изучить вопрос, как бы сохранить историю заказов.
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+    cleaner = models.ForeignKey(
+        verbose_name='Уборщик',
+        to=settings.AUTH_USER_MODEL,
+        related_name='work_orders',
+        # TODO: изучить вопрос, как бы сохранить клинера.
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
     )
     total_sum = models.IntegerField(
         verbose_name='Сумма',
@@ -154,10 +168,6 @@ class Order(models.Model):
         validators=(
             MinValueValidator(1, 'Укажите корректное время!'),
         ),
-        # TODO: Сделать поле обязательным после перехода на OrderViewSet
-        #       для создания и работы с заказом.
-        blank=True,
-        null=True,
     )
     comment = models.CharField(
         verbose_name='Комментарий',
@@ -201,11 +211,6 @@ class Order(models.Model):
         related_name='orders',
         on_delete=models.CASCADE,
     )
-    # А почему(?) не:
-    # creation_datetime = models.DateTimeField(
-    #     'Дата и время создания',
-    #     auto_now_add=True
-    # )
     creation_date = models.DateField(
         verbose_name='Дата создания',
         auto_now_add=True,
@@ -221,8 +226,11 @@ class Order(models.Model):
     cleaning_time = models.TimeField(
         verbose_name='Время уборки',
     )
-    # INFO! Я НАСТАИВАЮ на Datetime field - посмотрите, какая ерунда уже
-    #       вырисовывается! А могло быть 3 лаконичных поля!
+    cleaning_time_end = models.TimeField(
+        verbose_name='Время окончания уборки',
+        blank=True,
+        null=True,
+    )
     cancel_date = models.DateField(
         verbose_name='Дата отмены заказа',
         db_index=True,
@@ -242,6 +250,15 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Заказ №: {self.id}"
+
+    def save(self, *args, **kwargs):
+        time_start: datetime = datetime.combine(
+            date=self.cleaning_date,
+            time=self.cleaning_time,
+        )
+        time_end = time_start + timedelta(minutes=self.total_time)
+        self.cleaning_time_end = time_end.time()
+        super(Order, self).save(*args, **kwargs)
 
 
 class ServicesInOrder(models.Model):
