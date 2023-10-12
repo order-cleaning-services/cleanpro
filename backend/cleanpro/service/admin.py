@@ -1,10 +1,11 @@
 from django.contrib import admin
 
 from cleanpro.app_data import ADMIN_LIST_PER_PAGE
-from .models import (
+from service.models import (
     CleaningType, Measure, Order, Rating, Service,
     ServicesInCleaningType, ServicesInOrder
 )
+from users.models import User
 
 
 class ServicesInCleaningTypeInline(admin.StackedInline):
@@ -115,8 +116,21 @@ class ServicesInOrderInline(admin.StackedInline):
     extra = 1
 
 
-@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    """
+    Переопределяет ModelAdmin для модели Order:
+        - в поле уборщик (cleaner) выводит только пользователей,
+          которые имеют статус is_cleaner=True
+    """
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'cleaner':
+            kwargs['queryset'] = User.objects.filter(is_cleaner=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(Order)
+class OrderAdmin(OrderAdmin):
     """
     Переопределяет административный интерфейс Django для модели Order.
 
@@ -124,6 +138,7 @@ class OrderAdmin(admin.ModelAdmin):
         - list_display (tuple) - список полей для отображения в интерфейсе:
             - ID заказа (pk)
             - ID заказчика (user)
+            - ID уборщика (cleaner)
             - статус заказа (order_status)
             - статус оплаты (pay_status)
             - суммарное время работ (total_time)
@@ -136,12 +151,14 @@ class OrderAdmin(admin.ModelAdmin):
             - время создания заказа (creation_time)
             - дата начала уборки (cleaning_date)
             - время начала уборки (cleaning_time)
+            - время окончания уборки (cleaning_time_end)
             - комментарий отмены заказа (comment_cancel)
             - дата отмены заказа (cancel_date)
             - время отмены заказа (cancel_time)
         - inlines (tuple): определяет отображение связанных моделей:
             - отображает сервисы в заказе (ServicesInOrderInline)
         - list_editable (tuple) - список полей для изменения в интерфейсе:
+            - ID уборщика (cleaner)
             - статус заказа (order_status)
             - статус оплаты (pay_status)
             - сумма заказа (total_sum)
@@ -162,6 +179,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'user',
+        'cleaner',
         'order_status',
         'pay_status',
         'total_time',
@@ -174,12 +192,14 @@ class OrderAdmin(admin.ModelAdmin):
         'creation_time',
         'cleaning_date',
         'cleaning_time',
+        'cleaning_time_end',
         'comment_cancel',
         'cancel_date',
         'cancel_time',
     )
     inlines = (ServicesInOrderInline,)
     list_editable = (
+        'cleaner',
         'order_status',
         'pay_status',
         'total_sum',
