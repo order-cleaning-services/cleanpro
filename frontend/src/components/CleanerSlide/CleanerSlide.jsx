@@ -10,7 +10,7 @@ function CleanerSlide({ slide }) {
         <p className="slide__title-name">{name}</p>
         <div className="slide__rating">
           <p className="slide__mark">{mark}</p>
-          <img className="slide__star" src="./src/images/star.svg" alt="" />
+          <img className="slide__star" src="./src/assets/images/star.svg" alt="" />
         </div>
       </div>
       <img className="slide__img" src={image} alt={name} />

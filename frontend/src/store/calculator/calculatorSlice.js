@@ -14,10 +14,8 @@ const calculatorSlice = createSlice({
     },
     setExtra: (state, action) => {
       const index = action.payload.index
-      const newExtra = [...state.extra]
-      newExtra[index].amount += action.payload.step
       state.total += action.payload.price
-      state.extra = newExtra
+      state.extra[index].amount += action.payload.step
     },
     deleteExtra: (state, action) => {
       state.total -= action.payload

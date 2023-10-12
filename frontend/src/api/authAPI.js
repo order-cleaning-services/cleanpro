@@ -1,24 +1,25 @@
 import FetchAPI from '../utils/fetchAPI'
+import { API_URL } from '../constants/constants'
 
 class AuthAPI {
   auth(body) {
-    return FetchAPI.post('/auth/token/login/', { body })
+    return FetchAPI.post(`${API_URL.AUTH}login/`, { body })
   }
 
   logout(token) {
-    return FetchAPI.post('/auth/token/logout', { token })
+    return FetchAPI.post(`${API_URL.AUTH}login/`, { token })
   }
 
   create(body) {
-    return FetchAPI.post('/users/', { body })
+    return FetchAPI.post(`${API_URL.USERS}`, { body })
   }
 
   getUser(token) {
-    return FetchAPI.get('/users/me/', { token })
+    return FetchAPI.get(`${API_URL.USERS}/me`, { token })
   }
 
   updateUser(id, body, token) {
-    return FetchAPI.put(`/users/${id}/`, { body, token })
+    return FetchAPI.put(`${API_URL.USERS}${id}/`, { body, token })
   }
 }
 

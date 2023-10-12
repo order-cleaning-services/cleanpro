@@ -1,9 +1,11 @@
+@import '../../assets/styles/colors.scss';
+
 .service-card__container {
   width: 22rem;
   height: 6rem;
   border: none;
   border-radius: 20px;
-  background-color: #ffffff;
+  background-color: $background-color-main;
   display: flex;
   justify-content: space-between;
   flex-direction: column;

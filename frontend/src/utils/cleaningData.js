@@ -1,4 +1,4 @@
-import cleaner1 from '../images/cleaner.webp'
+import cleaner1 from '../assets/images/cleaner.webp'
 
 const cleanersData = [
   {

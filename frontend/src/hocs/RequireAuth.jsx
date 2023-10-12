@@ -8,10 +8,10 @@ function RequireAuth({ require = true }) {
   const isAuth = useSelector(authSelectors.getIsAuth)
 
   if (!isAuth && require) {
-    return <Navigate to={ROUTES.signin} state={{ from: location }} replace />
+    return <Navigate to={ROUTES.SIGNIN} state={{ from: location }} replace />
   }
   if (isAuth && !require) {
-    return <Navigate to={ROUTES.home} state={{ from: location }} replace />
+    return <Navigate to={ROUTES.HOME} state={{ from: location }} replace />
   }
   return <Outlet />
 }

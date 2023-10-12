@@ -1,3 +1,5 @@
+@import '../../assets/styles/colors.scss';
+
 .profile {
   width: 144rem;
   margin: 0 auto;
@@ -28,7 +30,7 @@
       font-style: normal;
       font-weight: 400;
       line-height: 130%;
-      background-color: #fff;
+      background-color: $background-color-main;
 
       &:first-child {
         margin-right: 1.6rem;
@@ -36,8 +38,8 @@
 
       &_active {
         font-weight: 700;
-        color: #242424;
-        border-bottom: 2px solid #ffb22e;
+        color: $text-color-main;
+        border-bottom: 2px solid $color-primary;
       }
     }
   }
