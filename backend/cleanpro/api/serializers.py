@@ -262,6 +262,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         order, is_created = Order.objects.get_or_create(
             user=user,
             total_sum=data.get('total_sum'),
+            comment=data.get('comment'),
             cleaning_type=data.get('cleaning_type'),
             address=address,
             cleaning_date=data.get('cleaning_date'),
