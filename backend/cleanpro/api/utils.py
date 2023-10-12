@@ -1,6 +1,7 @@
 """
 Вспомогательные функции приложения Api.
 """
+
 import random
 import string
 
