@@ -1,3 +1,4 @@
+import random
 import re
 
 from django.db import transaction
@@ -15,7 +16,7 @@ from users.validators import (
     validate_email,
     EMAIL_PATTERN, USERNAME_PATTERN
 )
-from .utils import get_or_create_address
+from .utils import get_or_create_address, get_available_cleaners
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -187,6 +188,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         fields = (
             'user',
             'total_sum',
+            'total_time',
             'comment',
             'cleaning_type',
             'services',
@@ -259,9 +261,17 @@ class OrderPostSerializer(serializers.ModelSerializer):
                 user_data=user_data,
                 address=address
             )
+        cleaner: QuerySet = get_available_cleaners(
+            cleaning_date=data.get('cleaning_date'),
+            cleaning_time=data.get('cleaning_time'),
+            total_time=data.get('total_time'),
+        )
+        random_cleaner: User = random.choice(list(cleaner))
         order, is_created = Order.objects.get_or_create(
             user=user,
+            cleaner=random_cleaner,
             total_sum=data.get('total_sum'),
+            total_time=data.get('total_time'),
             comment=data.get('comment'),
             cleaning_type=data.get('cleaning_type'),
             address=address,
