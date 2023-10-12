@@ -9,6 +9,7 @@ import Calculator from '../../components/Calculator/Calculator'
 import Materials from '../../components/Materials/Materials'
 import Faq from '../../components/Faq/Faq'
 import ButtonOrder from '../../components/ButtonOrder/ButtonOrder'
+import AuthModal from '../../components/Modal/AuthModal/AuthModal'
 
 export default function MainPage() {
   const location = useLocation()
@@ -35,6 +36,7 @@ export default function MainPage() {
       <Faq />
       <Footer />
       <ButtonOrder height={2700} />
+      <AuthModal />
     </>
   )
 }
