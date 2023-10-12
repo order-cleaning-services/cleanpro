@@ -1,4 +1,5 @@
 # TODO: аннотировать типы данных. Везде. Абсолютно.
+
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -11,10 +12,11 @@ from cleanpro.app_data import (
     EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
 )
 from cleanpro.settings import ADDITIONAL_CS
-from service.models import (CleaningType, Order, Rating, Service)
+from service.models import CleaningType, Order, Rating, Service
 from service.signals import get_cached_reviews
 from .permissions import IsOwner, IsOwnerOrReadOnly
 from .serializers import (
+    CleaningGetTimeSerializer,
     CleaningTypeSerializer,
     CommentSerializer,
     CustomUserSerializer,
@@ -28,7 +30,7 @@ from .serializers import (
     RatingSerializer,
     ServiceSerializer,
 )
-from .utils import generate_code, send_mail
+from .utils import generate_code, get_available_time_json, send_mail
 
 
 class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -179,6 +181,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         detail=True,
         methods=('patch',),
         permission_classes=(IsOwner,),
+        url_path='comment',
     )
     def comment(self, request, pk):
         """Добавить комментарий к заказу."""
@@ -192,7 +195,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(IsOwner,)
+        permission_classes=(IsOwner,),
+        url_path='change_datetime',
     )
     def change_datetime(self, request, pk):
         """Перенести заказ."""
@@ -206,7 +210,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(permissions.IsAdminUser,)
+        permission_classes=(permissions.IsAdminUser,),
+        url_path='change_status',
     )
     def change_status(self, request, pk):
         """Изменить статус заказа."""
@@ -216,6 +221,27 @@ class OrderViewSet(viewsets.ModelViewSet):
             serializer_class=OrderStatusSerializer,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(
+        detail=False,
+        methods=('post',),
+        url_path='get_available_time',
+    )
+    def get_available_time(self, request):
+        serializer = CleaningGetTimeSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            data=get_available_time_json(
+                cleaning_date=serializer.validated_data['cleaning_date'],
+                cleaning_time=serializer.validated_data['cleaning_time'],
+                total_time=serializer.validated_data['total_time'],
+            ),
+            status=status.HTTP_200_OK,
+        )
 
 
 class RatingViewSet(viewsets.ModelViewSet):
