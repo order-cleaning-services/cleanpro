@@ -35,6 +35,12 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
 
+class CleaningGetTimeSerializer(serializers.Serializer):
+    cleaning_date = serializers.DateField()
+    cleaning_time = serializers.TimeField()
+    total_time = serializers.IntegerField()
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для регистрации пользователей."""
     address = AddressSerializer()
