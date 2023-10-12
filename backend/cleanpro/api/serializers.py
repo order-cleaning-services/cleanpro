@@ -252,6 +252,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         """Создает новый заказ.
         Если пользователь отсутствует в базе данных - создает нового.
         Если адрес отсутствует в базе данных - создает новый."""
+        random_cleaner: User = self.__get_random_cleaner(data=data)
         address: Address = get_or_create_address(
             address_data=data.get('address')
         )
@@ -267,12 +268,6 @@ class OrderPostSerializer(serializers.ModelSerializer):
                 user_data=user_data,
                 address=address
             )
-        cleaner: QuerySet = get_available_cleaners(
-            cleaning_date=data.get('cleaning_date'),
-            cleaning_time=data.get('cleaning_time'),
-            total_time=data.get('total_time'),
-        )
-        random_cleaner: User = random.choice(list(cleaner))
         order, is_created = Order.objects.get_or_create(
             user=user,
             cleaner=random_cleaner,
@@ -324,7 +319,25 @@ class OrderPostSerializer(serializers.ModelSerializer):
         new_user.save()
         return new_user
 
-    def __services_bulk_create(self, order, services):
+    def __get_random_cleaner(self, data) -> User:
+        """
+        Проверяет наличие доступных уборщиков для указанного дня и времени
+        заказа. Возвращает случайного из всех доступных.
+
+        Если доступных уборщиков нет, вызывает ValidationError.
+        """
+        cleaner: QuerySet = get_available_cleaners(
+            cleaning_date=data.get('cleaning_date'),
+            cleaning_time=data.get('cleaning_time'),
+            total_time=data.get('total_time'),
+        )
+        if cleaner.count() == 0:
+            raise serializers.ValidationError(
+                'Для указанного дня и времени нет доступных уборщиков.'
+            )
+        return random.choice(list(cleaner))
+
+    def __services_bulk_create(self, order, services) -> None:
         """Добавляет сервисы в заказ."""
         ing_objs = []
         for item in services:
@@ -341,7 +354,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         ServicesInOrder.objects.bulk_create(ing_objs)
         return
 
-    def __validate_phone(self, phone_data):
+    def __validate_phone(self, phone_data) -> PhoneNumber:
         """Производит валидацию номера телефона.
         Возвращает False, в случае ошибки валидации."""
         try:
