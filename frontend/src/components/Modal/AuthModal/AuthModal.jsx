@@ -23,14 +23,18 @@ const AuthModal = ({ closeModal }) => {
             <div className="modal__content modal__content_auth">
               <h2 className="form-auth__title">Мы отправили на вашу почту код-подтверждение, введите его ниже</h2>
               <input className="form-auth__input" placeholder="Код-подтверждение"></input>
-              <Button buttonClassName={'button button_size-s'} onClick={handleSubmit} buttonText={'Подтвердить'} />
               <Button
-                buttonClassName={'button button_auth button_size-s'}
+                buttonClassName={'button button_type_auth-submit button_size_s'}
+                onClick={handleSubmit}
+                buttonText={'Подтвердить'}
+              />
+              <Button
+                buttonClassName={'button button_type_auth  button_size_s'}
                 onClick={handleSubmit}
                 buttonText={'Направить код повторно'}
               />
               <Button
-                buttonClassName={'button button_auth'}
+                buttonClassName={'button button_type_auth'}
                 onClick={handleSubmit}
                 buttonText={'Не приходит код? Обратиться в поддержку'}
               />

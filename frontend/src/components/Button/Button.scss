@@ -16,15 +16,19 @@
     margin: 3.6rem 0 0 0;
   }
 
-  &_auth {
+  &_type_auth {
     background-color: $background-color-secondary;
     box-shadow: none;
     color: $text-color-tertiary;
     line-height: 2.24rem;
   }
 
-  &_size-s {
-    width: 280px;
+  &_type_auth-submit {
+    margin-bottom: 1.2rem;
+  }
+
+  &_size_s {
+    width: 28rem;
   }
 
   &_disabled {
