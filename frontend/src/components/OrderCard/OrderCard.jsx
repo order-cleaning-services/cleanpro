@@ -92,11 +92,11 @@ const OrderCard = ({ order }) => {
               <button onClick={() => setShowTransfer(s => !s)} className="card__control-btn">
                 Перенести
               </button>
-              <TransferModal show={showTransfer} closeModal={() => setShowTransfer(false)} />
+              <TransferModal order={order.id} show={showTransfer} closeModal={() => setShowTransfer(false)} />
               <button onClick={() => setShowCancel(s => !s)} className="card__control-btn">
                 Отменить
               </button>
-              <CancelModal show={showCancel} closeModal={() => setShowCancel(false)} />
+              <CancelModal order={order.id} show={showCancel} closeModal={() => setShowCancel(false)} />
             </div>
           )}
         </div>

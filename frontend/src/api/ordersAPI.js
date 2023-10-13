@@ -13,6 +13,12 @@ class OrdersApi {
   repeatOrder(token, id) {
     return FetchApi.get(`${API_URL.ORDERS}${id}/`, { token, id })
   }
+  changeDateTime(order, body) {
+    return FetchApi.patch(`/orders/${order}/`, body)
+  }
+  cancel(order, body) {
+    return FetchApi.patch(`/orders/${order}/`, body)
+  }
 }
 
 export default new OrdersApi()

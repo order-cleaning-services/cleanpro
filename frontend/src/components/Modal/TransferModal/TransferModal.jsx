@@ -5,13 +5,27 @@ import SelectReact from '../../SelectReact/SelectReact'
 import Button from '../../Button/Button'
 import ButtonClose from '../../ButtonClose/ButtonClose'
 import { createPortal } from 'react-dom'
+import { getToken } from '../../../utils/tokenActions'
+import { useDispatch } from 'react-redux'
+import { getUserOrders } from '../../../store/order/orderActions'
+import ordersAPI from '../../../api/ordersAPI'
 
-function TransferModal({ show, closeModal }) {
+function TransferModal({ order, show, closeModal }) {
+  const dispatch = useDispatch()
   function handleSubmit(e) {
     e.preventDefault()
     const form = e.target
+    const token = getToken()
     const formData = new FormData(form)
     const formJson = Object.fromEntries(formData.entries())
+    ordersAPI.changeDateTime(order, {
+      body:{ cleaning_date: formJson.date,
+       cleaning_time: formJson.time},
+     token:token
+     } 
+      )
+      dispatch(getUserOrders())
+      closeModal()
     console.log(formJson)
   }
   if (!show) return null
