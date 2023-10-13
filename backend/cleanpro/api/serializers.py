@@ -1,6 +1,6 @@
 import random
 import re
-from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer # noqa (E501)
+from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer  # noqa (E501)
 
 from django.db import transaction
 from django.db.models import QuerySet
@@ -67,6 +67,16 @@ class UserGetSerializer(serializers.ModelSerializer):
             'phone',
             'address',
         )
+
+    def to_representation(self, instance):
+        """Добавляет поля в ответ, если user администратор или уборщик."""
+        data = super().to_representation(instance)
+        if instance.is_staff:
+            data['is_staff'] = getattr(instance, 'is_staff')
+        if instance.is_cleaner:
+            data['is_cleaner'] = getattr(instance, 'is_cleaner')
+
+        return data
 
     def update(self, instance, validated_data):
         """Производит обновление данных о пользователе и его адресе."""
@@ -385,7 +395,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def __check_user_data(
             self, address: Address, user: User, user_data: dict
-            ) -> None: # noqa E125
+            ) -> None:  # noqa E125
         """
         Проверяет данные пользователя:
             - если отсутствует значения полей username / phone: присваиваются
