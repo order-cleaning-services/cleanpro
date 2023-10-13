@@ -2,10 +2,12 @@
 ################################# TOKENS #################################
 ##########################################################################
 
-@admin_token = fb1319dfdc9906d7a1221e8a2136466351571d21
+@admin_token = b1d8545ad3325417a91e2152654ab9c67679efb0
 
 @login = http://127.0.0.1:80/api/auth/token/login/
 @logout = http://127.0.0.1:80/api/auth/token/logout/
+
+@measure = http://127.0.0.1:80/api/measure/
 
 @orders = http://127.0.0.1:80/api/orders/
 
@@ -25,15 +27,15 @@ Content-Type: application/json
 
 ###
 POST {{logout}} HTTP/1.1
-Authorization: Token fb1319dfdc9906d7a1221e8a2136466351571d21
+Authorization: Token b1d8545ad3325417a91e2152654ab9c67679efb0
 
 ### 
 GET {{users}} HTTP/1.1
-Authorization: Token fb1319dfdc9906d7a1221e8a2136466351571d21
+Authorization: Token b1d8545ad3325417a91e2152654ab9c67679efb0
 
 ###
 PUT {{users}}1/ HTTP/1.1
-Authorization: Token fb1319dfdc9906d7a1221e8a2136466351571d21
+Authorization: Token b1d8545ad3325417a91e2152654ab9c67679efb0
 Content-Type: application/json
 
 {
@@ -52,7 +54,7 @@ Content-Type: application/json
 
 ### 
 GET {{users_me}} HTTP/1.1
-Authorization: Token fb1319dfdc9906d7a1221e8a2136466351571d21
+Authorization: Token b1d8545ad3325417a91e2152654ab9c67679efb0
 
 ###
 POST {{login}} HTTP/1.1
@@ -89,7 +91,7 @@ GET {{ratings}}?limit=2 HTTP/1.1
 
 ### TODO: логика недоделана!
 POST {{ratings}} HTTP/1.1
-Authorization: Token fb1319dfdc9906d7a1221e8a2136466351571d21
+Authorization: Token b1d8545ad3325417a91e2152654ab9c67679efb0
 
 ###
 GET {{orders}} HTTP/1.1
