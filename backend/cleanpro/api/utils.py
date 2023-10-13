@@ -9,7 +9,11 @@ import string
 from django.core import mail
 from django.db.models import Q, QuerySet
 
-from cleanpro.app_data import DEFAULT_FROM_EMAIL, EMAIL_CODE_LENGTH
+from cleanpro.app_data import (
+    schedule_generate_bool,
+    DEFAULT_FROM_EMAIL, EMAIL_CODE_LENGTH,
+    SCHEDULE_WORK_START_H, SCHEDULE_WORK_STOP_H,
+)
 from service.models import Order
 from users.models import Address, User
 
@@ -59,18 +63,21 @@ def send_mail(subject: str, message: str, to: tuple[str]) -> None:
 def get_available_cleaners(
         cleaning_date: date,
         cleaning_time: time,
-        total_time: int) -> QuerySet:
+        total_time: int,
+        order_set: QuerySet = None,
+        cleaning_end_time: time = None) -> QuerySet:
     """
     Получает данные об уборке (дата, время, продолжительность) и возвращает
     список пользователей, которые доступны для ее выполнения.
     """
-    cleaning_end_time: time = (
-        datetime.combine(cleaning_date, cleaning_time) +
-        timedelta(minutes=total_time)
-    ).time()
-    overlapping_orders: QuerySet = Order.objects.filter(
-        cleaning_date=cleaning_date,
-    ).filter(
+    if cleaning_end_time is None:
+        cleaning_end_time: time = (
+            datetime.combine(cleaning_date, cleaning_time) +
+            timedelta(minutes=total_time)
+        ).time()
+    if order_set is None:
+        order_set: QuerySet = Order.objects.filter(cleaning_date=cleaning_date)
+    overlapping_orders: QuerySet = order_set.filter(
         Q(
             cleaning_time__gte=cleaning_time,
             cleaning_time__lt=cleaning_end_time,
@@ -101,3 +108,40 @@ def get_available_cleaners(
     )
     available_cleaners: QuerySet = all_cleaners.exclude(pk__in=busy_cleaners)
     return available_cleaners
+
+
+def get_available_time_json(cleaning_date: date, total_time: int) -> dict:
+    """
+    Возвращает словарь, где для каждого времени кратного 30 минутам
+    указана возможность бронирования заказа с указанной продолжительностью
+    в казанный день. Если указано True - заказ возможно оформить,
+    Если указано False - заказ оформить нельзя.
+
+    Формат ответа: {"00:00": False, "00:30": False, ... "23:30": False}
+    """
+    response_data: dict[str, bool] = schedule_generate_bool(value=False)
+    order_set: QuerySet = Order.objects.filter(cleaning_date=cleaning_date)
+    if cleaning_date < date.today():
+        return response_data
+    for current_time in response_data:
+        hour: int = int(current_time[:2])
+        if hour < SCHEDULE_WORK_START_H:
+            continue
+        minute: int = int(current_time[-2:])
+        cleaning_time = time(hour=hour, minute=minute)
+        cleaning_end_time: time = (
+            datetime.combine(cleaning_date, cleaning_time) +
+            timedelta(minutes=total_time)
+        ).time()
+        if cleaning_end_time.hour >= SCHEDULE_WORK_STOP_H:
+            break
+        available_cleaners: QuerySet = get_available_cleaners(
+            cleaning_date=cleaning_date,
+            cleaning_time=cleaning_time,
+            total_time=total_time,
+            order_set=order_set,
+            cleaning_end_time=cleaning_end_time,
+        )
+        if available_cleaners.exists():
+            response_data[current_time] = True
+    return response_data
