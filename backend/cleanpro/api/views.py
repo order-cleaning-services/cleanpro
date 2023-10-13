@@ -237,7 +237,6 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(
             data=get_available_time_json(
                 cleaning_date=serializer.validated_data['cleaning_date'],
-                cleaning_time=serializer.validated_data['cleaning_time'],
                 total_time=serializer.validated_data['total_time'],
             ),
             status=status.HTTP_200_OK,
