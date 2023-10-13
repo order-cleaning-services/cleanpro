@@ -4,7 +4,7 @@ export const ROUTES = {
   PROFILE: '/profile',
   SIGNIN: '/signin',
   PAYMENT: '/payment',
-  ADMIN: '/admin',
+  ADMIN: '/office',
 }
 
 export const TIME_OPTIONS = [
