@@ -164,6 +164,8 @@ class OrderAdmin(OrderAdmin):
             - сумма заказа (total_sum)
             - комментарий заказа (comment)
             - комментарий отмены заказа (comment_cancel)
+            - дата начала уборки (cleaning_date)
+            - время начала уборки (cleaning_time)
         - list_filter (tuple) - список фильтров:
             - статус заказа (order_status)
         - search_fields (tuple) - список полей для поиска объектов:
@@ -205,6 +207,8 @@ class OrderAdmin(OrderAdmin):
         'total_sum',
         'comment',
         'comment_cancel',
+        'cleaning_date',
+        'cleaning_time',
     )
     list_filter = ('order_status',)
     search_fields = ('user',)
