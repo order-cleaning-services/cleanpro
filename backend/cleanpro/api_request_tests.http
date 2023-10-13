@@ -2,7 +2,7 @@
 ################################# TOKENS #################################
 ##########################################################################
 
-@admin_token = 0ec9a2e114394958a354bf038609bbc3593ff166
+@admin_token = 0ea2d42e094dd79f9749706131a49ec7d4e2bf0f
 
 @login = http://127.0.0.1:80/api/auth/token/login/
 @logout = http://127.0.0.1:80/api/auth/token/logout/
@@ -25,15 +25,15 @@ Content-Type: application/json
 
 ###
 POST {{logout}} HTTP/1.1
-Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
+Authorization: Token 0ea2d42e094dd79f9749706131a49ec7d4e2bf0f
 
 ### 
 GET {{users}} HTTP/1.1
-Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
+Authorization: Token 0ea2d42e094dd79f9749706131a49ec7d4e2bf0f
 
 ###
 PUT {{users}}1/ HTTP/1.1
-Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
+Authorization: Token 0ea2d42e094dd79f9749706131a49ec7d4e2bf0f
 Content-Type: application/json
 
 {
@@ -52,7 +52,26 @@ Content-Type: application/json
 
 ### 
 GET {{users_me}} HTTP/1.1
-Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
+Authorization: Token 0ea2d42e094dd79f9749706131a49ec7d4e2bf0f
+
+###
+POST {{login}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "newuser@email.com",
+    "password": "MyPass!1"
+}
+
+###
+POST {{users}} HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "newuser@email.com",
+    "password": "MyPass!1"
+}
+
 
 ### 
 POST {{users}}confirm_email/ HTTP/1.1
@@ -70,7 +89,7 @@ GET {{ratings}}?limit=30 HTTP/1.1
 
 ###
 POST {{ratings}} HTTP/1.1
-Authorization: Token 0ec9a2e114394958a354bf038609bbc3593ff166
+Authorization: Token 0ea2d42e094dd79f9749706131a49ec7d4e2bf0f
 
 ###
 GET {{orders}} HTTP/1.1
@@ -117,6 +136,5 @@ Content-Type: application/json
 
 {
   "cleaning_date": "2023-11-12",
-  "cleaning_time": "03:00:00",
-  "total_time": 30
+  "total_time": 200
 }
