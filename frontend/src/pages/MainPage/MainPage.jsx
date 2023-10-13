@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
 
 import Banner from '../../components/Banner/Banner'
 import Footer from '../../components/Footer/Footer'
@@ -10,15 +9,9 @@ import Calculator from '../../components/Calculator/Calculator'
 import Materials from '../../components/Materials/Materials'
 import Faq from '../../components/Faq/Faq'
 import ButtonOrder from '../../components/ButtonOrder/ButtonOrder'
-import { getRatings } from '../../store/ratings/ratingsActions'
 
 export default function MainPage() {
   const location = useLocation()
-  const dispatch = useDispatch()
-
-  useEffect(() => {
-    dispatch(getRatings())
-  }, [dispatch])
 
   useEffect(() => {
     const elementId = location.hash.substring(1)

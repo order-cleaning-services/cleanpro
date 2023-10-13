@@ -59,7 +59,7 @@ function CardOrder() {
             </div>
           )}
         </div>
-        {!viewExtra ? <AdditionalInfoAdmin /> : ''}
+        {!viewExtra && <AdditionalInfoAdmin />}
       </div>
     </div>
   )

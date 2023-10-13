@@ -6,7 +6,7 @@
   max-width: 58rem;
   margin: 5.9rem auto 10rem;
   border-radius: 2rem;
-  background: #f2f2f2;
+  background: $background-color-secondary;
   display: flex;
   flex-direction: column;
 
@@ -20,7 +20,7 @@
     font-weight: 700;
     line-height: 140%;
     text-decoration: none;
-    color: #163b6c;
+    color: $text-color-tertiary;
   }
 
   &__info {

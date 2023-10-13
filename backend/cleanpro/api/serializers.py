@@ -1,13 +1,17 @@
+import random
 import re
+from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer  # noqa (E501)
 
 from django.db import transaction
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
-from rest_framework import serializers, status
 from phonenumber_field.phonenumber import PhoneNumber
+from rest_framework import serializers, status
 
+from cleanpro.app_data import ORDER_CANCELLED_STATUS
 from service.models import (
-    Address, CleaningType, Order, Rating, Service, ServicesInOrder
+    Address, CleaningType, Measure, Order, Rating, Service, ServicesInOrder
 )
 from users.models import User, generate_random_password
 from users.validators import (
@@ -15,7 +19,7 @@ from users.validators import (
     validate_email,
     EMAIL_PATTERN, USERNAME_PATTERN
 )
-from .utils import get_or_create_address
+from .utils import get_or_create_address, get_available_cleaners
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -34,8 +38,26 @@ class AddressSerializer(serializers.ModelSerializer):
         )
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class CleaningGetTimeSerializer(serializers.Serializer):
+    """Сериализатор для запроса проверки доступного времени записи."""
+
+    cleaning_date = serializers.DateField()
+    total_time = serializers.IntegerField()
+
+
+class UserCreateSerializer(DjoserUserCreateSerializer):
     """Сериализатор для регистрации пользователей."""
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'password',
+        )
+
+
+class UserGetSerializer(serializers.ModelSerializer):
+    """Сериализатор для предоставления пользователей."""
     address = AddressSerializer()
 
     class Meta:
@@ -76,10 +98,21 @@ class EmailConfirmSerializer(serializers.Serializer):
         return value
 
 
-class ServiceSerializer(serializers.ModelSerializer):
-    """Сериализатор услуг."""
+class MeasureSerializer(serializers.ModelSerializer):
+    """Сериализатор единиц измерения"""
 
-    image = Base64ImageField(read_only=True,)
+    class Meta:
+        model = Measure
+        fields = (
+            'id',
+            'title',
+        )
+
+
+class GetServiceSerializer(serializers.ModelSerializer):
+    """Сериализатор услуг"""
+
+    image = Base64ImageField(read_only=True)
     measure = serializers.ReadOnlyField(
         source='measure.title',
         read_only=True,
@@ -97,10 +130,37 @@ class ServiceSerializer(serializers.ModelSerializer):
         )
 
 
-class CleaningTypeSerializer(serializers.ModelSerializer):
+class CreateServiceSerializer(serializers.ModelSerializer):
+    """Сериализатор создания и изменения услуг"""
+
+    image = Base64ImageField(allow_null=True)
+    measure = serializers.PrimaryKeyRelatedField(
+        queryset=Measure.objects.all()
+    )
+
+    class Meta:
+        model = Service
+        fields = (
+            'id',
+            'title',
+            'price',
+            'measure',
+            'image',
+            'service_type',
+            'cleaning_time',
+        )
+
+    def to_representation(self, value):
+        representation = super().to_representation(value)
+
+        representation['measure'] = value.measure.title
+        return representation
+
+
+class GetCleaningTypeSerializer(serializers.ModelSerializer):
     """Сериализатор набора услуг."""
 
-    service = ServiceSerializer(
+    service = GetServiceSerializer(
         many=True,
         read_only=True,
     )
@@ -113,6 +173,45 @@ class CleaningTypeSerializer(serializers.ModelSerializer):
             'coefficient',
             'service',
         )
+
+
+class CreateCleaningTypeSerializer(serializers.ModelSerializer):
+    """Сериализатор создания и изменения наборов услуг"""
+
+    service = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=Service.objects.select_related('measure').all(),
+    )
+
+    class Meta:
+        model = CleaningType
+        fields = (
+            'id',
+            'title',
+            'coefficient',
+            'service',
+        )
+
+    def create(self, validated_data):
+        services = validated_data.pop('service')
+        cleaning_type = super().create(validated_data)
+        cleaning_type.service.set(services)
+        return cleaning_type
+
+    def update(self, instance, validated_data):
+        services = validated_data.pop('service')
+        super().update(instance, validated_data)
+        if services:
+            instance.service.set(services)
+        instance.save()
+        return instance
+
+    def to_representation(self, value):
+        request = self.context.get('request')
+        return GetCleaningTypeSerializer(
+            value,
+            context={'request': request}
+        ).data
 
 
 class ServicesInOrderSerializer(serializers.ModelSerializer):
@@ -139,9 +238,9 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
 
-    user = CustomUserSerializer(read_only=True)
+    user = UserGetSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
-    cleaning_type = CleaningTypeSerializer(read_only=True)
+    cleaning_type = GetCleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
         source='services_in_order',
         many=True,
@@ -156,6 +255,7 @@ class OrderGetSerializer(serializers.ModelSerializer):
             'total_sum',
             'total_time',
             'comment',
+            'comment_cancel',
             'order_status',
             'cleaning_type',
             'services',
@@ -187,6 +287,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         fields = (
             'user',
             'total_sum',
+            'total_time',
             'comment',
             'cleaning_type',
             'services',
@@ -244,6 +345,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         """Создает новый заказ.
         Если пользователь отсутствует в базе данных - создает нового.
         Если адрес отсутствует в базе данных - создает новый."""
+        random_cleaner: User = self.__get_random_cleaner(data=data)
         address: Address = get_or_create_address(
             address_data=data.get('address')
         )
@@ -261,7 +363,10 @@ class OrderPostSerializer(serializers.ModelSerializer):
             )
         order, is_created = Order.objects.get_or_create(
             user=user,
+            cleaner=random_cleaner,
             total_sum=data.get('total_sum'),
+            total_time=data.get('total_time'),
+            comment=data.get('comment'),
             cleaning_type=data.get('cleaning_type'),
             address=address,
             cleaning_date=data.get('cleaning_date'),
@@ -279,7 +384,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def __check_user_data(
             self, address: Address, user: User, user_data: dict
-            ) -> None: # noqa E125
+            ) -> None:  # noqa E125
         """
         Проверяет данные пользователя:
             - если отсутствует значения полей username / phone: присваиваются
@@ -307,7 +412,25 @@ class OrderPostSerializer(serializers.ModelSerializer):
         new_user.save()
         return new_user
 
-    def __services_bulk_create(self, order, services):
+    def __get_random_cleaner(self, data) -> User:
+        """
+        Проверяет наличие доступных уборщиков для указанного дня и времени
+        заказа. Возвращает случайного из всех доступных.
+
+        Если доступных уборщиков нет, вызывает ValidationError.
+        """
+        cleaner: QuerySet = get_available_cleaners(
+            cleaning_date=data.get('cleaning_date'),
+            cleaning_time=data.get('cleaning_time'),
+            total_time=data.get('total_time'),
+        )
+        if cleaner.count() == 0:
+            raise serializers.ValidationError(
+                'Для указанного дня и времени нет доступных уборщиков.'
+            )
+        return random.choice(list(cleaner))
+
+    def __services_bulk_create(self, order, services) -> None:
         """Добавляет сервисы в заказ."""
         ing_objs = []
         for item in services:
@@ -324,7 +447,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
         ServicesInOrder.objects.bulk_create(ing_objs)
         return
 
-    def __validate_phone(self, phone_data):
+    def __validate_phone(self, phone_data) -> PhoneNumber:
         """Производит валидацию номера телефона.
         Возвращает False, в случае ошибки валидации."""
         try:
@@ -336,92 +459,170 @@ class OrderPostSerializer(serializers.ModelSerializer):
         return False
 
 
-class OrderStatusSerializer(serializers.ModelSerializer):
-    """Сериализатор для изменения статуса заказа."""
+class AdminOrderPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для частичного изменения данных заказа админом."""
 
-    order_status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
+    order_status = serializers.ChoiceField(
+        choices=Order.STATUS_CHOICES,
+        required=False,
+    )
+    comment_cancel = serializers.CharField(required=False)
+    pay_status = serializers.BooleanField(required=False)
+    comment = serializers.CharField(required=False)
+    cleaning_date = serializers.DateField(required=False)
+    cleaning_time = serializers.TimeField(required=False)
 
     class Meta:
         model = Order
-        fields = ('order_status',)
-
-    def update(self, instance, validated_data):
-        instance.order_status = validated_data.get(
+        fields = (
             'order_status',
-            instance.order_status,
+            'comment_cancel',
+            'pay_status',
+            'comment',
+            'cleaning_date',
+            'cleaning_time',
         )
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError(
+                'Среди указанных полей нет ни одного '
+                'разрешенного для редактирования.')
+        return data
+
+    def update(self, instance, validated_data):
+        # TODO: максимально не DRY. Объединить одинаковый код.
+        #       setattr и getattr в помощь.
+        if 'order_status' in validated_data.keys():
+            instance.order_status = validated_data.get(
+                'order_status',
+                instance.order_status,
+            )
+            if not instance.order_status == ORDER_CANCELLED_STATUS:
+                instance.comment_cancel = None
+        if 'comment_cancel' in validated_data.keys():
+            instance.order_status = 'cancelled'
+            instance.comment_cancel = validated_data.get(
+                'comment_cancel',
+                instance.comment_cancel
+            )
+        if 'pay_status' in validated_data.keys():
+            instance.pay_status = validated_data.get(
+                'pay_status',
+                instance.pay_status,
+            )
+        if 'comment' in validated_data.keys():
+            instance.comment = validated_data.get(
+                'comment',
+                instance.comment,
+            )
+        if 'cleaning_date' in validated_data.keys():
+            instance.cleaning_date = validated_data.get(
+                'cleaning_date',
+                instance.cleaning_date,
+            )
+        if 'cleaning_time' in validated_data.keys():
+            instance.cleaning_time = validated_data.get(
+                'cleaning_time',
+                instance.cleaning_time,
+            )
         instance.save()
         return instance
 
+    def to_representation(self, value):
+        request = self.context['request']
+        return OrderGetSerializer(
+            value,
+            context={'request': request}
+        ).data
 
-class OrderCancelSerializer(serializers.ModelSerializer):
-    """Сериализатор для отмены заказа."""
+
+class OwnerOrderPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для частичного изменения данных заказа владельцем."""
+
+    comment_cancel = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False)
+    cleaning_date = serializers.DateField(required=False)
+    cleaning_time = serializers.TimeField(required=False)
 
     class Meta:
         model = Order
-        fields = ('comment_cancel',)
+        fields = (
+            'comment_cancel',
+            'comment',
+            'cleaning_date',
+            'cleaning_time',
+        )
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError(
+                'Среди указанных полей нет ни '
+                'одного разрешенного для редактирования.')
+        return data
 
     def update(self, instance, validated_data):
-        instance.order_status = 'cancelled'
-        instance.comment_cancel = validated_data.get(
-            'comment_cancel',
-            instance.comment_cancel
-        )
+        # TODO: аналогично
+        if 'comment_cancel' in validated_data.keys():
+            instance.order_status = 'cancelled'
+            instance.comment_cancel = validated_data.get(
+                'comment_cancel',
+                instance.comment_cancel
+            )
+        if 'comment' in validated_data.keys():
+            instance.comment = validated_data.get(
+                'comment',
+                instance.comment,
+            )
+        if 'cleaning_date' in validated_data.keys():
+            instance.cleaning_date = validated_data.get(
+                'cleaning_date',
+                instance.cleaning_date,
+            )
+        if 'cleaning_time' in validated_data.keys():
+            instance.cleaning_time = validated_data.get(
+                'cleaning_time',
+                instance.cleaning_time,
+            )
         instance.save()
         return instance
 
+    def to_representation(self, value):
+        request = self.context['request']
+        return OrderGetSerializer(
+            value,
+            context={'request': request}
+        ).data
 
-# TODO: убрать сериализатор, он в точности повторяет предыдущий
-#       и предпредыдущий.
-#       Сделать один общий сериализатор для PATCH запросов!
+
 class PaySerializer(serializers.ModelSerializer):
     """Сериализатор для оплаты заказа."""
-
-    # TODO: Зачем?
-    pay_status = True
 
     class Meta:
         model = Order
         fields = ('pay_status',)
 
+    def validate(self, data):
+        # TODO: в коде для develop и (тем более) main не должно быть print!
+        print(data)
+        # TODO: аннотация типов желательна.
+        request = self.context['request']
+        user = request.user
+        order_id = request.data['id']
+        order = get_object_or_404(Order, id=order_id)
+        if not order.user == user:
+            raise serializers.ValidationError(
+                'Попытка оплатить чужой заказ. Оплата не возможна.')
+        if order.pay_status:
+            raise serializers.ValidationError(
+                'Заказ уже оплачен. Повторная оплата не возможна.')
+        if order.order_status == ORDER_CANCELLED_STATUS:
+            raise serializers.ValidationError(
+                'Заказ Отменен. Оплата не возможна.')
+        return data
+
     def update(self, instance, validated_data):
         instance.pay_status = True
-        instance.save()
-        return instance
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления комментария к заказу."""
-
-    class Meta:
-        model = Order
-        fields = ('comment',)
-
-    def update(self, instance, validated_data):
-        instance.comment = validated_data.get('comment', instance.comment)
-        instance.save()
-        return instance
-
-
-# TODO: уточнить необходимость таких сериализаторов. Рассмотреть возможность
-# PATCH запросов и использования сериализатора для отображения модели.
-class DateTimeSerializer(serializers.ModelSerializer):
-    """Сериализатор для переноса времени заказа."""
-
-    class Meta:
-        model = Order
-        # TODO: вопрос про datetime поле все-еще активен, дублирую тут.
-        fields = ('cleaning_date', 'cleaning_time')
-
-    def update(self, instance, validated_data):
-        instance.cleaning_date = validated_data.get(
-            'cleaning_date',
-            instance.cleaning_date,
-        )
-        instance.cleaning_time = validated_data.get(
-            'cleaning_time',
-            instance.cleaning_time,
-        )
         instance.save()
         return instance
 
@@ -431,14 +632,13 @@ class RatingSerializer(serializers.ModelSerializer):
     Сериализатор для представления отзыва на уборку на главной странице.
     """
 
-    user = CustomUserSerializer(read_only=True)
+    user = UserGetSerializer(read_only=True)
 
     class Meta:
         fields = (
             'id',
             'username',
             'user',
-            # TODO: вместо order должно быть имя клинера.
             'order',
             'pub_date',
             'text',
@@ -451,6 +651,7 @@ class RatingSerializer(serializers.ModelSerializer):
         )
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data.pop('user', None)
+        data: dict = super().to_representation(instance)
+        for field in ('user', 'order'):
+            data.pop(field, None)
         return data

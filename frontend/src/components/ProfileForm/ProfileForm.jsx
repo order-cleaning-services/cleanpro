@@ -5,6 +5,7 @@ import './ProfileForm.scss'
 import { useDispatch, useSelector } from 'react-redux'
 import { authSelectors } from '../../store/auth/authSelectors'
 import { updateUser } from '../../store/auth/authActions'
+import { PATTERNS } from '../../utils/validation'
 
 const ProfileForm = () => {
   const userData = useSelector(authSelectors.getUser)
@@ -33,11 +34,7 @@ const ProfileForm = () => {
             label="Имя"
             value={userData?.username || ''}
             {...register('username', {
-              pattern: {
-                value:
-                  /^(?=^.{2,60}$)[А-ЯЁ][а-яё]{1,}([-][А-ЯЁ][а-яё]{1,})?(\s[А-ЯЁ][а-яё]{1,})?(\s[А-ЯЁ][а-яё]{1,})?([-][А-ЯЁ][а-яё]{1,})?$/,
-                message: 'Укажите ваше имя. Пример: Апполинарий Вальдемарович фон Спасо-Преображенский',
-              },
+              pattern: PATTERNS.USERNAME,
               required: 'Заполните поле имя',
             })}
             error={errors?.username}
@@ -47,10 +44,7 @@ const ProfileForm = () => {
             label="E-mail"
             value={userData?.email || ''}
             {...register('email', {
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Введите Email. Пример: example@example.ru',
-              },
+              pattern: PATTERNS.EMAIL,
               required: 'Заполните поле email',
             })}
             error={errors?.email}
@@ -60,10 +54,7 @@ const ProfileForm = () => {
             label="Телефон"
             value={userData?.phone || ''}
             {...register('phone', {
-              pattern: {
-                value: /^((\+7)[- ]?)?(\(?\d{3}\)?[- ]?)?[\d\- ]{10}$/i,
-                message: 'Укажите номер телефона. Пример: +7(999) 999-99-99',
-              },
+              pattern: PATTERNS.PHONE,
               required: 'Заполните поле телефон',
             })}
             error={errors?.phone}

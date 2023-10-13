@@ -1,17 +1,24 @@
 import { Swiper } from 'swiper/react'
 import { Navigation, Grid } from 'swiper/modules'
 import { Link, useLocation } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import CommentsList from '../CommentsList/CommentsList'
 import 'swiper/css'
 import 'swiper/css/grid'
 import './Comments.scss'
 import ButtonsSwiper from '../ButtonsSwiper/ButtonsSwiper'
 import { SwiperSlide } from 'swiper/react'
+import { getRatings } from '../../store/ratings/ratingsActions'
 import { ratingsSelectors } from '../../store/ratings/ratingsSelectors'
+import { useEffect } from 'react'
 
 const Comments = () => {
   const location = useLocation().pathname
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(getRatings())
+  }, [dispatch])
   const ratings = useSelector(ratingsSelectors.getRatings)
 
   return (

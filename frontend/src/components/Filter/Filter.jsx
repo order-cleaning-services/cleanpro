@@ -1,6 +1,6 @@
 import './Filter.scss'
 
-import filter from '../../images/filter.svg'
+import filter from '../../assets/images/filter.svg'
 
 function Filter({ onClick }) {
   return (

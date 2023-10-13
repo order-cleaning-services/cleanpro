@@ -15,6 +15,9 @@ const orderSlice = createSlice({
     resetRepeatedOrder: state => {
       state.repeatOrder = initialState.repeatOrder
     },
+    setRepeatedTotal: (state, action) => {
+      state.repeatedTotal = action.payload
+    },
   },
   extraReducers: builder => {
     buildGetUserOrders(builder)
@@ -23,5 +26,5 @@ const orderSlice = createSlice({
   },
 })
 
-export const { setOrders, resetRepeatedOrder } = orderSlice.actions
+export const { setOrders, resetRepeatedOrder, setRepeatedTotal } = orderSlice.actions
 export default orderSlice.reducer

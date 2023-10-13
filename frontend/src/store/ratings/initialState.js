@@ -1,5 +1,5 @@
 export const initialState = {
-  ratings: {},
+  ratings: [],
 
   ratingsStatus: 'initial',
   ratingsError: null,

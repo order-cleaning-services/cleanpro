@@ -1,8 +1,8 @@
 import Total from '../Total/Total'
 import './Payment.scss'
-import left from '../../images/arr-left.svg'
-import calend from '../../images/calendar.svg'
-import geo from '../../images/geo.svg'
+import left from '../../assets/images/arr-left.svg'
+import calend from '../../assets/images/calendar.svg'
+import geo from '../../assets/images/geo.svg'
 import Button from '../Button/Button'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -22,7 +22,7 @@ const Payment = () => {
     const services = extra.filter(item => item.amount > 0).map(item => ({ id: item.id, amount: item.amount }))
     const data = { ...orderData, total_sum: total, cleaning_type: cleaningType, services }
     dispatch(createOrder(data))
-    navigate(ROUTES.profile)
+    navigate(ROUTES.PROFILE)
   }
 
   return (

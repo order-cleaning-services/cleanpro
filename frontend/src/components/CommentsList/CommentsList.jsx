@@ -1,7 +1,6 @@
 import './CommentsList.scss'
-const CommentsList = props => {
-  const { rating, comment, clientName } = props
 
+const CommentsList = ({ rating, comment, clientName }) => {
   return (
     <div className="comments__cell">
       <div className="comments__upblock">

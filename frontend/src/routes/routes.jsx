@@ -14,44 +14,44 @@ import RequireAuth from '../hocs/RequireAuth.jsx'
 
 const router = createBrowserRouter([
   {
-    path: ROUTES.home,
+    path: ROUTES.HOME,
     element: <App />,
     errorElement: <Page404 />,
     children: [
       {
-        path: ROUTES.home,
+        path: ROUTES.HOME,
         element: <MainPage />,
       },
       {
-        path: ROUTES.about,
+        path: ROUTES.ABOUT,
         element: <AboutPage />,
       },
       {
-        path: ROUTES.admin,
+        path: ROUTES.ADMIN,
         element: <AdminPage />,
       },
       {
-        path: ROUTES.profile,
+        path: ROUTES.PROFILE,
         element: <RequireAuth />,
         children: [
           {
-            path: ROUTES.profile,
+            path: ROUTES.PROFILE,
             element: <ProfilePage />,
           },
         ],
       },
       {
-        path: ROUTES.signin,
+        path: ROUTES.SIGNIN,
         element: <RequireAuth require={false} />,
         children: [
           {
-            path: ROUTES.signin,
+            path: ROUTES.SIGNIN,
             element: <SigninPage />,
           },
         ],
       },
       {
-        path: ROUTES.payment,
+        path: ROUTES.PAYMENT,
         element: <PaymentPage />,
       },
     ],

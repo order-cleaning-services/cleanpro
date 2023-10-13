@@ -245,7 +245,7 @@ CORS_ALLOWED_ORIGINS = [
 
 DJOSER = {
     'SERIALIZERS': {
-        'user': 'api.serializers.CustomUserSerializer',
+        'user': 'api.serializers.UserGetSerializer',
     }
 }
 

@@ -1,4 +1,6 @@
-.comments{
+@import '../../assets/styles/colors.scss';
+
+.comments {
   &__button {
     position: absolute;
     width: 4rem;
@@ -16,12 +18,12 @@
   }
 
   &__button_left {
-    background: #fff url(../../images/arrow-left.png) center no-repeat;
+    background: $background-color-main url(../../assets/images/arrow-left.png) center no-repeat;
     right: calc(50% - 1.6rem);
   }
 
   &__button_rigth {
-    background: #fff url(../../images/arrow-rigth.png) center no-repeat;
+    background: $background-color-main url(../../assets/images/arrow-rigth.png) center no-repeat;
     left: calc(50% + 1.6rem);
   }
 }
