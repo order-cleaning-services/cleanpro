@@ -1,5 +1,6 @@
 import random
 import re
+from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer # noqa (E501)
 
 from django.db import transaction
 from django.db.models import QuerySet
@@ -37,12 +38,24 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class CleaningGetTimeSerializer(serializers.Serializer):
     """Сериализатор для запроса проверки доступного времени записи."""
+
     cleaning_date = serializers.DateField()
     total_time = serializers.IntegerField()
 
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class UserCreateSerializer(DjoserUserCreateSerializer):
     """Сериализатор для регистрации пользователей."""
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'password',
+        )
+
+
+class UserGetSerializer(serializers.ModelSerializer):
+    """Сериализатор для предоставления пользователей."""
     address = AddressSerializer()
 
     class Meta:
@@ -146,7 +159,7 @@ class ServicesInOrderSerializer(serializers.ModelSerializer):
 class OrderGetSerializer(serializers.ModelSerializer):
     """Сериализатор для представления заказа."""
 
-    user = CustomUserSerializer(read_only=True)
+    user = UserGetSerializer(read_only=True)
     address = AddressSerializer(read_only=True)
     cleaning_type = CleaningTypeSerializer(read_only=True)
     services = ServicesInOrderSerializer(
@@ -461,7 +474,7 @@ class RatingSerializer(serializers.ModelSerializer):
     Сериализатор для представления отзыва на уборку на главной странице.
     """
 
-    user = CustomUserSerializer(read_only=True)
+    user = UserGetSerializer(read_only=True)
 
     class Meta:
         fields = (

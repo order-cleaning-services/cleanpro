@@ -2,24 +2,17 @@
 
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 
-from cleanpro.app_data import (
-    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
-)
-from cleanpro.settings import ADDITIONAL_CS
-from service.models import CleaningType, Order, Rating, Service
-from service.signals import get_cached_reviews
-from .permissions import IsOwner, IsOwnerOrReadOnly
-from .serializers import (
+from api.mixin import CreateUpdateListSet
+from api.permissions import IsOwner, IsOwnerOrReadOnly
+from api.serializers import (
     CleaningGetTimeSerializer,
     CleaningTypeSerializer,
     CommentSerializer,
-    CustomUserSerializer,
     DateTimeSerializer,
     EmailConfirmSerializer,
     OrderCancelSerializer,
@@ -29,8 +22,17 @@ from .serializers import (
     PaySerializer,
     RatingSerializer,
     ServiceSerializer,
+    UserCreateSerializer,
+    UserGetSerializer,
 )
-from .utils import generate_code, get_available_time_json, send_mail
+from api.utils import generate_code, get_available_time_json, send_mail
+from cleanpro.app_data import (
+    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
+)
+from cleanpro.settings import ADDITIONAL_CS
+from service.models import CleaningType, Order, Rating, Service
+from service.signals import get_cached_reviews
+from users.models import User
 
 
 class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -47,18 +49,14 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = None
 
 
-class UserViewSet(UserViewSet):
+class UserViewSet(CreateUpdateListSet):
     """Список пользователей."""
-    serializer_class = CustomUserSerializer
-    http_method_names = ('get', 'post', 'put')
+    queryset = User.objects.select_related('address').all()
 
-    def create(self, request):
-        """Создание пользователей (без вывода данных)."""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(status=status.HTTP_201_CREATED, headers=headers)
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserCreateSerializer
+        return UserGetSerializer
 
     @action(
         detail=True,
@@ -81,14 +79,13 @@ class UserViewSet(UserViewSet):
 
     @action(
         detail=False,
-        url_path='me',
         methods=('get',),
         permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request):
         """Личные данные авторизованного пользователя."""
         instance = request.user
-        serializer = CustomUserSerializer(instance)
+        serializer = UserGetSerializer(instance)
         return Response(serializer.data)
 
     @action(
@@ -129,6 +126,17 @@ class OrderViewSet(viewsets.ModelViewSet):
     #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
     #       А вот POST - для пользователя.
     # permission_classes = ()
+
+    @action(
+        detail=True,
+        methods=('get',),
+        permission_classes=(IsOwnerOrReadOnly,)
+    )
+    def rating(self, request, pk):
+        order = Order.objects.get(pk=pk)
+        ratings = Rating.objects.filter(order=order)
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
