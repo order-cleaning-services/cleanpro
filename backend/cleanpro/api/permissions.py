@@ -18,20 +18,6 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return request.user == obj.user or request.user.is_staff
 
 
-class IsOwner(permissions.BasePermission):
-    """
-    Предоставляет доступ:
-        - на чтение - автору объекта;
-        - на запись - автору объекта.
-    """
-
-    def has_permission(self, request, view):
-        return request.user.is_authenticated
-
-    def has_object_permission(self, request, view, obj):
-        return obj.user == request.user
-
-
 class IsAdminOrReadOnly(permissions.BasePermission):
     """
     Предоставляет доступ:
@@ -50,21 +36,28 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 # TODO: убрать это. Повторяет IsOwnerOrReadOnly.
-# class IsAdminOrIsOwner(permissions.BasePermission):
-#     """
-#     Предоставляет доступ:
-#         - на запись: только администратору и автору.
-#     """
+# REPLE: Прошу не удалять. IsOwnerOrReadOnly дает право
+# анониму смотерть все заказы. Мне думается, что
+# не гоже анониму смотреть данные чужих заказов.
+# Если есть иное мнение, то я переделаю. Мне не сложно.
+class IsAdminOrIsOwner(permissions.BasePermission):
+    """
+    Предоставляет доступ:
+        - на запись: только администратору и автору.
+    """
 
-#     def has_object_permission(self, request, view, obj):
-#         return request.user == obj.user or request.user.is_staff
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.user or request.user.is_staff
 
 
-# TODO: убрать это. В DRF уже встроен такой тип разрешений.
-# class IsAdminOnly(permissions.BasePermission):
-#     """
-#     Предоставляет доступ только администратору.
-#     """
+class IsNotAdmin(permissions.BasePermission):
+    """
+    Запрещает доступ администратору.
+    """
 
-#     def has_permission(self, request, view):
-#         return request.user.is_staff
+    def has_permission(self, request, view):
+        return (request.user.is_authenticated and
+                not request.user.is_staff)
