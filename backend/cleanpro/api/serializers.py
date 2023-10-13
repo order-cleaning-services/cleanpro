@@ -4,10 +4,12 @@ from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerialize
 
 from django.db import transaction
 from django.db.models import QuerySet
+from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from phonenumber_field.phonenumber import PhoneNumber
 from rest_framework import serializers, status
 
+from cleanpro.app_data import ORDER_CANCELLED_STATUS
 from service.models import (
     Address, CleaningType, Measure, Order, Rating, Service, ServicesInOrder
 )
@@ -204,11 +206,7 @@ class CreateCleaningTypeSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-    # TODO: разобраться, что тут вообще происходит.
     def to_representation(self, value):
-        # INFO: не нужно использовать небезопасный прямой доступ по ключу.
-        #       Исправил на метод .get().
-        #       После прочтения - удалить комментарий :)
         request = self.context.get('request')
         return GetCleaningTypeSerializer(
             value,
@@ -257,6 +255,7 @@ class OrderGetSerializer(serializers.ModelSerializer):
             'total_sum',
             'total_time',
             'comment',
+            'comment_cancel',
             'order_status',
             'cleaning_type',
             'services',
@@ -460,88 +459,170 @@ class OrderPostSerializer(serializers.ModelSerializer):
         return False
 
 
-class OrderStatusSerializer(serializers.ModelSerializer):
-    """Сериализатор для изменения статуса заказа."""
+class AdminOrderPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для частичного изменения данных заказа админом."""
 
-    order_status = serializers.ChoiceField(choices=Order.STATUS_CHOICES)
+    order_status = serializers.ChoiceField(
+        choices=Order.STATUS_CHOICES,
+        required=False,
+    )
+    comment_cancel = serializers.CharField(required=False)
+    pay_status = serializers.BooleanField(required=False)
+    comment = serializers.CharField(required=False)
+    cleaning_date = serializers.DateField(required=False)
+    cleaning_time = serializers.TimeField(required=False)
 
     class Meta:
         model = Order
-        fields = ('order_status',)
-
-    def update(self, instance, validated_data):
-        instance.order_status = validated_data.get(
+        fields = (
             'order_status',
-            instance.order_status,
+            'comment_cancel',
+            'pay_status',
+            'comment',
+            'cleaning_date',
+            'cleaning_time',
         )
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError(
+                'Среди указанных полей нет ни одного '
+                'разрешенного для редактирования.')
+        return data
+
+    def update(self, instance, validated_data):
+        # TODO: максимально не DRY. Объединить одинаковый код.
+        #       setattr и getattr в помощь.
+        if 'order_status' in validated_data.keys():
+            instance.order_status = validated_data.get(
+                'order_status',
+                instance.order_status,
+            )
+            if not instance.order_status == ORDER_CANCELLED_STATUS:
+                instance.comment_cancel = None
+        if 'comment_cancel' in validated_data.keys():
+            instance.order_status = 'cancelled'
+            instance.comment_cancel = validated_data.get(
+                'comment_cancel',
+                instance.comment_cancel
+            )
+        if 'pay_status' in validated_data.keys():
+            instance.pay_status = validated_data.get(
+                'pay_status',
+                instance.pay_status,
+            )
+        if 'comment' in validated_data.keys():
+            instance.comment = validated_data.get(
+                'comment',
+                instance.comment,
+            )
+        if 'cleaning_date' in validated_data.keys():
+            instance.cleaning_date = validated_data.get(
+                'cleaning_date',
+                instance.cleaning_date,
+            )
+        if 'cleaning_time' in validated_data.keys():
+            instance.cleaning_time = validated_data.get(
+                'cleaning_time',
+                instance.cleaning_time,
+            )
         instance.save()
         return instance
 
+    def to_representation(self, value):
+        request = self.context['request']
+        return OrderGetSerializer(
+            value,
+            context={'request': request}
+        ).data
 
-class OrderCancelSerializer(serializers.ModelSerializer):
-    """Сериализатор для отмены заказа."""
+
+class OwnerOrderPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для частичного изменения данных заказа владельцем."""
+
+    comment_cancel = serializers.CharField(required=False)
+    comment = serializers.CharField(required=False)
+    cleaning_date = serializers.DateField(required=False)
+    cleaning_time = serializers.TimeField(required=False)
 
     class Meta:
         model = Order
-        fields = ('comment_cancel',)
+        fields = (
+            'comment_cancel',
+            'comment',
+            'cleaning_date',
+            'cleaning_time',
+        )
+
+    def validate(self, data):
+        if not data:
+            raise serializers.ValidationError(
+                'Среди указанных полей нет ни '
+                'одного разрешенного для редактирования.')
+        return data
 
     def update(self, instance, validated_data):
-        instance.order_status = 'cancelled'
-        instance.comment_cancel = validated_data.get(
-            'comment_cancel',
-            instance.comment_cancel
-        )
+        # TODO: аналогично
+        if 'comment_cancel' in validated_data.keys():
+            instance.order_status = 'cancelled'
+            instance.comment_cancel = validated_data.get(
+                'comment_cancel',
+                instance.comment_cancel
+            )
+        if 'comment' in validated_data.keys():
+            instance.comment = validated_data.get(
+                'comment',
+                instance.comment,
+            )
+        if 'cleaning_date' in validated_data.keys():
+            instance.cleaning_date = validated_data.get(
+                'cleaning_date',
+                instance.cleaning_date,
+            )
+        if 'cleaning_time' in validated_data.keys():
+            instance.cleaning_time = validated_data.get(
+                'cleaning_time',
+                instance.cleaning_time,
+            )
         instance.save()
         return instance
 
+    def to_representation(self, value):
+        request = self.context['request']
+        return OrderGetSerializer(
+            value,
+            context={'request': request}
+        ).data
 
-# TODO: сериализаторы не написаны с использованием DRY. Исправить.
+
 class PaySerializer(serializers.ModelSerializer):
     """Сериализатор для оплаты заказа."""
-
-    # TODO: Зачем?
-    pay_status = True
 
     class Meta:
         model = Order
         fields = ('pay_status',)
 
+    def validate(self, data):
+        # TODO: в коде для develop и (тем более) main не должно быть print!
+        print(data)
+        # TODO: аннотация типов желательна.
+        request = self.context['request']
+        user = request.user
+        order_id = request.data['id']
+        order = get_object_or_404(Order, id=order_id)
+        if not order.user == user:
+            raise serializers.ValidationError(
+                'Попытка оплатить чужой заказ. Оплата не возможна.')
+        if order.pay_status:
+            raise serializers.ValidationError(
+                'Заказ уже оплачен. Повторная оплата не возможна.')
+        if order.order_status == ORDER_CANCELLED_STATUS:
+            raise serializers.ValidationError(
+                'Заказ Отменен. Оплата не возможна.')
+        return data
+
     def update(self, instance, validated_data):
         instance.pay_status = True
-        instance.save()
-        return instance
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления комментария к заказу."""
-
-    class Meta:
-        model = Order
-        fields = ('comment',)
-
-    def update(self, instance, validated_data):
-        instance.comment = validated_data.get('comment', instance.comment)
-        instance.save()
-        return instance
-
-
-class DateTimeSerializer(serializers.ModelSerializer):
-    """Сериализатор для переноса времени заказа."""
-
-    class Meta:
-        model = Order
-        # TODO: вопрос про datetime поле все-еще активен, дублирую тут.
-        fields = ('cleaning_date', 'cleaning_time')
-
-    def update(self, instance, validated_data):
-        instance.cleaning_date = validated_data.get(
-            'cleaning_date',
-            instance.cleaning_date,
-        )
-        instance.cleaning_time = validated_data.get(
-            'cleaning_time',
-            instance.cleaning_time,
-        )
         instance.save()
         return instance
 

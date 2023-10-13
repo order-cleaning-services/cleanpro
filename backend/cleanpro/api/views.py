@@ -11,21 +11,24 @@ from rest_framework.utils.serializer_helpers import ReturnDict
 
 from api.filters import FilterService
 from api.mixin import CreateUpdateListSet
-from api.permissions import IsAdminOrReadOnly, IsOwner, IsOwnerOrReadOnly
+from api.permissions import (
+    IsAdminOrReadOnly,
+    IsNotAdmin,
+    IsOwner,
+    IsOwnerOrReadOnly,
+)
 from api.serializers import (
+    AdminOrderPatchSerializer,
     CleaningGetTimeSerializer,
     CreateCleaningTypeSerializer,
     CreateServiceSerializer,
-    CommentSerializer,
-    DateTimeSerializer,
     EmailConfirmSerializer,
     GetCleaningTypeSerializer,
     GetServiceSerializer,
     MeasureSerializer,
-    OrderCancelSerializer,
     OrderGetSerializer,
     OrderPostSerializer,
-    OrderStatusSerializer,
+    OwnerOrderPatchSerializer,
     PaySerializer,
     RatingSerializer,
     UserCreateSerializer,
@@ -34,7 +37,6 @@ from api.serializers import (
 from api.utils import generate_code, get_available_time_json, send_mail
 from cleanpro.app_data import (
     EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT,
-    FIELDS_TO_ADD_IN_USER_ME,
 )
 from cleanpro.settings import ADDITIONAL_CS
 from service.models import CleaningType, Measure, Order, Rating, Service
@@ -59,13 +61,6 @@ class CleaningTypeViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'put')
 
     def get_serializer_class(self):
-        # INFO: не нужно сюда включать проверку на права доступа, для этого
-        #       есть permission_classes.
-        #       после прочтения удалить :)
-        # if (
-        #     self.request.method == 'GET' and
-        #     not self.request.user.is_staff
-        # ):
         if self.request.method == 'GET':
             return GetCleaningTypeSerializer
         else:
@@ -109,10 +104,10 @@ class UserViewSet(CreateUpdateListSet):
         methods=('get',),
         permission_classes=(permissions.IsAdminUser,)
     )
-    def orders(self, request, id):
+    def orders(self, request, pk):
         """Список заказов пользователя."""
         queryset = Order.objects.filter(
-            user=id
+            user=pk
         ).select_related('user', 'cleaning_type', 'address')
         page = self.paginate_queryset(queryset)
         serializer = OrderGetSerializer(
@@ -170,23 +165,30 @@ class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
     http_method_names = ('get', 'post', 'patch',)
     queryset = Order.objects.select_related('user', 'address',).all()
-    # TODO: получается, что сейчас любой пользователь может прочитать
-    #       чужие заказы? Это нужно сделать только для администратора.
-    #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
-    #       А вот POST - для пользователя.
-    # permission_classes = ()
+    # TODO: лишний код. Можно оставить permission_classes на уровне проекта
+    #       и переписать get_permissions(self)
+    permission_classes = (IsOwner,)
 
     def get_permissions(self):
-        if not self.request.method == 'POST':
-            self.permission_classes = (IsOwnerOrReadOnly,)
+        if self.request.method == 'POST':
+            self.permission_classes = (permissions.AllowAny,)
         return super().get_permissions()
 
-    # TODO: проверить и исправить логику если пользователь анонимный.
-    # def get_queryset(self):
-    #     if not self.request.user.is_staff:
-    #         return self.queryset.filter(user=self.request.user)
-    #     else:
-    #         return self.queryset
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return self.queryset.filter(user=self.request.user)
+        else:
+            return self.queryset
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return OrderGetSerializer
+        if self.request.method == 'PATCH':
+            if self.request.user.is_staff:
+                return AdminOrderPatchSerializer
+            else:
+                return OwnerOrderPatchSerializer
+        return OrderPostSerializer
 
     @action(
         detail=True,
@@ -199,19 +201,18 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer = RatingSerializer(ratings, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def get_serializer_class(self):
-        if self.request.method == 'GET':
-            return OrderGetSerializer
-        else:
-            return OrderPostSerializer
-
     def __modify_order(
+            self,
             order_id,
             request: HttpRequest,
             serializer_class: serializers,
             ) -> serializers:  # NoQa
         order = get_object_or_404(Order, id=order_id)
-        serializer = serializer_class(order, request.data)
+        request.data['id'] = order.id
+        serializer = serializer_class(
+            order,
+            request.data,
+            context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return serializer
@@ -219,7 +220,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(IsOwner,),
+        # TODO: сделать разрешение только создателю заказа.
+        #       Можно без администратора, мысль здравая.
+        permission_classes=(IsNotAdmin,),
         url_path='pay',
     )
     def pay(self, request, pk):
@@ -228,66 +231,6 @@ class OrderViewSet(viewsets.ModelViewSet):
             order_id=pk,
             request=request,
             serializer_class=PaySerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(IsOwner,),
-        url_path='cancel',
-    )
-    def cancel(self, request, pk):
-        """Отменить заказ."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=OrderCancelSerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(IsOwner,),
-        url_path='comment',
-    )
-    def comment(self, request, pk):
-        """Добавить комментарий к заказу."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=CommentSerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(IsOwner,),
-        url_path='change_datetime',
-    )
-    def change_datetime(self, request, pk):
-        """Перенести заказ."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=DateTimeSerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(permissions.IsAdminUser,),
-        url_path='change_status',
-    )
-    def change_status(self, request, pk):
-        """Изменить статус заказа."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=OrderStatusSerializer,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
