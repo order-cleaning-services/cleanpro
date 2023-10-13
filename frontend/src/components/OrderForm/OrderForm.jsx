@@ -61,6 +61,7 @@ function OrderForm() {
     const body = {
       user: { username, email, phone },
       address: { city, street, house, apartment, entrance, floor },
+      total_time: 3,
       cleaning_date,
       cleaning_time,
       comment,
