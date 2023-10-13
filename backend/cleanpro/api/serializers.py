@@ -36,8 +36,8 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class CleaningGetTimeSerializer(serializers.Serializer):
+    """Сериализатор для запроса проверки доступного времени записи."""
     cleaning_date = serializers.DateField()
-    cleaning_time = serializers.TimeField()
     total_time = serializers.IntegerField()
 
 
