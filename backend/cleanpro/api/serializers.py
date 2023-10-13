@@ -1,6 +1,6 @@
 import random
 import re
-from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer # noqa (E501)
+from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer  # noqa (E501)
 
 from django.db import transaction
 from django.db.models import QuerySet
@@ -385,7 +385,7 @@ class OrderPostSerializer(serializers.ModelSerializer):
 
     def __check_user_data(
             self, address: Address, user: User, user_data: dict
-            ) -> None: # noqa E125
+            ) -> None:  # noqa E125
         """
         Проверяет данные пользователя:
             - если отсутствует значения полей username / phone: присваиваются

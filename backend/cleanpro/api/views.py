@@ -7,6 +7,7 @@ from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.utils.serializer_helpers import ReturnDict
 
 from api.filters import FilterService
 from api.mixin import CreateUpdateListSet
@@ -32,7 +33,8 @@ from api.serializers import (
 )
 from api.utils import generate_code, get_available_time_json, send_mail
 from cleanpro.app_data import (
-    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
+    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT,
+    FIELDS_TO_ADD_IN_USER_ME,
 )
 from cleanpro.settings import ADDITIONAL_CS
 from service.models import CleaningType, Measure, Order, Rating, Service
@@ -127,9 +129,13 @@ class UserViewSet(CreateUpdateListSet):
     )
     def me(self, request):
         """Личные данные авторизованного пользователя."""
-        instance = request.user
-        serializer = UserGetSerializer(instance)
-        return Response(serializer.data)
+        instance: User = request.user
+        serializer: UserGetSerializer = UserGetSerializer(instance)
+        data: ReturnDict = serializer.data
+        for attribute in ('is_staff', 'is_cleaner'):
+            if getattr(self.request.user, attribute):
+                data[attribute] = True
+        return Response(data)
 
     @action(
         detail=False,
@@ -179,7 +185,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     # def get_queryset(self):
     #     if not self.request.user.is_staff:
     #         return self.queryset.filter(user=self.request.user)
-    #     else: 
+    #     else:
     #         return self.queryset
 
     @action(
