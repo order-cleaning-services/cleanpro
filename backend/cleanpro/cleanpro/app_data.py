@@ -102,3 +102,8 @@ EMAIL_REGISTER_TEXT: str = (
     'Best regards,\n'
     'The CleanPro Team'
 )
+
+
+"""Views data."""
+
+FIELDS_TO_ADD_IN_USER_ME: list[str] = ['is_cleaner', 'is_staff']

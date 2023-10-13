@@ -32,7 +32,8 @@ from api.serializers import (
 )
 from api.utils import generate_code, get_available_time_json, send_mail
 from cleanpro.app_data import (
-    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
+    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT,
+    FIELDS_TO_ADD_IN_USER_ME,
 )
 from cleanpro.settings import ADDITIONAL_CS
 from service.models import CleaningType, Measure, Order, Rating, Service
@@ -128,8 +129,13 @@ class UserViewSet(CreateUpdateListSet):
     def me(self, request):
         """Личные данные авторизованного пользователя."""
         instance = request.user
-        serializer = UserGetSerializer(instance)
-        return Response(serializer.data)
+        data = UserGetSerializer(instance).data
+        fields = FIELDS_TO_ADD_IN_USER_ME
+        for field in fields:
+            field_value = getattr(instance, field)
+            if field_value:
+                data[field] = field_value
+        return Response(data)
 
     @action(
         detail=False,
@@ -179,7 +185,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     # def get_queryset(self):
     #     if not self.request.user.is_staff:
     #         return self.queryset.filter(user=self.request.user)
-    #     else: 
+    #     else:
     #         return self.queryset
 
     @action(
