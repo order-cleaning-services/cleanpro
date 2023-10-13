@@ -19,6 +19,24 @@ CLEANPRO_YA_MAPS_URL: str = (
     f'https://yandex.ru/maps-reviews-widget/{CLEANPRO_YA_MAPS_ID}?comments'
 )
 
+SCHEDULE_WORK_START_H: str = 9
+SCHEDULE_WORK_STOP_H: str = 21
+
+HOURS_IN_DAY: int = 24
+AVAILABLE_MINUTES: tuple[int] = (0, 30)
+
+
+def schedule_generate_bool(value: any = False):
+    """
+    Генерирует пустой словарь с графиком времени уборок.
+    Формат: {"00:00": value, "00:30": value, ... "23:30": value}
+    """
+    schedule_bool: dict[str, any] = {}
+    for hour in range(HOURS_IN_DAY):
+        for minute in AVAILABLE_MINUTES:
+            schedule_bool[f'{hour:02}:{minute:02}'] = value
+    return schedule_bool
+
 
 """Database settings."""
 
