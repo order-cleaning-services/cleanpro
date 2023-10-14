@@ -163,7 +163,7 @@ class UserViewSet(CreateUpdateListSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    http_method_names = ('get', 'post', 'patch',)
+    http_method_names = ('get', 'post', 'patch', 'put',)
     queryset = Order.objects.select_related('user', 'address',).all()
     # TODO: лишний код. Можно оставить permission_classes на уровне проекта
     #       и переписать get_permissions(self)
@@ -192,14 +192,30 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     @action(
         detail=True,
-        methods=('get',),
+        methods=('get', 'post', 'put',),
         permission_classes=(IsOwnerOrReadOnly,)
     )
     def rating(self, request, pk):
         order = Order.objects.get(pk=pk)
-        ratings = Rating.objects.filter(order=order)
-        serializer = RatingSerializer(ratings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'GET':
+            rating = Rating.objects.filter(order=order)
+            serializer = RatingSerializer(rating, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'POST':
+            serializer = RatingSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.validated_data['username'] = request.user.username
+                serializer.validated_data['user'] = request.user
+                serializer.validated_data['order'] = order
+                serializer.save()
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'PUT':
+            rating = Rating.objects.get(order=order)
+            serializer = RatingSerializer(rating, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     def __modify_order(
             self,
