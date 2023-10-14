@@ -16,8 +16,11 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
   const navigate = useNavigate()
 
   const orderData = useSelector(calculatorSelectors.getOrderForm)
-  const { email } = orderData.user
 
+  const repeatRequest = () => {
+    const { email } = orderData.user
+    requestCode(email)
+  }
   const onClose = () => {
     setText('')
     setIsError(false)
@@ -66,9 +69,7 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
               />
               <Button
                 buttonClassName={'button button_type_auth  button_size_s'}
-                onClick={() => {
-                  requestCode(email)
-                }}
+                onClick={repeatRequest}
                 buttonText={'Направить код повторно'}
               />
               <Button
