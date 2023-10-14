@@ -34,8 +34,6 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
 
   function handleSubmit(evt) {
     evt.preventDefault()
-    console.log(code)
-    console.log(text)
     if (text === code) {
       navigate(ROUTES.payment)
       onClose()
@@ -62,17 +60,20 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
               />
               <span className={`form-auth__error ${isError ? 'form-auth__error_active' : ''}`}>Введите верный код</span>
               <Button
+                type="submit"
                 buttonClassName={`button button_type_auth-submit button_size_s ${isError ? 'button_disabled' : ''}`}
                 onClick={handleSubmit}
                 buttonText={'Подтвердить'}
                 disable={isError}
               />
               <Button
+                type="button"
                 buttonClassName={'button button_type_auth  button_size_s'}
                 onClick={repeatRequest}
                 buttonText={'Направить код повторно'}
               />
               <Button
+                type="button"
                 buttonClassName={'button button_type_auth'}
                 onClick={() => console.log('Привет поддержка')}
                 buttonText={'Не приходит код? Обратиться в поддержку'}
