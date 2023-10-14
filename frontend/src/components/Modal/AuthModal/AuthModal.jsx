@@ -4,38 +4,76 @@ import '../Modal.scss'
 import Button from '../../Button/Button'
 import ButtonClose from '../../ButtonClose/ButtonClose'
 import { createPortal } from 'react-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../../constants/constants'
+import { useSelector } from 'react-redux'
+import { calculatorSelectors } from '../../../store/calculator/calculatorSelectors'
 
-const AuthModal = ({ closeModal }) => {
+const AuthModal = ({ show, closeModal, code, requestCode }) => {
+  const [text, setText] = useState('')
+  const [isError, setIsError] = useState(false)
+  const navigate = useNavigate()
+
+  const orderData = useSelector(calculatorSelectors.getOrderForm)
+  const { email } = orderData.user
+
+  const onClose = () => {
+    setText('')
+    setIsError(false)
+    closeModal(false)
+  }
+
+  const handleInput = evt => {
+    setIsError(false)
+    setText(evt.target.value)
+  }
+
   function handleSubmit(evt) {
     evt.preventDefault()
-    const form = evt.target
-    const formData = new FormData(form)
-    const formJson = Object.fromEntries(formData.entries())
-    console.log(formJson)
+    console.log(code)
+    console.log(text)
+    if (text === code) {
+      navigate(ROUTES.payment)
+      onClose()
+    } else {
+      setIsError(true)
+    }
   }
+
+  if (!show) return null
   return (
     <>
       {createPortal(
         <div className="modal">
-          <div onClick={closeModal} className="modal__overlay"></div>
+          <div onClick={onClose} className="modal__overlay"></div>
           <form onSubmit={handleSubmit} action="" className="modal__form form-auth">
-            <ButtonClose closeModal={closeModal} />
+            <ButtonClose closeModal={onClose} />
             <div className="modal__content modal__content_auth">
               <h2 className="form-auth__title">Мы отправили на вашу почту код-подтверждение, введите его ниже</h2>
-              <input className="form-auth__input" placeholder="Код-подтверждение"></input>
+              <input
+                className={`form-auth__input ${isError ? 'form-auth__input_error' : ''}`}
+                placeholder="Код-подтверждение"
+                value={text}
+                onChange={handleInput}
+              />
+              <span className={`form-auth__error ${isError ? 'form-auth__error_active' : ''}`}>Введите верный код</span>
               <Button
-                buttonClassName={'button button_type_auth-submit button_size_s'}
+                buttonClassName={`button button_type_auth-submit button_size_s ${isError ? 'button_disabled' : ''}`}
                 onClick={handleSubmit}
                 buttonText={'Подтвердить'}
+                disable={isError}
               />
               <Button
                 buttonClassName={'button button_type_auth  button_size_s'}
-                onClick={handleSubmit}
+                onClick={() => {
+                  requestCode(email)
+                }}
                 buttonText={'Направить код повторно'}
               />
               <Button
                 buttonClassName={'button button_type_auth'}
-                onClick={handleSubmit}
+                onClick={() => console.log('Привет поддержка')}
                 buttonText={'Не приходит код? Обратиться в поддержку'}
               />
             </div>
