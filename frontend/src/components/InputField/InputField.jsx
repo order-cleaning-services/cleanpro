@@ -11,7 +11,7 @@ const InputField = forwardRef(
       error = null,
       label,
       name,
-      onChange,
+      // onChange,
       isValid,
       classNameModal,
       value,
@@ -30,7 +30,7 @@ const InputField = forwardRef(
 
     const handleCange = e => {
       setMyValue(e.target.value)
-      onChange(e)
+      // onChange(e)
     }
 
     return (

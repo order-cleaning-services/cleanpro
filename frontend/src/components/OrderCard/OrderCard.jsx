@@ -13,7 +13,7 @@ import { HashLink } from 'react-router-hash-link'
 import { getOrderById } from '../../store/order/orderActions'
 
 const OrderCard = ({ order }) => {
-  const { cleaning_date, cleaning_time, address, cleaning_type, services, total_sum, id } = order
+  const { cleaning_date, cleaning_time, address, cleaning_type, services, total_sum, id, order_status } = order
   const [isDetailed, setIsDetailed] = useState(false)
   const toggleInfo = () => setIsDetailed(!isDetailed)
   const [showTransfer, setShowTransfer] = useState(false)
@@ -27,16 +27,18 @@ const OrderCard = ({ order }) => {
   }
 
   // Переменные из констант нужно будет переписать в аргументы, получаемые на рендер компонентом
-  const isCompleted = true
+  const isCompleted = order_status === 'created'||order_status === 'Создан' ? false : order_status === 'accepted' ? false : true
   const CLEANERS = ['Климова Ольга', 'Плотников Евгений']
+
+  console.log(order.order_status)
 
   return (
     <div className={`card ${isCompleted ? 'card_completed' : ''}`}>
       <div className="card__header">
         <h2 className="card__title">{cleaning_type.title} уборка</h2>
         <div className="card__header-info">
-          <div className="card__status-led"></div>
-          <p className="card__status-text">Оплачен</p>
+          {order_status == 'finished' || order_status == 'cancelled'? null:<div className="card__status-led"></div>}
+          <p className="card__status-text">{order_status== 'created' ? 'Оплачен' : order_status== 'accepted' ? 'Принят' : order_status== 'finished' ? 'Завершен' : 'Отменен'}</p>
           <p className="card__cost">{`${total_sum?.toString().slice(0, -3)} ${total_sum?.toString().slice(-3)}`} ₽</p>
         </div>
       </div>
