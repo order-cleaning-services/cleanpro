@@ -44,18 +44,20 @@ function Calculator() {
   }
 
   return (
-    <section id="calculator" className="calculator__container">
-      <h2>Выберите тип уборки</h2>
-      <div className="calculator__wrapper">
-        <div className="cleaning-type__container">
-          <CleaningTypesTabs types={types} isActive={isActive} onHandleActiveType={handleActiveType} />
-          <RoomsAmount isTypeWindow={isTypeWindow} />
-          <IncludeServices cleanType={cleanType} />
-          {!isTypeWindow && <ExtraServices />}
-        </div>
-        <div className="calculator-form__wrapper">
-          <Total total={total} />
-          <OrderForm />
+    <section id="calculator" className="calculator">
+      <div className="calculator__container">
+        <h2>Выберите тип уборки</h2>
+        <div className="calculator__wrapper">
+          <div className="calculator__cleaning-type-container">
+            <CleaningTypesTabs types={types} isActive={isActive} onHandleActiveType={handleActiveType} />
+            <RoomsAmount isTypeWindow={isTypeWindow} />
+            <IncludeServices cleanType={cleanType} />
+            {!isTypeWindow && <ExtraServices />}
+          </div>
+          <div className="calculator__form-wrapper">
+            <Total total={total} />
+            <OrderForm />
+          </div>
         </div>
       </div>
     </section>

@@ -1,9 +1,12 @@
 @import '../../assets/styles/colors.scss';
 
 .profile {
-  width: 144rem;
-  margin: 0 auto;
-  padding: 6rem 10rem;
+  &__content {
+    width: 144rem;
+    margin: 0 auto;
+    padding: 6rem 10rem;
+    min-height: calc(100vh - 44.8rem - 9.1rem);
+  }
 
   &__title {
     margin-bottom: 4rem;

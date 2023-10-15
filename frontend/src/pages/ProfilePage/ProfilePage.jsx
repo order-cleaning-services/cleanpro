@@ -19,8 +19,8 @@ export default function Profile() {
   }, [dispatch])
 
   return (
-    <>
-      <div className="profile">
+    <div className="profile">
+      <div className="profile__content">
         <h1 className="profile__title">Профиль</h1>
         <nav className="profile__menu">
           <button
@@ -45,6 +45,6 @@ export default function Profile() {
         )}
       </div>
       <Footer />
-    </>
+    </div>
   )
 }

@@ -1,12 +1,15 @@
 @import '../../assets/styles/colors.scss';
 
 .comments {
-  position: relative;
-  margin: 0 auto 12rem;
-  width: 144rem;
   background: $color-secondary;
-  padding: 7.2rem 10rem;
-  box-sizing: border-box;
+
+  &__container {
+    position: relative;
+    margin: 0 auto 12rem;
+    width: 144rem;
+    padding: 7.2rem 10rem;
+    box-sizing: border-box;
+  }
 
   &__wrapper {
     display: flex;

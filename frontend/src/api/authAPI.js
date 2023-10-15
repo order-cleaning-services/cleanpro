@@ -15,7 +15,7 @@ class AuthAPI {
   }
 
   getUser(token) {
-    return FetchAPI.get(`${API_URL.USERS}/me`, { token })
+    return FetchAPI.get(`${API_URL.USERS}me`, { token })
   }
 
   updateUser(id, body, token) {

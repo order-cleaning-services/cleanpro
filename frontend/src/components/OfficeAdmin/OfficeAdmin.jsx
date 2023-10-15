@@ -30,7 +30,7 @@ function OfficeAdmin() {
       <div className="headings">
         {headings.map(h => (
           <Headings
-            key={headings.id}
+            key={h.id}
             onClick={() => dispatch(h.handleClick)}
             tab={h.handleTab}
             title={h.title}

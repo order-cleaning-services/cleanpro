@@ -22,7 +22,6 @@ const InputField = forwardRef(
     function handleFocus(e) {
       if (focus) e.target.setAttribute('type', 'date')
     }
-
     const [myValue, setMyValue] = useState(value)
     useEffect(() => {
       setMyValue(value)
@@ -35,7 +34,7 @@ const InputField = forwardRef(
 
     return (
       <div className={`input__wrapper ${type === 'password' ? 'input__wrapper__password' : ''}`}>
-        <label htmlFor={name}>{label}</label>
+        {label && <label htmlFor={name}>{label}</label>}
         <input
           name={name}
           className={`form-input ${size === 'small' ? 'form-input-small' : ''} ${

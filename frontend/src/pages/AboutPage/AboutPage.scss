@@ -1,10 +1,7 @@
 .about-page {
-  max-width: 144rem;
-  margin: 0 auto;
   &__wrapper {
+    width: 144rem;
+    margin: 0 auto;
     padding: 6rem 10rem 0 10rem;
-  }
-  &__title {
-    font-weight: 600;
   }
 }
