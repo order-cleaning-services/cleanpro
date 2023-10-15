@@ -606,9 +606,16 @@ class OrderRatingSerializer(serializers.ModelSerializer):
             if not order.user == user:
                 raise serializers.ValidationError(
                     'Оставить отзыв на чужой заказ невозможно.')
+            if not order.order_status == 'finished':
+                raise serializers.ValidationError(
+                    'Оставить отзыв на незавершенный заказ невозможно.')
             if Rating.objects.filter(order=order, user=user).exists():
                 raise serializers.ValidationError(
                     'Отзыв на этот заказ вы уже оставляли.')
+        if request.method == 'PUT':
+            if not order.order_status == 'finished':
+                raise serializers.ValidationError(
+                    'Изменить отзыв на незавершенный заказ невозможно.')
         return data
 
     def to_representation(self, instance):
