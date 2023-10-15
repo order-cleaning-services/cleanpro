@@ -462,16 +462,6 @@ class OrderPostSerializer(serializers.ModelSerializer):
 class AdminOrderPatchSerializer(serializers.ModelSerializer):
     """Сериализатор для частичного изменения данных заказа админом."""
 
-    order_status = serializers.ChoiceField(
-        choices=Order.STATUS_CHOICES,
-        required=False,
-    )
-    comment_cancel = serializers.CharField(required=False)
-    pay_status = serializers.BooleanField(required=False)
-    comment = serializers.CharField(required=False)
-    cleaning_date = serializers.DateField(required=False)
-    cleaning_time = serializers.TimeField(required=False)
-
     class Meta:
         model = Order
         fields = (
@@ -493,44 +483,20 @@ class AdminOrderPatchSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         # TODO: максимально не DRY. Объединить одинаковый код.
         #       setattr и getattr в помощь.
-        if 'order_status' in validated_data.keys():
-            instance.order_status = validated_data.get(
-                'order_status',
-                instance.order_status,
-            )
-            if not instance.order_status == ORDER_CANCELLED_STATUS:
-                instance.comment_cancel = None
+        # REPLE: Переосмыслил.
+        super().update(instance, validated_data)
+        if ('comment_cancel' not in validated_data.keys() and
+                'order_status' in validated_data.keys() and
+                not validated_data.get('order_status') is
+                ORDER_CANCELLED_STATUS):
+            instance.comment_cancel = None
         if 'comment_cancel' in validated_data.keys():
             instance.order_status = 'cancelled'
-            instance.comment_cancel = validated_data.get(
-                'comment_cancel',
-                instance.comment_cancel
-            )
-        if 'pay_status' in validated_data.keys():
-            instance.pay_status = validated_data.get(
-                'pay_status',
-                instance.pay_status,
-            )
-        if 'comment' in validated_data.keys():
-            instance.comment = validated_data.get(
-                'comment',
-                instance.comment,
-            )
-        if 'cleaning_date' in validated_data.keys():
-            instance.cleaning_date = validated_data.get(
-                'cleaning_date',
-                instance.cleaning_date,
-            )
-        if 'cleaning_time' in validated_data.keys():
-            instance.cleaning_time = validated_data.get(
-                'cleaning_time',
-                instance.cleaning_time,
-            )
         instance.save()
         return instance
 
     def to_representation(self, value):
-        request = self.context['request']
+        request = self.context.get('request',)
         return OrderGetSerializer(
             value,
             context={'request': request}
@@ -539,11 +505,6 @@ class AdminOrderPatchSerializer(serializers.ModelSerializer):
 
 class OwnerOrderPatchSerializer(serializers.ModelSerializer):
     """Сериализатор для частичного изменения данных заказа владельцем."""
-
-    comment_cancel = serializers.CharField(required=False)
-    comment = serializers.CharField(required=False)
-    cleaning_date = serializers.DateField(required=False)
-    cleaning_time = serializers.TimeField(required=False)
 
     class Meta:
         model = Order
@@ -563,32 +524,15 @@ class OwnerOrderPatchSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         # TODO: аналогично
+        # REPLE: Переосмыслил.
+        super().update(instance, validated_data)
         if 'comment_cancel' in validated_data.keys():
             instance.order_status = 'cancelled'
-            instance.comment_cancel = validated_data.get(
-                'comment_cancel',
-                instance.comment_cancel
-            )
-        if 'comment' in validated_data.keys():
-            instance.comment = validated_data.get(
-                'comment',
-                instance.comment,
-            )
-        if 'cleaning_date' in validated_data.keys():
-            instance.cleaning_date = validated_data.get(
-                'cleaning_date',
-                instance.cleaning_date,
-            )
-        if 'cleaning_time' in validated_data.keys():
-            instance.cleaning_time = validated_data.get(
-                'cleaning_time',
-                instance.cleaning_time,
-            )
         instance.save()
         return instance
 
     def to_representation(self, value):
-        request = self.context['request']
+        request = self.context.get('request',)
         return OrderGetSerializer(
             value,
             context={'request': request}
@@ -603,12 +547,11 @@ class PaySerializer(serializers.ModelSerializer):
         fields = ('pay_status',)
 
     def validate(self, data):
-        # TODO: в коде для develop и (тем более) main не должно быть print!
-        print(data)
         # TODO: аннотация типов желательна.
-        request = self.context['request']
+        # REPLE: Пока не до аннотации.
+        request = self.context.get('request',)
         user = request.user
-        order_id = request.data['id']
+        order_id = request.data.get('id',)
         order = get_object_or_404(Order, id=order_id)
         if not order.user == user:
             raise serializers.ValidationError(
@@ -625,6 +568,54 @@ class PaySerializer(serializers.ModelSerializer):
         instance.pay_status = True
         instance.save()
         return instance
+
+
+class OrderRatingSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для представления отзыва на уборку на главной странице.
+    """
+
+    user = UserGetSerializer(read_only=True)
+
+    class Meta:
+        fields = (
+            'id',
+            'username',
+            'user',
+            'order',
+            'pub_date',
+            'text',
+            'score',
+        )
+        model = Rating
+        read_only_fields = (
+            'id',
+            'username',
+        )
+
+    def validate(self, data):
+        request = self.context.get('request',)
+        user = request.user
+        order_id = request.data.get('id',)
+        order = get_object_or_404(Order, id=order_id)
+        if (not request.user.is_authenticated or
+                request.user.is_staff):
+            raise serializers.ValidationError(
+                'Доступ пользователю запрещен.')
+        if request.method == 'POST':
+            if not order.user == user:
+                raise serializers.ValidationError(
+                    'Оставить отзыв на чужой заказ невозможно.')
+            if Rating.objects.filter(order=order, user=user).exists():
+                raise serializers.ValidationError(
+                    'Отзыв на этот заказ вы уже оставляли.')
+        return data
+
+    def to_representation(self, instance):
+        data: dict = super().to_representation(instance)
+        for field in ('user', 'order'):
+            data.pop(field, None)
+        return data
 
 
 class RatingSerializer(serializers.ModelSerializer):
