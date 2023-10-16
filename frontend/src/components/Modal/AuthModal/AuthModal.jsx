@@ -20,8 +20,9 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
   const orderData = useSelector(calculatorSelectors.getOrderForm)
   const cleaningType = useSelector(calculatorSelectors.getCleanType)
   const total = useSelector(calculatorSelectors.getTotal)
-
   const extra = useSelector(calculatorSelectors.getExtras)
+  const rooms = useSelector(calculatorSelectors.getRooms)
+  const toilets = useSelector(calculatorSelectors.getToilets)
 
   const repeatRequest = () => {
     const { email } = orderData.user
@@ -42,7 +43,15 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
     evt.preventDefault()
     if (text === code) {
       const services = extra.filter(item => item.amount > 0).map(item => ({ id: item.id, amount: item.amount }))
-      const data = { ...orderData, total_sum: total, cleaning_type: cleaningType, services, total_time: 3 }
+      const data = {
+        ...orderData,
+        total_sum: total,
+        cleaning_type: cleaningType,
+        services,
+        total_time: 3,
+        rooms_number: rooms,
+        bathrooms_number: toilets,
+      }
 
       dispatch(createOrder(data))
       navigate(ROUTES.payment)

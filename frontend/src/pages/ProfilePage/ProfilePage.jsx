@@ -16,7 +16,7 @@ export default function Profile() {
 
   useEffect(() => {
     dispatch(getUserOrders())
-  }, [dispatch, userOrders])
+  }, [dispatch])
 
   return (
     <div className="profile">

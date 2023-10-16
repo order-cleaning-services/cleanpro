@@ -9,9 +9,12 @@ import { getToken } from '../../../utils/tokenActions'
 import { useDispatch } from 'react-redux'
 import { getUserOrders } from '../../../store/order/orderActions'
 import ordersAPI from '../../../api/ordersAPI'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '../../../constants/constants'
 
 function TransferModal({ order, show, closeModal }) {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -25,6 +28,7 @@ function TransferModal({ order, show, closeModal }) {
     })
     dispatch(getUserOrders())
     closeModal()
+    navigate(ROUTES.PROFILE)
   }
 
   if (!show) return null
