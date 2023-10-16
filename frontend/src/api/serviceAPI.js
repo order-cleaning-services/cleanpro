@@ -1,12 +1,13 @@
+import { API_URL } from '../constants/constants'
 import FetchApi from '../utils/fetchAPI'
 
 class ServiceApi {
   getExra() {
-    return FetchApi.get('/services/')
+    return FetchApi.get(`${API_URL.SERVICES}`)
   }
 
   getTypes() {
-    return FetchApi.get('/types')
+    return FetchApi.get(`${API_URL.TYPES}`)
   }
 }
 

@@ -1,8 +1,8 @@
 import Total from '../Total/Total'
 import './Payment.scss'
-import left from '../../images/arr-left.svg'
-import calend from '../../images/calendar.svg'
-import geo from '../../images/geo.svg'
+import left from '../../assets/images/arr-left.svg'
+import calend from '../../assets/images/calendar.svg'
+import geo from '../../assets/images/geo.svg'
 import Button from '../Button/Button'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -20,7 +20,7 @@ const Payment = () => {
   function handleSubmit() {
     // TODO: подключить оплату
     // dispatch()
-    isAuth ? navigate(ROUTES.profile) : navigate(ROUTES.home)
+    isAuth ? navigate(ROUTES.PROFILE) : navigate(ROUTES.HOME)
   }
 
   return (

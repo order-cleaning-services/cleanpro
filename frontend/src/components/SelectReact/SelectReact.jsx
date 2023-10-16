@@ -2,7 +2,7 @@ import Select from 'react-select'
 import './SelectReact.scss'
 import { useState } from 'react'
 import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
-import { options } from '../../utils/initialData'
+import { TIME_OPTIONS } from '../../constants/constants'
 
 function SelectReact({ time }) {
   const [userChoice, setUserChoice] = useState('')
@@ -12,7 +12,7 @@ function SelectReact({ time }) {
       name={time}
       className="select-time"
       classNamePrefix="select-time"
-      options={options}
+      options={TIME_OPTIONS}
       styles={customerStylesSelect}
       onChange={choice => setUserChoice(choice.value)}
     />

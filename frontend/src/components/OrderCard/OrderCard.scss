@@ -1,11 +1,13 @@
+@import '../../assets/styles/colors.scss';
+
 .card {
   padding: 2.4rem 3.2rem;
   border-radius: 20px;
-  background-color: #e5f0ff;
+  background-color: $color-secondary;
   max-width: 81.6rem;
 
   &_completed {
-    background-color: #f2f2f2;
+    background-color: $background-color-secondary;
   }
 
   &__header {
@@ -22,7 +24,7 @@
   &__status-led {
     width: 0.6rem;
     height: 0.6rem;
-    background-color: #19be20;
+    background-color: $color-green;
     border-radius: 50%;
     margin-right: 0.8rem;
   }
@@ -90,15 +92,15 @@
     &-link {
       text-decoration: none;
     }
-    
+
     &-btn {
       display: flex;
       align-items: center;
       gap: 0.8rem;
       padding: 1.2rem 2.4em;
-      border: 1px solid #d9d9d9;
+      border: 1px solid $border-color;
       border-radius: 12px;
-      background-color: #fff;
+      background-color: $background-color-main;
       font-size: 1.6rem;
       font-weight: 700;
       line-height: 140%;
@@ -126,7 +128,7 @@
       font-size: 1.6rem;
       font-weight: 700;
       line-height: 140%;
-      color: #242424;
+      color: $text-color-main;
     }
 
     &-container {

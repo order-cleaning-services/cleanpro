@@ -47,7 +47,7 @@ const Footer = () => {
         )}
       </div>
       <div className="footer__column">
-        <h4 className="footer__title">Компания</h4>
+        <h4 className="footer__title  text-l">Компания</h4>
         {location.pathname === '/' ? (
           <>
             <Link to={`/about#${aboutElementId}`} className="footer__link">

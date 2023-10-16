@@ -48,22 +48,22 @@ function About() {
           <AboutMore
             title="Калькулятор стоимости"
             subTitle="Узнайте полную стоимость услуг перед&nbsp;оплатой"
-            src="./src/images/calc-rub-about.svg"
+            src="./src/assets/images/calc-rub-about.svg"
           />
           <AboutMore
             title="Опытные профессионалы"
             subTitle="Отбираем наши сотрудников по&nbsp;какой нибудь системе"
-            src="./src/images/profs-about.svg"
+            src="./src/assets/images/profs-about.svg"
           />
           <AboutMore
             title="Без сюрпризов"
             subTitle="Обосновать удобство предоплаты, цена после&nbsp;уборки не&nbsp;изменится"
-            src="./src/images/warranty-about.svg"
+            src="./src/assets/images/warranty-about.svg"
           />
           <AboutMore
             title="Выбор клинера"
             subTitle="Выберите клинера, который уже&nbsp;знает что&nbsp;как"
-            src="./src/images/choice-about.svg"
+            src="./src/assets/images/choice-about.svg"
           />
         </div>
       </div>

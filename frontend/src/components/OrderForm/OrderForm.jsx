@@ -5,8 +5,8 @@ import InputFieldDate from '../InputFieldDate/InputFieldDate'
 import Select from 'react-select'
 import { formOrderValidationSelectors } from '../../store/formOrderValidation/formOrderValidationSelectors'
 import { safeOrderForm } from '../../store/calculator/calculatorSlice'
+import { ROUTES, TIME_OPTIONS } from '../../constants/constants'
 import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
-import { options } from '../../utils/initialData'
 import './OrderForm.scss'
 import { orderSelectors } from '../../store/order/orderSelectors'
 import { authSelectors } from '../../store/auth/authSelectors'
@@ -14,6 +14,10 @@ import { useEffect, useState } from 'react'
 import { resetRepeatedOrder } from '../../store/order/orderSlice'
 import FetchAPI from '../../utils/fetchAPI'
 import AuthModal from '../Modal/AuthModal/AuthModal'
+import { useNavigate } from 'react-router-dom'
+import { PATTERNS } from '../../utils/validation'
+import { calculatorSelectors } from '../../store/calculator/calculatorSelectors'
+import { createOrder } from '../../store/order/orderActions'
 
 function OrderForm() {
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -22,12 +26,13 @@ function OrderForm() {
   const stateDate = useSelector(formOrderValidationSelectors.getStateDate)
   const userData = useSelector(authSelectors.getUser)
   const repeatedOrder = useSelector(orderSelectors.getRepeatedOrder)
+  const types = useSelector(calculatorSelectors.getTypes)
+  const isAuth = useSelector(authSelectors.getIsAuth)
+  const cleaningType = useSelector(calculatorSelectors.getCleanType)
+  const total = useSelector(calculatorSelectors.getTotal)
+  const extra = useSelector(calculatorSelectors.getExtras)
 
   const dispatch = useDispatch()
-
-  useEffect(() => {
-    return () => dispatch(resetRepeatedOrder())
-  }, [dispatch])
 
   const {
     control,
@@ -61,6 +66,14 @@ function OrderForm() {
     }
   }
 
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    return () => {
+      if (repeatedOrder) dispatch(resetRepeatedOrder())
+    }
+  }, [repeatedOrder, dispatch, types])
+
   const onSubmit = data => {
     const {
       username,
@@ -79,13 +92,24 @@ function OrderForm() {
     const body = {
       user: { username, email, phone },
       address: { city, street, house, apartment, entrance, floor },
+      total_time: 3,
       cleaning_date,
       cleaning_time,
       comment,
     }
+
     dispatch(safeOrderForm(body))
-    setShowAuthModal(true)
-    openConfirmEmail(email)
+
+    if (isAuth) {
+      const services = extra.filter(item => item.amount > 0).map(item => ({ id: item.id, amount: item.amount }))
+      const data = { ...body, total_sum: total, cleaning_type: cleaningType, services, total_time: 3 }
+      dispatch(createOrder(data))
+      navigate(ROUTES.PAYMENT)
+    } else {
+      setShowAuthModal(true)
+      openConfirmEmail(email)
+    }
+
     reset()
   }
 
@@ -100,18 +124,16 @@ function OrderForm() {
         <div className="inputs_wrapper-field">
           <InputField
             isValid
+            readOnly={!!userData?.username}
             label="Имя"
-            value={repeatedOrder?.user?.username || userData?.username || ''}
+            value={userData?.username || ''}
             {...register('username', {
-              required,
+              minLength: 2,
               maxLength: {
                 value: 60,
                 message: 'Максимум 60 символов',
               },
-              pattern: {
-                value: /^(?=.{1,60}$)[а-яёА-ЯЁ '-]+$/,
-                message: 'Укажите ваше имя. Пример: Апполинарий Вальдемарович фон Спасо-Преображенский',
-              },
+              pattern: PATTERNS.USERNAME,
             })}
             error={errors?.username}
           />
@@ -120,22 +142,19 @@ function OrderForm() {
         <div className="inputs_wrapper-field">
           <InputField
             isValid
+            readOnly={!!userData?.email}
             type="email"
             id="input-email"
             label="E-mail"
             placeholder="example@example.ru"
-            value={repeatedOrder?.user?.email || userData?.email || ''}
+            value={userData?.email || ''}
             {...register('email', {
-              required,
+              minLength: 5,
               maxLength: {
                 value: 50,
                 message: 'Максимум 50 символов',
               },
-              pattern: {
-                value:
-                  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                message: 'Укажите почту. Пример: example@example.ru',
-              },
+              pattern: PATTERNS.EMAIL,
             })}
             error={errors?.email}
           />
@@ -145,13 +164,14 @@ function OrderForm() {
         <div className="inputs_wrapper-field">
           <InputField
             isValid
+            readOnly={!!userData?.phone}
             type="tel"
             label="Телефон"
             placeholder="+7 (999) 999-99-99"
-            value={repeatedOrder?.user?.phone || userData?.phone || ''}
+            value={userData?.phone || ''}
             {...register('phone', {
-              required,
-              pattern: /(\+7[-_()\s]+|\+7|8\s?[(]{0,1}[0-9]{3}[)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2})/,
+              minLength: 10,
+              pattern: PATTERNS.PHONE,
             })}
             error={errors?.phone}
           />
@@ -160,9 +180,10 @@ function OrderForm() {
         {/* -------------------------------------ГОРОД--------------------------------- */}
         <div className="inputs_wrapper-field">
           <InputField
+            isValid
+            readOnly
             placeholder="Москва"
             value="Москва"
-            isValid
             label="Город"
             {...register('city', {})}
             error={errors?.city}
@@ -298,8 +319,8 @@ function OrderForm() {
               ref={register('cleaning_time', {
                 required,
               })}
-              options={options}
-              value={slotValue ? options.find(x => x.value === slotValue) : slotValue}
+              options={TIME_OPTIONS}
+              value={slotValue ? TIME_OPTIONS.find(x => x.value === slotValue) : slotValue}
               onChange={option => timeOnChange(option ? option.value : option)}
               {...restTimeField}
             />

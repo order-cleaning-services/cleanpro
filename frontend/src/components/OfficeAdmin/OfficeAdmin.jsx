@@ -15,7 +15,6 @@ function OfficeAdmin() {
   const dispatch = useDispatch()
 
   const [visibleFieldFilters, setVisibleFieldFilters] = useState(false)
-  console.log(visibleFieldFilters)
 
   function handleToggleClick() {
     if (visibleFieldFilters === false) {
@@ -30,7 +29,7 @@ function OfficeAdmin() {
       <div className="headings">
         {headings.map(h => (
           <Headings
-            key={headings.id}
+            key={h.id}
             onClick={() => dispatch(h.handleClick)}
             tab={h.handleTab}
             title={h.title}

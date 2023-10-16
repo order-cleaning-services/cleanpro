@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import Logo from '../Logo/Logo'
-import signin from '../../images/signin.svg'
-import profile from '../../images/profile.svg'
+import signin from '../../assets/images/signin.svg'
+import profile from '../../assets/images/profile.svg'
 import './Header.scss'
 import { ROUTES } from '../../constants/constants'
 import { useSelector } from 'react-redux'
@@ -17,12 +17,12 @@ const Header = () => {
         <Logo />
         <ul className="header__links">
           <li>
-            <Link className={`header__link${location.pathname === ROUTES.home ? '-active' : ''}`} to="/">
+            <Link className={`header__link${location.pathname === ROUTES.HOME ? '-active' : ''}`} to="/">
               Уборка
             </Link>
           </li>
           <li>
-            <Link className={`header__link${location.pathname === ROUTES.about ? '-active' : ''}`} to="/about">
+            <Link className={`header__link${location.pathname === ROUTES.ABOUT ? '-active' : ''}`} to="/about">
               О компании
             </Link>
           </li>

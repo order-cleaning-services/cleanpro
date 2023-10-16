@@ -1,7 +1,7 @@
 import './Materials.scss'
-import material1 from '../../images/material1.png'
-import material2 from '../../images/material2.png'
-import material3 from '../../images/material3.png'
+import material1 from '../../assets/images/material1.png'
+import material2 from '../../assets/images/material2.png'
+import material3 from '../../assets/images/material3.png'
 const Materials = () => {
   return (
     <section className="materials">

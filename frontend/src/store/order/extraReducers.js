@@ -7,7 +7,9 @@ export const buildGetUserOrders = builder =>
     })
     .addCase(getUserOrders.fulfilled, (state, action) => {
       state.userOrdersStatus = 'success'
-      state.orders = action.payload.results
+      state.orders = action.payload.results.sort(
+        (a, b) => new Date(`1970/01/01 ${a.creation_time}`) - new Date(`1970/01/01 ${b.creation_time}`),
+      )
       state.userOrdersError = null
     })
     .addCase(getUserOrders.rejected, state => {
@@ -23,6 +25,8 @@ export const buildCreateOrder = builder =>
     .addCase(createOrder.fulfilled, (state, action) => {
       state.orderStatus = 'success'
       state.newOrder = action.payload
+      state.repeatOrder = null
+      state.repeatedTotal = null
       state.orderError = null
     })
     .addCase(createOrder.rejected, state => {

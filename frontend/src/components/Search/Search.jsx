@@ -1,13 +1,10 @@
 import { useState } from 'react'
-
 import './Search.scss'
-
-import search from '../../images/search.svg'
+import search from '../../assets/images/search.svg'
 
 function Search() {
   const [searchText, setSearchText] = useState('')
   console.log(searchText)
-
   const handleChange = evt => {
     setSearchText(evt.target.value)
   }

@@ -13,8 +13,6 @@ function App() {
     dispatch(getServiceTypes())
     dispatch(getExtraService())
     dispatch(getUser())
-    // т.к. нет кнопки выйти можно выйти вручную через action
-    // dispatch(logOut())
   }, [dispatch])
 
   return (

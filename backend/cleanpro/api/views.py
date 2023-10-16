@@ -1,73 +1,113 @@
 # TODO: аннотировать типы данных. Везде. Абсолютно.
+
 from django.http import HttpRequest
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from django_filters import rest_framework as filters
 from rest_framework import permissions, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.utils.serializer_helpers import ReturnDict
 
-from cleanpro.app_data import (
-    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT
+from api.filters import FilterService
+from api.mixin import CreateUpdateListSet
+from api.permissions import (
+    IsAdminOrReadOnly,
+    IsNotAdmin,
+    IsOwner,
+    IsOwnerOrReadOnly,
 )
-from cleanpro.settings import ADDITIONAL_CS
-from service.models import (CleaningType, Order, Rating, Service)
-from service.signals import get_cached_reviews
-from .permissions import IsOwner, IsOwnerOrReadOnly
-from .serializers import (
-    CleaningTypeSerializer,
-    CommentSerializer,
-    CustomUserSerializer,
-    DateTimeSerializer,
+from api.serializers import (
+    AdminOrderPatchSerializer,
+    CleaningGetTimeSerializer,
+    CreateCleaningTypeSerializer,
+    CreateServiceSerializer,
     EmailConfirmSerializer,
-    OrderCancelSerializer,
+    GetCleaningTypeSerializer,
+    GetServiceSerializer,
+    MeasureSerializer,
     OrderGetSerializer,
     OrderPostSerializer,
-    OrderStatusSerializer,
+    OwnerOrderPatchSerializer,
     PaySerializer,
     RatingSerializer,
-    ServiceSerializer,
+    UserCreateSerializer,
+    UserGetSerializer,
 )
-from .utils import generate_code, send_mail
+from api.utils import generate_code, get_available_time_json, send_mail
+from cleanpro.app_data import (
+    EMAIL_CONFIRM_CODE_TEXT, EMAIL_CONFIRM_CODE_SUBJECT,
+)
+from cleanpro.settings import ADDITIONAL_CS
+from service.models import CleaningType, Measure, Order, Rating, Service
+from service.signals import get_cached_reviews
+from users.models import User
 
 
-class CleaningTypeViewSet(viewsets.ReadOnlyModelViewSet):
-    """Получение списка типов основных услуг."""
-    queryset = CleaningType.objects.all()
-    serializer_class = CleaningTypeSerializer
+class MeasureViewSet(viewsets.ModelViewSet):
+    """Работа с единицами измерения услуг."""
+    queryset = Measure.objects.all()
+    serializer_class = MeasureSerializer
+    permission_classes = (permissions.IsAuthenticated, IsAdminOrReadOnly,)
     pagination_class = None
+    http_method_names = ('get', 'post', 'put',)
 
 
-class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
-    """Получение списка дополнительных услуг."""
-    queryset = Service.objects.filter(service_type=ADDITIONAL_CS)
-    serializer_class = ServiceSerializer
+class CleaningTypeViewSet(viewsets.ModelViewSet):
+    """Работа с типами услуг."""
+    queryset = CleaningType.objects.prefetch_related('service').all()
+    permission_classes = (IsAdminOrReadOnly,)
     pagination_class = None
-
-
-class UserViewSet(UserViewSet):
-    """Список пользователей."""
-    serializer_class = CustomUserSerializer
     http_method_names = ('get', 'post', 'put')
 
-    def create(self, request):
-        """Создание пользователей (без вывода данных)."""
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(status=status.HTTP_201_CREATED, headers=headers)
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GetCleaningTypeSerializer
+        else:
+            return CreateCleaningTypeSerializer
+
+
+class ServiceViewSet(viewsets.ModelViewSet):
+    """Работа с услугами."""
+    queryset = Service.objects.select_related('measure').all()
+    permission_classes = (IsAdminOrReadOnly,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = FilterService
+    http_method_names = ('get', 'post', 'put',)
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            self.pagination_class = None
+            return self.queryset.filter(service_type=ADDITIONAL_CS)
+        else:
+            return self.queryset
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return GetServiceSerializer
+        else:
+            return CreateServiceSerializer
+
+
+class UserViewSet(CreateUpdateListSet):
+    """Список пользователей."""
+    queryset = User.objects.select_related('address').all()
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserCreateSerializer
+        return UserGetSerializer
 
     @action(
         detail=True,
         url_path='orders',
         methods=('get',),
-        permission_classes=(permissions.IsAuthenticated,)
+        permission_classes=(permissions.IsAdminUser,)
     )
-    def orders(self, request, id):
+    def orders(self, request, pk):
         """Список заказов пользователя."""
         queryset = Order.objects.filter(
-            user=id
+            user=pk
         ).select_related('user', 'cleaning_type', 'address')
         page = self.paginate_queryset(queryset)
         serializer = OrderGetSerializer(
@@ -79,15 +119,18 @@ class UserViewSet(UserViewSet):
 
     @action(
         detail=False,
-        url_path='me',
         methods=('get',),
         permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request):
         """Личные данные авторизованного пользователя."""
-        instance = request.user
-        serializer = CustomUserSerializer(instance)
-        return Response(serializer.data)
+        instance: User = request.user
+        serializer: UserGetSerializer = UserGetSerializer(instance)
+        data: ReturnDict = serializer.data
+        for attribute in ('is_staff', 'is_cleaner'):
+            if getattr(self.request.user, attribute):
+                data[attribute] = True
+        return Response(data)
 
     @action(
         detail=False,
@@ -120,27 +163,56 @@ class UserViewSet(UserViewSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    methods = ('get', 'post', 'patch',)
+    http_method_names = ('get', 'post', 'patch',)
     queryset = Order.objects.select_related('user', 'address',).all()
-    # TODO: получается, что сейчас любой пользователь может прочитать
-    #       чужие заказы? Это нужно сделать только для администратора.
-    #       То же самое для PATCH запроса. DELETE я убрал - нельзя никому!
-    #       А вот POST - для пользователя.
-    # permission_classes = ()
+    # TODO: лишний код. Можно оставить permission_classes на уровне проекта
+    #       и переписать get_permissions(self)
+    permission_classes = (IsOwner,)
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            self.permission_classes = (permissions.AllowAny,)
+        return super().get_permissions()
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return self.queryset.filter(user=self.request.user)
+        else:
+            return self.queryset
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return OrderGetSerializer
-        else:
-            return OrderPostSerializer
+        if self.request.method == 'PATCH':
+            if self.request.user.is_staff:
+                return AdminOrderPatchSerializer
+            else:
+                return OwnerOrderPatchSerializer
+        return OrderPostSerializer
+
+    @action(
+        detail=True,
+        methods=('get',),
+        permission_classes=(IsOwnerOrReadOnly,)
+    )
+    def rating(self, request, pk):
+        order = Order.objects.get(pk=pk)
+        ratings = Rating.objects.filter(order=order)
+        serializer = RatingSerializer(ratings, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def __modify_order(
+            self,
             order_id,
             request: HttpRequest,
             serializer_class: serializers,
             ) -> serializers:  # NoQa
         order = get_object_or_404(Order, id=order_id)
-        serializer = serializer_class(order, request.data)
+        request.data['id'] = order.id
+        serializer = serializer_class(
+            order,
+            request.data,
+            context={'request': request})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return serializer
@@ -148,7 +220,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=('patch',),
-        permission_classes=(IsOwner,),
+        # TODO: сделать разрешение только создателю заказа.
+        #       Можно без администратора, мысль здравая.
+        permission_classes=(IsNotAdmin,),
         url_path='pay',
     )
     def pay(self, request, pk):
@@ -161,61 +235,24 @@ class OrderViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(IsOwner,),
-        url_path='cancel',
+        detail=False,
+        methods=('post',),
+        url_path='get_available_time',
     )
-    def cancel(self, request, pk):
-        """Отменить заказ."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=OrderCancelSerializer,
+    def get_available_time(self, request):
+        serializer = CleaningGetTimeSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            data=get_available_time_json(
+                cleaning_date=serializer.validated_data['cleaning_date'],
+                total_time=serializer.validated_data['total_time'],
+            ),
+            status=status.HTTP_200_OK,
         )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(IsOwner,),
-    )
-    def comment(self, request, pk):
-        """Добавить комментарий к заказу."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=CommentSerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(IsOwner,)
-    )
-    def change_datetime(self, request, pk):
-        """Перенести заказ."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=DateTimeSerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(
-        detail=True,
-        methods=('patch',),
-        permission_classes=(permissions.IsAdminUser,)
-    )
-    def change_status(self, request, pk):
-        """Изменить статус заказа."""
-        serializer: serializers = self.__modify_order(
-            order_id=pk,
-            request=request,
-            serializer_class=OrderStatusSerializer,
-        )
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class RatingViewSet(viewsets.ModelViewSet):
@@ -223,7 +260,7 @@ class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     permission_classes = (IsOwnerOrReadOnly,)
     serializer_class = RatingSerializer
-    methods = ('get', 'post', 'patch', 'delete')
+    http_method_names = ('get', 'post', 'patch', 'delete',)
     pagination_class = LimitOffsetPagination
 
     def list(self, request, *args, **kwargs):
