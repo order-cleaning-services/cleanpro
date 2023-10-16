@@ -259,6 +259,8 @@ class OrderGetSerializer(serializers.ModelSerializer):
             'order_status',
             'cleaning_type',
             'services',
+            'rooms_number',
+            'bathrooms_number',
             'pay_status',
             'address',
             'creation_date',
@@ -291,6 +293,8 @@ class OrderPostSerializer(serializers.ModelSerializer):
             'comment',
             'cleaning_type',
             'services',
+            'rooms_number',
+            'bathrooms_number',
             'address',
             'creation_date',
             'creation_time',
@@ -340,6 +344,11 @@ class OrderPostSerializer(serializers.ModelSerializer):
             )
         return services_data
 
+    def validate_total_sum(self, total_sum_data):
+        # TODO: добавить проверку валидности стоимости заказа,
+        #       чтобы его не подменили.
+        return total_sum_data
+
     @transaction.atomic
     def create(self, data):
         """Создает новый заказ.
@@ -368,6 +377,8 @@ class OrderPostSerializer(serializers.ModelSerializer):
             total_time=data.get('total_time'),
             comment=data.get('comment'),
             cleaning_type=data.get('cleaning_type'),
+            rooms_number=data.get('rooms_number'),
+            bathrooms_number=data.get('bathrooms_number'),
             address=address,
             cleaning_date=data.get('cleaning_date'),
             cleaning_time=data.get('cleaning_time'),

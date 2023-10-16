@@ -2,7 +2,7 @@
 ################################# TOKENS #################################
 ##########################################################################
 
-@admin_token = de797d446f8f7a98afc6e176401bd0a4668dd6b1
+@admin_token = 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 @login = http://127.0.0.1:80/api/auth/token/login/
 @logout = http://127.0.0.1:80/api/auth/token/logout/
@@ -27,15 +27,15 @@ Content-Type: application/json
 
 ###
 POST {{logout}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 ### 
 GET {{users}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 ###
 PUT {{users}}1/ HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 Content-Type: application/json
 
 {
@@ -54,7 +54,7 @@ Content-Type: application/json
 
 ### 
 GET {{users_me}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 ###
 POST {{login}} HTTP/1.1
@@ -91,15 +91,15 @@ GET {{ratings}}?limit=2 HTTP/1.1
 
 ### TODO: логика недоделана!
 POST {{ratings}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 ###
 GET {{measure}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 ###
 POST {{measure}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 Content-Type: application/json
 
 {
@@ -109,7 +109,7 @@ Content-Type: application/json
 
 ###
 GET {{orders}} HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 
 ###
 POST {{orders}} HTTP/1.1
@@ -135,6 +135,8 @@ Content-Type: application/json
             "amount": 1
         }
     ],
+    "rooms_number": 1,
+    "bathrooms_number": 3,
     "address": {
         "city": 11,
         "street": 11,
@@ -149,7 +151,7 @@ Content-Type: application/json
 
 ###
 PATCH {{orders}}1/ HTTP/1.1
-Authorization: Token de797d446f8f7a98afc6e176401bd0a4668dd6b1
+Authorization: Token 84ef023fd7c98af89c7141a9ac2e333a56ce92a7
 Content-Type: application/json
 
 {

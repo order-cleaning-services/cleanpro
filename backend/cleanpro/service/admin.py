@@ -147,6 +147,8 @@ class OrderAdmin(OrderAdmin):
             - комментарий заказа (comment)
             - тип уборки (cleaning_type)
             - список сервисов и их количество в заказе (services_list)
+            - количество комнат (rooms_number)
+            - количество санузлов (bathrooms_number)
             - дата создания заказа (creation_date)
             - время создания заказа (creation_time)
             - дата начала уборки (cleaning_date)
@@ -190,6 +192,8 @@ class OrderAdmin(OrderAdmin):
         'comment',
         'cleaning_type',
         'services_list',
+        'rooms_number',
+        'bathrooms_number',
         'creation_date',
         'creation_time',
         'cleaning_date',
