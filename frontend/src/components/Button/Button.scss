@@ -12,9 +12,24 @@
   font-weight: 700;
   line-height: 2.24rem;
   width: 100%;
-	&__modal-indent {
-		margin: 3.6rem 0 0 0;
-	}
+  &__modal-indent {
+    margin: 3.6rem 0 0 0;
+  }
+
+  &_type_auth {
+    background-color: $background-color-secondary;
+    box-shadow: none;
+    color: $text-color-tertiary;
+    line-height: 2.24rem;
+  }
+
+  &_type_auth-submit {
+    margin-bottom: 1.2rem;
+  }
+
+  &_size_s {
+    width: 28rem;
+  }
 
   &_disabled {
     cursor: default;

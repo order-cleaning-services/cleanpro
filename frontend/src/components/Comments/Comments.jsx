@@ -26,7 +26,7 @@ const Comments = () => {
             </Link>
           </div>
           <Swiper slidesPerView={4} spaceBetween={32} modules={[Navigation]} className="mySwiper comments__list">
-            {ratings.map(c => (
+            {ratings?.map(c => (
               <SwiperSlide key={c.id}>
                 <CommentsList rating={c.score} comment={c.text} clientName={c.username} />
               </SwiperSlide>
@@ -48,7 +48,7 @@ const Comments = () => {
             spaceBetween={32}
             modules={[Navigation, Grid]}
             className="mySwiper comments__list">
-            {ratings.map(c => (
+            {ratings?.map(c => (
               <SwiperSlide key={c.id}>
                 <CommentsList rating={c.score} comment={c.text} clientName={c.username} />
               </SwiperSlide>
