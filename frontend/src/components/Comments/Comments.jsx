@@ -1,19 +1,19 @@
 import { Swiper } from 'swiper/react'
 import { Navigation, Grid } from 'swiper/modules'
 import { Link, useLocation } from 'react-router-dom'
-// import { useSelector } from 'react-redux'
-// import CommentsList from '../CommentsList/CommentsList'
+import { useSelector } from 'react-redux'
+import CommentsList from '../CommentsList/CommentsList'
 import 'swiper/css'
 import 'swiper/css/grid'
 import './Comments.scss'
 import ButtonsSwiper from '../ButtonsSwiper/ButtonsSwiper'
-// import { SwiperSlide } from 'swiper/react'
-// import { ratingsSelectors } from '../../store/ratings/ratingsSelectors'
+import { SwiperSlide } from 'swiper/react'
+import { ratingsSelectors } from '../../store/ratings/ratingsSelectors'
 
 const Comments = () => {
   const location = useLocation().pathname
 
-  // const ratings = useSelector(ratingsSelectors.getRatings)
+  const ratings = useSelector(ratingsSelectors.getRatings)
 
   return (
     <section className="comments">
@@ -26,11 +26,11 @@ const Comments = () => {
             </Link>
           </div>
           <Swiper slidesPerView={4} spaceBetween={32} modules={[Navigation]} className="mySwiper comments__list">
-            {/* {ratings?.map(c => (
+            {ratings?.map(c => (
               <SwiperSlide key={c.id}>
                 <CommentsList rating={c.score} comment={c.text} clientName={c.username} />
               </SwiperSlide>
-            ))} */}
+            ))}
             <ButtonsSwiper />
           </Swiper>
         </>
@@ -48,11 +48,11 @@ const Comments = () => {
             spaceBetween={32}
             modules={[Navigation, Grid]}
             className="mySwiper comments__list">
-            {/* {ratings?.map(c => (
+            {ratings?.map(c => (
               <SwiperSlide key={c.id}>
                 <CommentsList rating={c.score} comment={c.text} clientName={c.username} />
               </SwiperSlide>
-            ))} */}
+            ))}
             <ButtonsSwiper />
           </Swiper>
         </>
