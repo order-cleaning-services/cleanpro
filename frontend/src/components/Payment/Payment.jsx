@@ -5,24 +5,22 @@ import calend from '../../images/calendar.svg'
 import geo from '../../images/geo.svg'
 import Button from '../Button/Button'
 import { Link, useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { calculatorSelectors } from '../../store/calculator/calculatorSelectors'
-import { createOrder } from '../../store/order/orderActions'
 import { ROUTES } from '../../constants/constants'
+import { authSelectors } from '../../store/auth/authSelectors'
 
 const Payment = () => {
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
   const navigate = useNavigate()
   const total = useSelector(calculatorSelectors.getTotal)
   const orderData = useSelector(calculatorSelectors.getOrderForm)
-  const cleaningType = useSelector(calculatorSelectors.getCleanType)
-  const extra = useSelector(calculatorSelectors.getExtras)
+  const isAuth = useSelector(authSelectors.getIsAuth)
 
   function handleSubmit() {
-    const services = extra.filter(item => item.amount > 0).map(item => ({ id: item.id, amount: item.amount }))
-    const data = { ...orderData, total_sum: total, cleaning_type: cleaningType, services }
-    dispatch(createOrder(data))
-    navigate(ROUTES.profile)
+    // TODO: подключить оплату
+    // dispatch()
+    isAuth ? navigate(ROUTES.profile) : navigate(ROUTES.home)
   }
 
   return (

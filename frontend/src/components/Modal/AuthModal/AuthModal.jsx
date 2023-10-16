@@ -7,15 +7,21 @@ import { createPortal } from 'react-dom'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../../constants/constants'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { calculatorSelectors } from '../../../store/calculator/calculatorSelectors'
+import { createOrder } from '../../../store/order/orderActions'
 
 const AuthModal = ({ show, closeModal, code, requestCode }) => {
   const [text, setText] = useState('')
   const [isError, setIsError] = useState(false)
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const orderData = useSelector(calculatorSelectors.getOrderForm)
+  const cleaningType = useSelector(calculatorSelectors.getCleanType)
+  const total = useSelector(calculatorSelectors.getTotal)
+
+  const extra = useSelector(calculatorSelectors.getExtras)
 
   const repeatRequest = () => {
     const { email } = orderData.user
@@ -35,6 +41,10 @@ const AuthModal = ({ show, closeModal, code, requestCode }) => {
   function handleSubmit(evt) {
     evt.preventDefault()
     if (text === code) {
+      const services = extra.filter(item => item.amount > 0).map(item => ({ id: item.id, amount: item.amount }))
+      const data = { ...orderData, total_sum: total, cleaning_type: cleaningType, services, total_time: 3 }
+
+      dispatch(createOrder(data))
       navigate(ROUTES.payment)
       onClose()
     } else {
