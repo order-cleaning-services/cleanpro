@@ -1,11 +1,11 @@
 from django.contrib import admin
 
-from .models import (
-    CleaningType, Measure, Order, Rating, RatingViaMaps, Service,
+from cleanpro.app_data import ADMIN_LIST_PER_PAGE
+from service.models import (
+    CleaningType, Measure, Order, Rating, Service,
     ServicesInCleaningType, ServicesInOrder
 )
-
-ADMIN_LIST_PER_PAGE: int = 15
+from users.models import User
 
 
 class ServicesInCleaningTypeInline(admin.StackedInline):
@@ -116,8 +116,21 @@ class ServicesInOrderInline(admin.StackedInline):
     extra = 1
 
 
-@admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    """
+    Переопределяет ModelAdmin для модели Order:
+        - в поле уборщик (cleaner) выводит только пользователей,
+          которые имеют статус is_cleaner=True
+    """
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'cleaner':
+            kwargs['queryset'] = User.objects.filter(is_cleaner=True)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(Order)
+class OrderAdmin(OrderAdmin):
     """
     Переопределяет административный интерфейс Django для модели Order.
 
@@ -125,6 +138,7 @@ class OrderAdmin(admin.ModelAdmin):
         - list_display (tuple) - список полей для отображения в интерфейсе:
             - ID заказа (pk)
             - ID заказчика (user)
+            - ID уборщика (cleaner)
             - статус заказа (order_status)
             - статус оплаты (pay_status)
             - суммарное время работ (total_time)
@@ -137,17 +151,21 @@ class OrderAdmin(admin.ModelAdmin):
             - время создания заказа (creation_time)
             - дата начала уборки (cleaning_date)
             - время начала уборки (cleaning_time)
+            - время окончания уборки (cleaning_time_end)
             - комментарий отмены заказа (comment_cancel)
             - дата отмены заказа (cancel_date)
             - время отмены заказа (cancel_time)
         - inlines (tuple): определяет отображение связанных моделей:
             - отображает сервисы в заказе (ServicesInOrderInline)
         - list_editable (tuple) - список полей для изменения в интерфейсе:
+            - ID уборщика (cleaner)
             - статус заказа (order_status)
             - статус оплаты (pay_status)
             - сумма заказа (total_sum)
             - комментарий заказа (comment)
             - комментарий отмены заказа (comment_cancel)
+            - дата начала уборки (cleaning_date)
+            - время начала уборки (cleaning_time)
         - list_filter (tuple) - список фильтров:
             - статус заказа (order_status)
         - search_fields (tuple) - список полей для поиска объектов:
@@ -163,6 +181,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'user',
+        'cleaner',
         'order_status',
         'pay_status',
         'total_time',
@@ -175,17 +194,21 @@ class OrderAdmin(admin.ModelAdmin):
         'creation_time',
         'cleaning_date',
         'cleaning_time',
+        'cleaning_time_end',
         'comment_cancel',
         'cancel_date',
         'cancel_time',
     )
     inlines = (ServicesInOrderInline,)
     list_editable = (
+        'cleaner',
         'order_status',
         'pay_status',
         'total_sum',
         'comment',
         'comment_cancel',
+        'cleaning_date',
+        'cleaning_time',
     )
     list_filter = ('order_status',)
     search_fields = ('user',)
@@ -193,7 +216,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     def services_list(self, obj):
         services = [
-            f'{service} ({service.orders_with_service.get(order=obj).amount})'
+            f'{service} ({service.services_in_order.get(order=obj).amount})'
             for service in obj.services.all()
         ]
         return ',\n'.join(services)
@@ -209,7 +232,9 @@ class RatingAdmin(admin.ModelAdmin):
     Атрибуты:
         - list_display (tuple) - список полей для отображения в интерфейсе:
             - ID отзыва (pk)
+            - отображаемое имя заказчика (username)
             - ID заказчика (user)
+            - получен ли отзыв с Я.Карт (from_maps)
             - ID заказа (order)
             - дата публикации (pub_date)
             - текст отзыва (text)
@@ -225,55 +250,27 @@ class RatingAdmin(admin.ModelAdmin):
     """
     list_display = (
         'pk',
+        'username',
         'user',
+        'from_maps',
         'order',
         'pub_date',
         'text',
         'score',
     )
     list_editable = (
-        'text',
-        'score',
-    )
-    list_filter = ('score',)
-    search_fields = ('user',)
-    list_per_page = ADMIN_LIST_PER_PAGE
-
-
-@admin.register(RatingViaMaps)
-class RatingViaMapsAdmin(admin.ModelAdmin):
-    """
-    Переопределяет административный интерфейс Django для модели RatingViaMaps.
-
-    Атрибуты:
-        - list_display (tuple) - список полей для отображения в интерфейсе:
-            - ID отзыва (pk)
-            - имя пользователя Я.Карт (username)
-            - дата публикации (pub_date)
-            - текст отзыва (text)
-            - оценка заказа (score)
-        - list_editable (tuple) - список полей для изменения в интерфейсе:
-            - текст отзыва (text)
-            - оценка заказа (score)
-        - list_filter (tuple) - список фильтров:
-            - оценка заказа (score)
-        - search_fields (tuple) - список полей для поиска объектов:
-            - имя пользователя Я.Карт (username)
-        - list_per_page (int) - количество объектов на одной странице
-    """
-    list_display = (
-        'pk',
         'username',
-        'pub_date',
         'text',
         'score',
     )
-    list_editable = (
-        'text',
+    list_filter = (
+        'from_maps',
         'score',
     )
-    list_filter = ('score',)
-    search_fields = ('username',)
+    search_fields = (
+        'username',
+        'user',
+    )
     list_per_page = ADMIN_LIST_PER_PAGE
 
 

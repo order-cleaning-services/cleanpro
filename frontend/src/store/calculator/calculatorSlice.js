@@ -14,10 +14,17 @@ const calculatorSlice = createSlice({
     },
     setExtra: (state, action) => {
       const index = action.payload.index
-      const newExtra = [...state.extra]
-      newExtra[index].amount += action.payload.step
       state.total += action.payload.price
-      state.extra = newExtra
+      state.extra[index].amount += action.payload.step
+    },
+    setExtraRepeated: (state, action) => {
+      state.extra.map(ex => {
+        const newAmount = action.payload.find(service => service.id === ex.id)?.amount
+        if (newAmount) ex.amount = newAmount
+      })
+    },
+    setTotalRepeated: (state, action) => {
+      state.total = action.payload
     },
     deleteExtra: (state, action) => {
       state.total -= action.payload
@@ -62,5 +69,6 @@ export const {
   setExtra,
   resetRooms,
   safeOrderForm,
+  setExtraRepeated,
 } = calculatorSlice.actions
 export default calculatorSlice.reducer

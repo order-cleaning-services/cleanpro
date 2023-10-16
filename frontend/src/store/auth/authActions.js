@@ -34,6 +34,18 @@ export const getUser = createAsyncThunk('auth/getUser', async (_, { rejectWithVa
   }
 })
 
+export const updateUser = createAsyncThunk('auth/updateUser', async (body, { getState, rejectWithValue }) => {
+  try {
+    const token = getToken()
+    const state = getState()
+    const id = state.auth.user.id
+    const res = await authAPI.updateUser(id, body, token)
+    return res
+  } catch (e) {
+    return rejectWithValue(e)
+  }
+})
+
 export const registration = createAsyncThunk('auth/signup', async (body, { dispatch, rejectWithValue }) => {
   try {
     const response = await authAPI.create(body)

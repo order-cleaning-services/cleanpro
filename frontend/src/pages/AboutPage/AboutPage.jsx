@@ -3,9 +3,9 @@ import Footer from '../../components/Footer/Footer'
 import About from '../../components/About/About'
 import CleanersList from '../../components/CleanersList/CleanersList'
 import ButtonOrder from '../../components/ButtonOrder/ButtonOrder'
-import CommentsAbout from '../../components/CommentsAbout/CommentsAbout'
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
+import Comments from '../../components/Comments/Comments'
 
 function AboutPage() {
   const location = useLocation()
@@ -34,7 +34,7 @@ function AboutPage() {
         </h2>
         <CleanersList />
       </div>
-      <CommentsAbout />
+      <Comments />
       <Footer />
       <ButtonOrder height={0} />
     </div>

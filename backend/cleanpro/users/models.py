@@ -9,7 +9,9 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 
-from .validators import validate_email, validate_username, validate_password
+from users.validators import (
+    validate_email, validate_username, validate_password
+)
 
 ADDRESS_CITY_MAX_LEN: int = 50
 ADDRESS_STREET_MAX_LEN: int = 50
@@ -102,12 +104,12 @@ class Address(models.Model):
 
 
 class UserManager(BaseUserManager):
-    '''Менеджер модели пользователя.'''
+    """Менеджер модели пользователя."""
 
     use_in_migrations = True
 
     def _create_user(self, email, password, **extra_fields):
-        '''Создает и сохраняет пользователя с полученными почтой и паролем.'''
+        """Создает и сохраняет пользователя с полученными почтой и паролем."""
         if not email or not password:
             raise ValueError('Укажите email и password.')
         email = self.normalize_email(email).lower()
@@ -117,13 +119,20 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, email, password, **extra_fields):
+        """Обрабатывает метод создания пользователя."""
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(email, password, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
+        """Обрабатывает метод создания пользователя-администратора."""
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_cleaner(self, email, password, **extra_fields):
+        """Обрабатывает метод создания пользователя-уборщика."""
+        extra_fields.setdefault('is_cleaner', True)
         return self._create_user(email, password, **extra_fields)
 
 
@@ -155,6 +164,25 @@ class User(AbstractUser):
         verbose_name='Адрес',
         related_name='users',
         on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+    )
+    # INFO: следующие 3 поля нужны для учетной записи уборщиков.
+    is_cleaner = models.BooleanField(
+        verbose_name='Уборщик',
+        default=False,
+    )
+    # TODO: написать задачу для Celery, которая бы после достижения
+    #       окончания отпуска обнуляла эти 2 поля.
+    on_vacation_from = models.DateField(
+        verbose_name='Начало отпуска',
+        default=None,
+        blank=True,
+        null=True,
+    )
+    on_vacation_to = models.DateField(
+        verbose_name='Конец отпуска',
+        default=None,
         blank=True,
         null=True,
     )

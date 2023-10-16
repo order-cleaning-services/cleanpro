@@ -10,6 +10,7 @@ import { resetRooms, setCleanType, setTotal } from '../../store/calculator/calcu
 import { initialState } from '../../store/calculator/initialState'
 import CleaningTypesTabs from '../CleaningTypesTabs/CleaningTypesTabs'
 import RoomsAmount from '../RoomsAmount/RoomsAmount'
+import { orderSelectors } from '../../store/order/orderSelectors'
 
 function Calculator() {
   const dispatch = useDispatch()
@@ -17,13 +18,21 @@ function Calculator() {
   const total = useSelector(calculatorSelectors.getTotal)
   const cleanType = useSelector(calculatorSelectors.getCleanType)
   const types = useSelector(calculatorSelectors.getTypes)
+  const repeatedTotal = useSelector(orderSelectors.getRepeatedTotal)
 
   const isTypeWindow = types.filter(card => card.id === cleanType)[0]?.title === 'Окна'
 
   useEffect(() => {
-    dispatch(resetRooms())
-    dispatch(setTotal(types ? types.filter(card => card.id === cleanType)[0]?.price : initialState.total))
-  }, [cleanType, dispatch, types])
+    dispatch(
+      setTotal(
+        repeatedTotal
+          ? repeatedTotal
+          : types
+          ? types.filter(card => card.id === cleanType)[0]?.price
+          : initialState.total,
+      ),
+    )
+  }, [cleanType, dispatch, types, repeatedTotal])
 
   function handleActiveType(id) {
     dispatch(setCleanType(id))

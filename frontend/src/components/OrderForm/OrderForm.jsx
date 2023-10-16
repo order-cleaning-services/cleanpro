@@ -6,13 +6,24 @@ import InputFieldDate from '../InputFieldDate/InputFieldDate'
 import Select from 'react-select'
 import { formOrderValidationSelectors } from '../../store/formOrderValidation/formOrderValidationSelectors'
 import { safeOrderForm } from '../../store/calculator/calculatorSlice'
-import { ROUTES } from '../../constants/constants'
+import { ROUTES, TIME_OPTIONS } from '../../constants/constants'
 import { customerStylesSelect } from '../../assets/styles/customerStylesSelect'
-import { options } from '../../utils/initialData'
 import './OrderForm.scss'
+import { orderSelectors } from '../../store/order/orderSelectors'
+import { authSelectors } from '../../store/auth/authSelectors'
+import { useEffect } from 'react'
+import { resetRepeatedOrder } from '../../store/order/orderSlice'
+import { PATTERNS } from '../../utils/validation'
+import { calculatorSelectors } from '../../store/calculator/calculatorSelectors'
+
 function OrderForm() {
   const stateDate = useSelector(formOrderValidationSelectors.getStateDate)
+  const userData = useSelector(authSelectors.getUser)
+  const repeatedOrder = useSelector(orderSelectors.getRepeatedOrder)
+  const types = useSelector(calculatorSelectors.getTypes)
+
   const dispatch = useDispatch()
+
   const {
     control,
     reset,
@@ -25,6 +36,13 @@ function OrderForm() {
 
   const required = 'Обязательное поле'
   const navigate = useNavigate()
+
+  useEffect(() => {
+    return () => {
+      if (repeatedOrder) dispatch(resetRepeatedOrder())
+    }
+  }, [repeatedOrder, dispatch, types])
+
   const onSubmit = data => {
     const {
       username,
@@ -43,12 +61,13 @@ function OrderForm() {
     const body = {
       user: { username, email, phone },
       address: { city, street, house, apartment, entrance, floor },
+      total_time: 3,
       cleaning_date,
       cleaning_time,
       comment,
     }
     dispatch(safeOrderForm(body))
-    navigate(ROUTES.payment)
+    navigate(ROUTES.PAYMENT)
     reset()
   }
 
@@ -61,71 +80,77 @@ function OrderForm() {
       <div className="inputs_wrapper-field">
         <InputField
           isValid
+          readOnly={!!userData?.username}
           label="Имя"
+          value={userData?.username || ''}
           {...register('username', {
-            required,
+            minLength: 2,
             maxLength: {
               value: 60,
               message: 'Максимум 60 символов',
             },
-            pattern: {
-              value: /^(?=.{1,60}$)[а-яёА-ЯЁ '-]+$/,
-              message: 'Укажите ваше имя. Пример: Апполинарий Вальдемарович фон Спасо-Преображенский',
-            },
+            pattern: PATTERNS.USERNAME,
           })}
+          error={errors?.username}
         />
-        {errors?.username && <span className="form-entry__error">{errors?.username?.message || 'Ошибка'}</span>}
       </div>
       {/* -------------------------------------EMAIL--------------------------------- */}
       <div className="inputs_wrapper-field">
         <InputField
           isValid
+          readOnly={!!userData?.email}
           type="email"
           id="input-email"
           label="E-mail"
           placeholder="example@example.ru"
+          value={userData?.email || ''}
           {...register('email', {
-            required,
+            minLength: 5,
             maxLength: {
               value: 50,
               message: 'Максимум 50 символов',
             },
-            pattern: {
-              value:
-                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-              message: 'Укажите почту. Пример: example@example.ru',
-            },
+            pattern: PATTERNS.EMAIL,
           })}
+          error={errors?.email}
         />
-        {errors?.email && <span className="form-entry__error">{errors?.email?.message || 'Ошибка'}</span>}
       </div>
 
       {/* -------------------------------------PHONE--------------------------------- */}
       <div className="inputs_wrapper-field">
         <InputField
           isValid
+          readOnly={!!userData?.phone}
           type="tel"
           label="Телефон"
           placeholder="+7 (999) 999-99-99"
+          value={userData?.phone || ''}
           {...register('phone', {
-            required,
-            pattern: /(\+7[-_()\s]+|\+7|8\s?[(]{0,1}[0-9]{3}[)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2})/,
+            minLength: 10,
+            pattern: PATTERNS.PHONE,
           })}
+          error={errors?.phone}
         />
-        {errors?.phone && <span className="form-entry__error">{errors?.phone?.message || 'Ошибка'}</span>}
       </div>
 
       {/* -------------------------------------ГОРОД--------------------------------- */}
       <div className="inputs_wrapper-field">
-        <InputField placeholder="Москва" value="Москва" isValid label="Город" {...register('city', {})} />
-        {errors?.city && <span className="form-entry__error">{errors?.city?.message || 'Ошибка'}</span>}
+        <InputField
+          isValid
+          readOnly
+          placeholder="Москва"
+          value="Москва"
+          label="Город"
+          {...register('city', {})}
+          error={errors?.city}
+        />
       </div>
-
       {/* -------------------------------------УЛИЦА--------------------------------- */}
       <div className="inputs_wrapper-field">
         <InputField
           isValid
           label="Улица"
+          value={repeatedOrder?.address?.street || userData?.address?.street || ''}
           {...register('street', {
             required,
             maxLength: {
@@ -133,10 +158,9 @@ function OrderForm() {
               message: 'Максимум 150 символов',
             },
           })}
+          error={errors?.street}
         />
-        {errors?.street && <span className="form-entry__error">{errors?.street?.message || 'Ошибка'}</span>}
       </div>
-
       <div className="inputs_wrapper">
         {/* -------------------------------------ДОМ--------------------------------- */}
         <div className="inputs_wrapper-field">
@@ -144,6 +168,7 @@ function OrderForm() {
             isValid
             size="small"
             label="Дом"
+            value={repeatedOrder?.address?.house || userData?.address?.house || ''}
             {...register('house', {
               required,
               pattern: {
@@ -155,10 +180,9 @@ function OrderForm() {
                 message: 'Максимум 60 символов',
               },
             })}
+            error={errors?.house}
           />
-          {errors?.house && <span className="form-entry__error">{errors?.house?.message || 'Ошибка'}</span>}
         </div>
-
         {/* -------------------------------------КВАРТИРА--------------------------------- */}
         <div className="inputs_wrapper-field">
           <InputField
@@ -166,21 +190,21 @@ function OrderForm() {
             type="number"
             size="small"
             label="Квартира"
+            value={repeatedOrder?.address?.apartment || userData?.address?.apartment || ''}
             {...register('apartment', {
               required,
               max: {
-                value: 99,
-                message: 'Максимальное значение 99',
+                value: 9999,
+                message: 'Максимальное значение 9999',
               },
               min: {
                 value: 0,
                 message: 'Минимальное значение 0',
               },
             })}
+            error={errors?.apartment}
           />
-          {errors?.apartment && <span className="form-entry__error">{errors?.apartment?.message || 'Ошибка'}</span>}
         </div>
-
         {/* -------------------------------------ПОДЪЕЗД--------------------------------- */}
         <div className="inputs_wrapper-field">
           <InputField
@@ -188,6 +212,7 @@ function OrderForm() {
             type="number"
             size="small"
             label="Подъезд"
+            value={repeatedOrder?.address?.entrance || userData?.address?.entrance || ''}
             {...register('entrance', {
               required,
               max: {
@@ -199,16 +224,16 @@ function OrderForm() {
                 message: 'Минимальное значение 0',
               },
             })}
+            error={errors?.entrance}
           />
-          {errors?.entrance && <span className="form-entry__error">{errors?.entrance?.message || 'Ошибка'}</span>}
         </div>
-
         {/* -------------------------------------ЭТАЖ--------------------------------- */}
         <div className="inputs_wrapper-field">
           <InputField
             isValid
             size="small"
             label="Этаж"
+            value={repeatedOrder?.address?.floor || userData?.address?.floor || ''}
             {...register('floor', {
               required,
               max: {
@@ -220,10 +245,9 @@ function OrderForm() {
                 message: 'Минимальное значение 0',
               },
             })}
+            error={errors?.floor}
           />
-          {errors?.floor && <span className="form-entry__error">{errors?.floor?.message || 'Ошибка'}</span>}
         </div>
-
         {/* -------------------------------------ДАТА--------------------------------- */}
         <div className="inputs_wrapper-field">
           <InputFieldDate
@@ -251,8 +275,8 @@ function OrderForm() {
             ref={register('cleaning_time', {
               required,
             })}
-            options={options}
-            value={slotValue ? options.find(x => x.value === slotValue) : slotValue}
+            options={TIME_OPTIONS}
+            value={slotValue ? TIME_OPTIONS.find(x => x.value === slotValue) : slotValue}
             onChange={option => timeOnChange(option ? option.value : option)}
             {...restTimeField}
           />

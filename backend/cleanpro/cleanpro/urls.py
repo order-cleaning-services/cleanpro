@@ -14,7 +14,7 @@ urlpatterns = [
     path('spectacular/docs/',
          SpectacularSwaggerView.as_view(url_name='schema'),
          name='docs',
-    ),
+         ),
 ]
 
 if settings.DEBUG:

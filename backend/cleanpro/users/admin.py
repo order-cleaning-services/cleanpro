@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from cleanpro.app_data import ADMIN_LIST_PER_PAGE
 from .models import Address, User
 
 
@@ -71,7 +72,7 @@ class AddressAdmin(admin.ModelAdmin):
         'floor',
         'apartment',
     )
-    list_per_page = 50
+    list_per_page = ADMIN_LIST_PER_PAGE
 
 
 @admin.register(User)
@@ -86,11 +87,21 @@ class UserAdmin(admin.ModelAdmin):
             - электронная почта пользователя (email)
             - контактный телефон по стандарту E.164 (phone)
             - ID адреса пользователя (address)
+            - статус администратора (is_staff)
+            - статус уборщика (is_cleaner)
+            - начало отпуска уборщика (on_vacation_from)
+            - конец отпуска уборщика (on_vacation_to)
         - list_editable (tuple) - список полей для изменения в интерфейсе:
             - имя пользователя (username)
             - электронная почта пользователя (email)
             - контактный телефон по стандарту E.164 (phone)
             - ID адреса пользователя (address)
+            - статус уборщика (is_cleaner)
+            - начало отпуска уборщика (on_vacation_from)
+            - конец отпуска уборщика (on_vacation_to)
+        - list_filter (tuple) - список фильтров:
+            - статус администратора (is_staff)
+            - статус уборщика (is_cleaner)
         - search_fields (tuple) - список полей для поиска объектов:
             - имя пользователя (username)
             - электронная почта пользователя (email)
@@ -110,16 +121,27 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'phone',
         'address',
+        'is_staff',
+        'is_cleaner',
+        'on_vacation_from',
+        'on_vacation_to',
     )
     list_editable = (
         'username',
         'email',
         'phone',
         'address',
+        'is_cleaner',
+        'on_vacation_from',
+        'on_vacation_to',
+    )
+    list_filter = (
+        'is_staff',
+        'is_cleaner',
     )
     search_fields = (
         'email',
         'username',
         'phone',
     )
-    list_per_page = 50
+    list_per_page = ADMIN_LIST_PER_PAGE
