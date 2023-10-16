@@ -19,7 +19,7 @@ const Comments = () => {
       {Array.isArray(ratings) ? (
         <section className="comments">
           {location === '/' ? (
-            <>
+            <div className="comments__container">
               <div className="comments__wrapper" id="comments">
                 <h2 className="comments__title">Отзывы клиентов</h2>
                 <Link to="/about" className="comments__go">
@@ -34,9 +34,9 @@ const Comments = () => {
                 ))}
                 <ButtonsSwiper />
               </Swiper>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="comments__container">
               <div className="comments__wrapper">
                 <h2 className="comments__title">Отзывы клиентов</h2>
               </div>
@@ -56,7 +56,7 @@ const Comments = () => {
                 ))}
                 <ButtonsSwiper />
               </Swiper>
-            </>
+            </div>
           )}
         </section>
       ) : null}

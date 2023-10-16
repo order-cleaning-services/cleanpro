@@ -7,7 +7,7 @@ class AuthAPI {
   }
 
   logout(token) {
-    return FetchAPI.post(`${API_URL.AUTH}login/`, { token })
+    return FetchAPI.post(`${API_URL.AUTH}logout/`, { token })
   }
 
   create(body) {
