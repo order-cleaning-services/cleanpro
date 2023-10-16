@@ -8,7 +8,13 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.utils.serializer_helpers import ReturnDict
-from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+    OpenApiParameter,
+    OpenApiResponse,
+    inline_serializer,
+)
 
 from api.filters import FilterService
 from api.mixin import CreateUpdateListSet
@@ -142,18 +148,33 @@ class ServiceViewSet(viewsets.ModelViewSet):
 @extend_schema_view(
     list=extend_schema(
         summary="Получить список всех пользователей.",
+        responses={
+            status.HTTP_200_OK: UserGetSerializer,
+        },
     ),
     create=extend_schema(
         summary="Создать нового пользователя.",
+        responses={
+            status.HTTP_201_CREATED: UserCreateSerializer,
+        },
     ),
     update=extend_schema(
         summary="Частично изменить существующего пользователя.",
+        responses={
+            status.HTTP_200_OK: UserGetSerializer,
+        },
     ),
     partial_update=extend_schema(
         summary="Полностью изменить существующего пользователя.",
+        responses={
+            status.HTTP_200_OK: UserGetSerializer,
+        },
     ),
     orders=extend_schema(
         summary="Получить список всех заказов пользователя.",
+        responses={
+            status.HTTP_200_OK: OrderGetSerializer,
+        },
     ),
     confirm_email=extend_schema(
         summary="Подтверждение электронной почты.",
@@ -165,9 +186,31 @@ class ServiceViewSet(viewsets.ModelViewSet):
             код подтверждения электронной почты. Этот код отправляется
             в JSON клиенту и письмом на указанную электронную почту.
             """,
+        responses={
+            status.HTTP_200_OK: EmailConfirmSerializer,
+        },
     ),
     me=extend_schema(
         summary="Получить данные авторизованного пользователя.",
+        description="""
+                Так же возвращает два дополнительных поля:
+                    'is_staff',
+                    'is_cleaner',
+
+                если эти значения равняются True
+            """,
+        parameters=[
+            OpenApiParameter(name="callsign", required=True, type=str),
+        ],
+        responses={
+            status.HTTP_200_OK: UserGetSerializer,
+            # status.HTTP_500_INTERNAL_SERVER_ERROR: inline_serializer(
+            #     name='PasscodeResponse',
+            #     fields={
+            #         'passcode': serializers.CharField(),
+            #     }
+            # ),
+        },
     ),
 )
 class UserViewSet(CreateUpdateListSet):
