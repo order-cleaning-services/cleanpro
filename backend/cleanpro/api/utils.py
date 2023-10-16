@@ -133,7 +133,8 @@ def get_available_time_json(cleaning_date: date, total_time: int) -> dict:
             datetime.combine(cleaning_date, cleaning_time) +
             timedelta(minutes=total_time)
         ).time()
-        if cleaning_end_time.hour >= SCHEDULE_WORK_STOP_H:
+        # TODO: сделать через datetime.
+        if cleaning_end_time.hour > SCHEDULE_WORK_STOP_H:
             break
         available_cleaners: QuerySet = get_available_cleaners(
             cleaning_date=cleaning_date,
