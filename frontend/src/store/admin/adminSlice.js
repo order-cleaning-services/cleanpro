@@ -13,6 +13,7 @@ const adminSlice = createSlice({
     },
     handleClickStaff: state => {
       state.linkView = 'staff'
+      state.tab = 'cliners'
     },
     handleClickStatistics: state => {
       state.linkView = 'statistics'
@@ -29,6 +30,18 @@ const adminSlice = createSlice({
     handleClickСancelled: state => {
       state.tab = 'cancelled'
     },
+    handleClickCliners: state => {
+      state.tab = 'cliners'
+    },
+    handleClickSchedule: state => {
+      state.tab = 'schedule'
+    },
+    handleClickCleanerCard: state => {
+      state.linkView = 'cleanerCard'
+    },
+    handleClickNewCleaner: state => {
+      state.linkView = 'newCleaner'
+    },
   },
 })
 
@@ -41,5 +54,9 @@ export const {
   handleClickCurrent,
   handleClickCompleted,
   handleClickСancelled,
+  handleClickCliners,
+  handleClickSchedule,
+  handleClickCleanerCard,
+  handleClickNewCleaner,
 } = adminSlice.actions
 export default adminSlice.reducer
