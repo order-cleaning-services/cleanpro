@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.utils.serializer_helpers import ReturnDict
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 from api.filters import FilterService
 from api.mixin import CreateUpdateListSet
@@ -44,6 +45,21 @@ from service.signals import get_cached_reviews
 from users.models import User
 
 
+@extend_schema(tags=["Measure"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список всех единиц измерений.",
+    ),
+    create=extend_schema(
+        summary="Создать новую единицу измерения.",
+    ),
+    retrieve=extend_schema(
+        summary="Получить существующий единицу измерения.",
+    ),
+    update=extend_schema(
+        summary="Частично изменить существующую единицу измерения.",
+    ),
+)
 class MeasureViewSet(viewsets.ModelViewSet):
     """Работа с единицами измерения услуг."""
     queryset = Measure.objects.all()
@@ -53,6 +69,24 @@ class MeasureViewSet(viewsets.ModelViewSet):
     http_method_names = ('get', 'post', 'put',)
 
 
+@extend_schema(tags=["Types cleaning"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список всех типов уборки.",
+    ),
+    create=extend_schema(
+        summary="Создать новый тип уборки.",
+    ),
+    retrieve=extend_schema(
+        summary="Получить существующий тип уборки.",
+        description="""
+            Возвращает тип уборки и список услуг, которые в нее входят.
+            """,
+    ),
+    update=extend_schema(
+        summary="Частично изменить существующий тип уборки.",
+    ),
+)
 class CleaningTypeViewSet(viewsets.ModelViewSet):
     """Работа с типами услуг."""
     queryset = CleaningType.objects.prefetch_related('service').all()
@@ -67,6 +101,21 @@ class CleaningTypeViewSet(viewsets.ModelViewSet):
             return CreateCleaningTypeSerializer
 
 
+@extend_schema(tags=["Service"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список всех услуг.",
+    ),
+    create=extend_schema(
+        summary="Создать новую услугу.",
+    ),
+    retrieve=extend_schema(
+        summary="Получить существующую услугу.",
+    ),
+    update=extend_schema(
+        summary="Частично изменить существующую услугу.",
+    ),
+)
 class ServiceViewSet(viewsets.ModelViewSet):
     """Работа с услугами."""
     queryset = Service.objects.select_related('measure').all()
@@ -89,8 +138,39 @@ class ServiceViewSet(viewsets.ModelViewSet):
             return CreateServiceSerializer
 
 
+@extend_schema(tags=["User"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список всех пользователей.",
+    ),
+    create=extend_schema(
+        summary="Создать нового пользователя.",
+    ),
+    update=extend_schema(
+        summary="Частично изменить существующего пользователя.",
+    ),
+    partial_update=extend_schema(
+        summary="Полностью изменить существующего пользователя.",
+    ),
+    orders=extend_schema(
+        summary="Получить список всех заказов пользователя.",
+    ),
+    confirm_email=extend_schema(
+        summary="Подтверждение электронной почты.",
+        description="""
+            Смотрит request.data и проверяет следующие данные:
+            - email: адрес электронной почты.
+
+            Если данные являются валидными, генерирует произвольный
+            код подтверждения электронной почты. Этот код отправляется
+            в JSON клиенту и письмом на указанную электронную почту.
+            """,
+    ),
+    me=extend_schema(
+        summary="Получить данные авторизованного пользователя.",
+    ),
+)
 class UserViewSet(CreateUpdateListSet):
-    """Список пользователей."""
     queryset = User.objects.select_related('address').all()
 
     def get_serializer_class(self):
@@ -105,7 +185,6 @@ class UserViewSet(CreateUpdateListSet):
         permission_classes=(permissions.IsAdminUser,)
     )
     def orders(self, request, pk):
-        """Список заказов пользователя."""
         queryset = Order.objects.filter(
             user=pk
         ).select_related('user', 'cleaning_type', 'address')
@@ -123,7 +202,6 @@ class UserViewSet(CreateUpdateListSet):
         permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request):
-        """Личные данные авторизованного пользователя."""
         instance: User = request.user
         serializer: UserGetSerializer = UserGetSerializer(instance)
         data: ReturnDict = serializer.data
@@ -139,14 +217,6 @@ class UserViewSet(CreateUpdateListSet):
         permission_classes=(permissions.AllowAny,)
     )
     def confirm_email(self, request):
-        """
-        Смотрит request.data и проверяет следующие данные:
-            - email: адрес электронной почты.
-
-        Если данные являются валидными, генерирует произвольный
-        код подтверждения электронной почты. Этот код отправляется
-        в JSON клиенту и письмом на указанную электронную почту.
-        """
         serializer: serializers = EmailConfirmSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         confirm_code: str = generate_code()
@@ -161,6 +231,34 @@ class UserViewSet(CreateUpdateListSet):
         )
 
 
+@extend_schema(tags=["Order"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список всех заказов.",
+    ),
+    create=extend_schema(
+        summary="Создать новый заказ.",
+    ),
+    retrieve=extend_schema(
+        summary="Получить существующий заказ.",
+    ),
+    partial_update=extend_schema(
+        summary="Полностью изменить существующий заказ.",
+    ),
+    pay=extend_schema(
+        summary="Изменить статус оплаты существующего заказа.",
+    ),
+    rating=extend_schema(
+        summary="Получить существующий отзыв к заказу.",
+        description="""
+            Так же есть запросы POST, PUT к этому эндпоинту,
+            но пока это обновление еще не в develop.
+            """,
+    ),
+    get_available_time=extend_schema(
+        summary="Получить доступную дату и время для заказа.",
+    ),
+)
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
     http_method_names = ('get', 'post', 'patch',)
@@ -255,6 +353,27 @@ class OrderViewSet(viewsets.ModelViewSet):
         )
 
 
+@extend_schema(tags=["Rating"])
+@extend_schema_view(
+    list=extend_schema(
+        summary="Получить список всех отзывов.",
+    ),
+    create=extend_schema(
+        summary="Создать новый отзыв.",
+        description="""
+            Создание простого отзыва, без прикрепления к конкретному заказу.
+            """,
+    ),
+    retrieve=extend_schema(
+        summary="Получить существующий отзыв.",
+    ),
+    partial_update=extend_schema(
+        summary="Полностью изменить существующий отзыв.",
+    ),
+    destroy=extend_schema(
+        summary="Удалить существующий отзыв.",
+    ),
+)
 class RatingViewSet(viewsets.ModelViewSet):
     """Список отзывов."""
     queryset = Rating.objects.all()
