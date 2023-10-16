@@ -31,8 +31,6 @@ const OrderCard = ({ order }) => {
     order_status === 'created' || order_status === 'Создан' ? false : order_status === 'accepted' ? false : true
   const CLEANERS = ['Климова Ольга', 'Плотников Евгений']
 
-  console.log(order.order_status)
-
   return (
     <div className={`card ${isCompleted ? 'card_completed' : ''}`}>
       <div className="card__header">
