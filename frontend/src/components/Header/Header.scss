@@ -5,7 +5,7 @@
   width: 144rem;
   margin: 0 auto;
   justify-content: space-between;
-  padding: 2.25rem 10rem;
+  padding: 2.55rem 10rem;
 }
 
 .header__menu {
@@ -32,7 +32,7 @@
     text-decoration: none;
     color: $text-color-main;
     padding-bottom: 1.6rem;
-    border-bottom: 0.2rem solid #ffb22e;
+    border-bottom: 0.2rem solid $color-primary;
   }
 }
 

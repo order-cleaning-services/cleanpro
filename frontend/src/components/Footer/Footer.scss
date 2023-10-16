@@ -1,12 +1,16 @@
 @import '../../assets/styles/GlobalStyle.scss';
 
 .footer {
-  display: flex;
-  width: 144rem;
-  padding: 8rem 10rem;
-  gap: 3.2rem;
-  margin: 0 auto;
   background-color: $background-color-secondary;
+
+  &__container {
+    display: flex;
+    width: 144rem;
+    padding: 8rem 10rem;
+    gap: 3.2rem;
+    margin: 0 auto;
+  }
+
   &__logo-wrapper {
     margin-top: -10px;
     flex-basis: 28.6rem;
