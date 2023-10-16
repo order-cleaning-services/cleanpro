@@ -50,7 +50,7 @@ CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://redis:6379/0',
+        'LOCATION': 'redis://redis:6379/1',
     }
 }
 
