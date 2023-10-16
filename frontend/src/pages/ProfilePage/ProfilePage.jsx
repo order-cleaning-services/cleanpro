@@ -16,7 +16,7 @@ export default function Profile() {
 
   useEffect(() => {
     dispatch(getUserOrders())
-  }, [dispatch])
+  }, [dispatch, userOrders])
 
   return (
     <>

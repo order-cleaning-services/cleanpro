@@ -12,6 +12,7 @@ import ordersAPI from '../../../api/ordersAPI'
 
 function TransferModal({ order, show, closeModal }) {
   const dispatch = useDispatch()
+
   function handleSubmit(e) {
     e.preventDefault()
     const form = e.target
@@ -19,15 +20,13 @@ function TransferModal({ order, show, closeModal }) {
     const formData = new FormData(form)
     const formJson = Object.fromEntries(formData.entries())
     ordersAPI.changeDateTime(order, {
-      body:{ cleaning_date: formJson.date,
-       cleaning_time: formJson.time},
-     token:token
-     } 
-      )
-      dispatch(getUserOrders())
-      closeModal()
-    console.log(formJson)
+      body: { cleaning_date: formJson.date, cleaning_time: formJson.time },
+      token: token,
+    })
+    dispatch(getUserOrders())
+    closeModal()
   }
+
   if (!show) return null
   return (
     <>
