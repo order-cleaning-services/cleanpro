@@ -139,6 +139,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     """Модель пользователя."""
 
+    # TODO: добавить фото.
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=USER_NAME_MAX_LEN,
