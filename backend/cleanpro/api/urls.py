@@ -3,6 +3,7 @@ from rest_framework import routers
 
 from .views import (
     CleaningTypeViewSet,
+    MeasureViewSet,
     OrderViewSet,
     RatingViewSet,
     ServiceViewSet,
@@ -13,10 +14,9 @@ app_name = 'api'
 
 router = routers.DefaultRouter()
 ROUTER_DATA = (
+    ('measure', MeasureViewSet,),
     ('orders', OrderViewSet,),
-    # TODO: два рейтинга. Зачем? Достаточно в OrderViewSet сделать @action.
     ('ratings', RatingViewSet,),
-    (r'^orders/(?P<order_id>\d+)/rating', RatingViewSet),
     ('services', ServiceViewSet),
     ('types', CleaningTypeViewSet,),
     ('users', UserViewSet,),

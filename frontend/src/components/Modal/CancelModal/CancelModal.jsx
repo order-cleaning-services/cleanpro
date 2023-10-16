@@ -6,14 +6,27 @@ import TextArea from '../../TextArea/TextArea'
 import Button from '../../Button/Button'
 import InputRadio from '../../InputRadio/InputRadio'
 import { createPortal } from 'react-dom'
+import { getToken } from '../../../utils/tokenActions'
+import { useDispatch } from 'react-redux'
+import { getUserOrders } from '../../../store/order/orderActions'
+import ordersAPI from '../../../api/ordersAPI'
 
-function CancelModal({ show, closeModal }) {
+function CancelModal({ order, show, closeModal }) {
+  const dispatch = useDispatch()
   function handleSubmit(e) {
     e.preventDefault()
     const form = e.target
     const formData = new FormData(form)
     const formJson = Object.fromEntries(formData.entries())
-    console.log(formJson)
+    const token = getToken()
+    ordersAPI.cancel(order, {
+      body:{ "comment_cancel": formJson.text || formJson.reason},
+     token:token
+     } 
+      )
+      console.log(formJson)
+      dispatch(getUserOrders())
+      closeModal()
   }
   if (!show) return null
   return (

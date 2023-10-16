@@ -201,6 +201,18 @@ class Order(models.Model):
         through_fields=('order', 'service'),
         verbose_name='Услуги',
     )
+    rooms_number = models.IntegerField(
+        verbose_name='Количество комнат',
+        validators=[
+            MinValueValidator(1, 'Укажите корректное значение комнат!'),
+        ]
+    )
+    bathrooms_number = models.IntegerField(
+        verbose_name='Количество санузлов',
+        validators=[
+            MinValueValidator(1, 'Укажите корректное значение санузлов!'),
+        ]
+    )
     pay_status = models.BooleanField(
         default=False,
         verbose_name='Статус оплаты',

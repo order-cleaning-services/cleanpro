@@ -5,7 +5,6 @@ import search from '../../assets/images/search.svg'
 function Search() {
   const [searchText, setSearchText] = useState('')
   console.log(searchText)
-
   const handleChange = evt => {
     setSearchText(evt.target.value)
   }

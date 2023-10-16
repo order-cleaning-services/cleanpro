@@ -15,7 +15,6 @@ function OfficeAdmin() {
   const dispatch = useDispatch()
 
   const [visibleFieldFilters, setVisibleFieldFilters] = useState(false)
-  console.log(visibleFieldFilters)
 
   function handleToggleClick() {
     if (visibleFieldFilters === false) {

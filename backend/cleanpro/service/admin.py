@@ -147,6 +147,8 @@ class OrderAdmin(OrderAdmin):
             - комментарий заказа (comment)
             - тип уборки (cleaning_type)
             - список сервисов и их количество в заказе (services_list)
+            - количество комнат (rooms_number)
+            - количество санузлов (bathrooms_number)
             - дата создания заказа (creation_date)
             - время создания заказа (creation_time)
             - дата начала уборки (cleaning_date)
@@ -164,6 +166,8 @@ class OrderAdmin(OrderAdmin):
             - сумма заказа (total_sum)
             - комментарий заказа (comment)
             - комментарий отмены заказа (comment_cancel)
+            - дата начала уборки (cleaning_date)
+            - время начала уборки (cleaning_time)
         - list_filter (tuple) - список фильтров:
             - статус заказа (order_status)
         - search_fields (tuple) - список полей для поиска объектов:
@@ -188,6 +192,8 @@ class OrderAdmin(OrderAdmin):
         'comment',
         'cleaning_type',
         'services_list',
+        'rooms_number',
+        'bathrooms_number',
         'creation_date',
         'creation_time',
         'cleaning_date',
@@ -205,6 +211,8 @@ class OrderAdmin(OrderAdmin):
         'total_sum',
         'comment',
         'comment_cancel',
+        'cleaning_date',
+        'cleaning_time',
     )
     list_filter = ('order_status',)
     search_fields = ('user',)
