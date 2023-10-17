@@ -1,5 +1,6 @@
 import random
 import re
+from datetime import datetime
 from djoser.serializers import UserCreateSerializer as DjoserUserCreateSerializer  # noqa (E501)
 
 from django.db import transaction
@@ -459,15 +460,14 @@ class OrderPostSerializer(serializers.ModelSerializer):
         return False
 
 
-class AdminOrderPatchSerializer(serializers.ModelSerializer):
-    """Сериализатор для частичного изменения данных заказа админом."""
+class OwnerOrderPatchSerializer(serializers.ModelSerializer):
+    """Сериализатор для частичного изменения данных заказа владельцем."""
 
     class Meta:
         model = Order
         fields = (
             'order_status',
             'comment_cancel',
-            'pay_status',
             'comment',
             'cleaning_date',
             'cleaning_time',
@@ -476,39 +476,38 @@ class AdminOrderPatchSerializer(serializers.ModelSerializer):
     def validate(self, data):
         if not data:
             raise serializers.ValidationError(
-                'Среди указанных полей нет ни одного '
-                'разрешенного для редактирования.')
+                'Среди указанных полей нет ни '
+                'одного разрешенного для редактирования.')
+        if (data.get('order_status') and
+                not data.get('order_status') == ORDER_CANCELLED_STATUS):
+            raise serializers.ValidationError(
+                'Вы можете установить только статус отмены заказа.')
         return data
 
     def update(self, instance, validated_data):
-        # TODO: максимально не DRY. Объединить одинаковый код.
-        #       setattr и getattr в помощь.
-        # REPLE: Переосмыслил.
         super().update(instance, validated_data)
-        if ('comment_cancel' not in validated_data.keys() and
-                'order_status' in validated_data.keys() and
-                not validated_data.get('order_status') is
-                ORDER_CANCELLED_STATUS):
-            instance.comment_cancel = None
-        if 'comment_cancel' in validated_data.keys():
+        if 'comment_cancel' in validated_data:
             instance.order_status = 'cancelled'
+            instance.cancel_date = datetime.today().date()
+            instance.cancel_time = datetime.today().time()
         instance.save()
         return instance
 
     def to_representation(self, value):
-        request = self.context.get('request',)
         return OrderGetSerializer(
             value,
-            context={'request': request}
+            context={'request': self.context.get('request',)}
         ).data
 
 
-class OwnerOrderPatchSerializer(serializers.ModelSerializer):
-    """Сериализатор для частичного изменения данных заказа владельцем."""
+class AdminOrderPatchSerializer(OwnerOrderPatchSerializer):
+    """Сериализатор для частичного изменения данных заказа админом."""
 
     class Meta:
         model = Order
         fields = (
+            'order_status',
+            'pay_status',
             'comment_cancel',
             'comment',
             'cleaning_date',
@@ -523,20 +522,15 @@ class OwnerOrderPatchSerializer(serializers.ModelSerializer):
         return data
 
     def update(self, instance, validated_data):
-        # TODO: аналогично
-        # REPLE: Переосмыслил.
         super().update(instance, validated_data)
-        if 'comment_cancel' in validated_data.keys():
-            instance.order_status = 'cancelled'
+        if ('comment_cancel' not in validated_data and
+                not validated_data.get('order_status') ==
+                ORDER_CANCELLED_STATUS):
+            instance.comment_cancel = None
+            instance.cancel_date = None
+            instance.cancel_time = None
         instance.save()
         return instance
-
-    def to_representation(self, value):
-        request = self.context.get('request',)
-        return OrderGetSerializer(
-            value,
-            context={'request': request}
-        ).data
 
 
 class PaySerializer(serializers.ModelSerializer):
@@ -549,11 +543,11 @@ class PaySerializer(serializers.ModelSerializer):
     def validate(self, data):
         # TODO: аннотация типов желательна.
         # REPLE: Пока не до аннотации.
-        request = self.context.get('request',)
+        request = self.context.get('request')
         user = request.user
         order_id = request.data.get('id',)
         order = get_object_or_404(Order, id=order_id)
-        if not order.user == user:
+        if order.user is not user:
             raise serializers.ValidationError(
                 'Попытка оплатить чужой заказ. Оплата не возможна.')
         if order.pay_status:
@@ -568,61 +562,6 @@ class PaySerializer(serializers.ModelSerializer):
         instance.pay_status = True
         instance.save()
         return instance
-
-
-class OrderRatingSerializer(serializers.ModelSerializer):
-    """
-    Сериализатор для представления отзыва на уборку на главной странице.
-    """
-
-    user = UserGetSerializer(read_only=True)
-
-    class Meta:
-        fields = (
-            'id',
-            'username',
-            'user',
-            'order',
-            'pub_date',
-            'text',
-            'score',
-        )
-        model = Rating
-        read_only_fields = (
-            'id',
-            'username',
-        )
-
-    def validate(self, data):
-        request = self.context.get('request',)
-        user = request.user
-        order_id = request.data.get('id',)
-        order = get_object_or_404(Order, id=order_id)
-        if (not request.user.is_authenticated or
-                request.user.is_staff):
-            raise serializers.ValidationError(
-                'Доступ пользователю запрещен.')
-        if request.method == 'POST':
-            if not order.user == user:
-                raise serializers.ValidationError(
-                    'Оставить отзыв на чужой заказ невозможно.')
-            if not order.order_status == 'finished':
-                raise serializers.ValidationError(
-                    'Оставить отзыв на незавершенный заказ невозможно.')
-            if Rating.objects.filter(order=order, user=user).exists():
-                raise serializers.ValidationError(
-                    'Отзыв на этот заказ вы уже оставляли.')
-        if request.method == 'PUT':
-            if not order.order_status == 'finished':
-                raise serializers.ValidationError(
-                    'Изменить отзыв на незавершенный заказ невозможно.')
-        return data
-
-    def to_representation(self, instance):
-        data: dict = super().to_representation(instance)
-        for field in ('user', 'order'):
-            data.pop(field, None)
-        return data
 
 
 class RatingSerializer(serializers.ModelSerializer):
@@ -652,4 +591,35 @@ class RatingSerializer(serializers.ModelSerializer):
         data: dict = super().to_representation(instance)
         for field in ('user', 'order'):
             data.pop(field, None)
+        return data
+
+
+class OrderRatingSerializer(RatingSerializer):
+    """
+    Сериализатор для создания/изменения отзыва на уборку в приложении.
+    """
+
+    def validate(self, data):
+        request = self.context.get('request')
+        user = request.user
+        order_id = request.data.get('id',)
+        order = get_object_or_404(Order, id=order_id)
+        if (not request.user.is_authenticated or
+                request.user.is_staff):
+            raise serializers.ValidationError(
+                'Доступ пользователю запрещен.')
+        if request.method == 'POST':
+            if not order.user == user:
+                raise serializers.ValidationError(
+                    'Оставить отзыв на чужой заказ невозможно.')
+            if not order.order_status == 'finished':
+                raise serializers.ValidationError(
+                    'Оставить отзыв на незавершенный заказ невозможно.')
+            if Rating.objects.filter(order=order, user=user).exists():
+                raise serializers.ValidationError(
+                    'Отзыв на этот заказ вы уже оставляли.')
+        if request.method == 'PUT':
+            if not order.order_status == 'finished':
+                raise serializers.ValidationError(
+                    'Изменить отзыв на незавершенный заказ невозможно.')
         return data

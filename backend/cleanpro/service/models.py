@@ -346,7 +346,7 @@ class Rating(models.Model):
 
     class Meta:
         constraints = [models.UniqueConstraint(
-            fields=['user', 'order'],
+            fields=('user', 'order'),
             name='unique_user_order_rating'
         )]
         ordering = ('-id',)

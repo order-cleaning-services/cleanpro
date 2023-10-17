@@ -183,8 +183,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return OrderGetSerializer
-        if (self.request.method == 'PATCH' or
-                self.request.method == 'PUT'):
+        if self.request.method in ('PATCH', 'PUT'):
             if self.request.user.is_staff:
                 return AdminOrderPatchSerializer
             else:
@@ -230,7 +229,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         if request.method == 'PUT':
             rating = get_object_or_404(Rating, order=order, user=request.user)
             serializer = OrderRatingSerializer(
-                rating,
+                instance=rating,
                 data=request.data,
                 context={'request': request},
             )
