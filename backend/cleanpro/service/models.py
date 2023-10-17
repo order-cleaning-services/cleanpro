@@ -357,6 +357,10 @@ class Rating(models.Model):
     )
 
     class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=('user', 'order'),
+            name='unique_user_order_rating'
+        )]
         ordering = ('-id',)
         verbose_name = 'Отзыв заказа'
         verbose_name_plural = 'Отзывы заказов'

@@ -15,7 +15,6 @@ from api.permissions import (
     IsAdminOrReadOnly,
     IsNotAdmin,
     IsOwner,
-    IsOwnerOrReadOnly,
 )
 from api.serializers import (
     AdminOrderPatchSerializer,
@@ -28,6 +27,7 @@ from api.serializers import (
     MeasureSerializer,
     OrderGetSerializer,
     OrderPostSerializer,
+    OrderRatingSerializer,
     OwnerOrderPatchSerializer,
     PaySerializer,
     RatingSerializer,
@@ -163,7 +163,7 @@ class UserViewSet(CreateUpdateListSet):
 
 class OrderViewSet(viewsets.ModelViewSet):
     """Список заказов."""
-    http_method_names = ('get', 'post', 'patch',)
+    http_method_names = ('get', 'post', 'patch', 'put',)
     queryset = Order.objects.select_related('user', 'address',).all()
     # TODO: лишний код. Можно оставить permission_classes на уровне проекта
     #       и переписать get_permissions(self)
@@ -183,23 +183,12 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'GET':
             return OrderGetSerializer
-        if self.request.method == 'PATCH':
+        if self.request.method in ('PATCH', 'PUT'):
             if self.request.user.is_staff:
                 return AdminOrderPatchSerializer
             else:
                 return OwnerOrderPatchSerializer
         return OrderPostSerializer
-
-    @action(
-        detail=True,
-        methods=('get',),
-        permission_classes=(IsOwnerOrReadOnly,)
-    )
-    def rating(self, request, pk):
-        order = Order.objects.get(pk=pk)
-        ratings = Rating.objects.filter(order=order)
-        serializer = RatingSerializer(ratings, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def __modify_order(
             self,
@@ -216,6 +205,37 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return serializer
+
+    @action(
+        detail=True,
+        methods=('post', 'put',),
+        url_path='rating',
+    )
+    def rating(self, request, pk):
+        """Оценить заказ."""
+        order = get_object_or_404(Order, id=pk)
+        request.data['id'] = order.id
+        if request.method == 'POST':
+            serializer = OrderRatingSerializer(
+                data=request.data,
+                context={'request': request},
+            )
+            if serializer.is_valid(raise_exception=True):
+                serializer.validated_data['user'] = request.user
+                serializer.validated_data['order'] = order
+                serializer.save()
+            self.perform_create(serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.method == 'PUT':
+            rating = get_object_or_404(Rating, order=order, user=request.user)
+            serializer = OrderRatingSerializer(
+                instance=rating,
+                data=request.data,
+                context={'request': request},
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
@@ -258,9 +278,9 @@ class OrderViewSet(viewsets.ModelViewSet):
 class RatingViewSet(viewsets.ModelViewSet):
     """Список отзывов."""
     queryset = Rating.objects.all()
-    permission_classes = (IsOwnerOrReadOnly,)
+    permission_classes = (IsAdminOrReadOnly,)
     serializer_class = RatingSerializer
-    http_method_names = ('get', 'post', 'patch', 'delete',)
+    http_method_names = ('get', 'patch',)
     pagination_class = LimitOffsetPagination
 
     def list(self, request, *args, **kwargs):
