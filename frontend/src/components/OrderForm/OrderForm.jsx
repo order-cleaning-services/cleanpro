@@ -31,6 +31,8 @@ function OrderForm() {
   const cleaningType = useSelector(calculatorSelectors.getCleanType)
   const total = useSelector(calculatorSelectors.getTotal)
   const extra = useSelector(calculatorSelectors.getExtras)
+  const rooms = useSelector(calculatorSelectors.getRooms)
+  const toilets = useSelector(calculatorSelectors.getToilets)
 
   const dispatch = useDispatch()
 
@@ -102,7 +104,15 @@ function OrderForm() {
 
     if (isAuth) {
       const services = extra.filter(item => item.amount > 0).map(item => ({ id: item.id, amount: item.amount }))
-      const data = { ...body, total_sum: total, cleaning_type: cleaningType, services, total_time: 3 }
+      const data = {
+        ...body,
+        total_sum: total,
+        cleaning_type: cleaningType,
+        services,
+        total_time: 3,
+        rooms_number: rooms,
+        bathrooms_number: toilets,
+      }
       dispatch(createOrder(data))
       navigate(ROUTES.PAYMENT)
     } else {

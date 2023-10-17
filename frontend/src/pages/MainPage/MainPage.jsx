@@ -16,9 +16,11 @@ import { getRatings } from '../../store/ratings/ratingsActions'
 export default function MainPage() {
   const location = useLocation()
   const dispatch = useDispatch()
+
   useEffect(() => {
     dispatch(getRatings())
   }, [dispatch])
+
   useEffect(() => {
     const elementId = location.hash.substring(1)
     scrollToElement(elementId)

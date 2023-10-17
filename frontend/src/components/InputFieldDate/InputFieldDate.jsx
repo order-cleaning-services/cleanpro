@@ -22,6 +22,7 @@ const InputFieldDate = forwardRef(
     function handleFocus(e) {
       if (focus) e.target.setAttribute('type', 'date')
     }
+
     const dispatch = useDispatch()
 
     function addLeadingZero(d) {

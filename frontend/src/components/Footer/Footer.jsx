@@ -19,65 +19,67 @@ const Footer = () => {
 
   return (
     <footer className="footer">
-      <div className="footer__logo-wrapper">
-        <Logo />
+      <div className="footer__container">
+        <div className="footer__logo-wrapper">
+          <Logo />
+        </div>
+        <div className="footer__column">
+          <h4 className="footer__title text-l">Уборка</h4>
+          {location.pathname === '/about' ? (
+            <div className="footer__column">
+              <Link onClick={() => dispatch(setCleanType(1))} to={`/#${tabsElementId}`} className="footer__link">
+                Поддерживающая
+              </Link>
+              <Link onClick={() => dispatch(setCleanType(2))} to={`/#${tabsElementId}`} className="footer__link">
+                Генеральная
+              </Link>
+              <Link onClick={() => dispatch(setCleanType(3))} to={`/#${tabsElementId}`} className="footer__link">
+                После ремонта
+              </Link>
+              <Link onClick={() => dispatch(setCleanType(4))} to={`/#${tabsElementId}`} className="footer__link">
+                После праздника
+              </Link>
+              <Link onClick={() => dispatch(setCleanType(5))} to={`/#${tabsElementId}`} className="footer__link">
+                Мытье окон
+              </Link>
+            </div>
+          ) : (
+            <FooterLinksToTabs />
+          )}
+        </div>
+        <div className="footer__column">
+          <h4 className="footer__title  text-l">Компания</h4>
+          {location.pathname === '/' ? (
+            <>
+              <Link to={`/about#${aboutElementId}`} className="footer__link">
+                О компании
+              </Link>
+              <Link to={`/about#${cleanersElementId}`} className="footer__link">
+                Клинеры
+              </Link>
+            </>
+          ) : (
+            <FooterLinksToAboutPage />
+          )}
+          {location.pathname === '/about' ? (
+            <>
+              <Link to={`/#${commentsElementId}`} className="footer__link">
+                Отзывы
+              </Link>
+              <Link to={`/#${faqElementId}`} className="footer__link">
+                Частые вопросы
+              </Link>
+            </>
+          ) : (
+            <FooterLinksToHomePage />
+          )}
+        </div>
+        <div className="footer__column">
+          <h4 className="footer__title text-l">Контакты</h4>
+          <p className="footer__link">+7 (495) 783-99-00</p>
+        </div>
+        <div></div>
       </div>
-      <div className="footer__column">
-        <h4 className="footer__title text-l">Уборка</h4>
-        {location.pathname === '/about' ? (
-          <div className="footer__column">
-            <Link onClick={() => dispatch(setCleanType(1))} to={`/#${tabsElementId}`} className="footer__link">
-              Поддерживающая
-            </Link>
-            <Link onClick={() => dispatch(setCleanType(2))} to={`/#${tabsElementId}`} className="footer__link">
-              Генеральная
-            </Link>
-            <Link onClick={() => dispatch(setCleanType(3))} to={`/#${tabsElementId}`} className="footer__link">
-              После ремонта
-            </Link>
-            <Link onClick={() => dispatch(setCleanType(4))} to={`/#${tabsElementId}`} className="footer__link">
-              После праздника
-            </Link>
-            <Link onClick={() => dispatch(setCleanType(5))} to={`/#${tabsElementId}`} className="footer__link">
-              Мытье окон
-            </Link>
-          </div>
-        ) : (
-          <FooterLinksToTabs />
-        )}
-      </div>
-      <div className="footer__column">
-        <h4 className="footer__title  text-l">Компания</h4>
-        {location.pathname === '/' ? (
-          <>
-            <Link to={`/about#${aboutElementId}`} className="footer__link">
-              О компании
-            </Link>
-            <Link to={`/about#${cleanersElementId}`} className="footer__link">
-              Клинеры
-            </Link>
-          </>
-        ) : (
-          <FooterLinksToAboutPage />
-        )}
-        {location.pathname === '/about' ? (
-          <>
-            <Link to={`/#${commentsElementId}`} className="footer__link">
-              Отзывы
-            </Link>
-            <Link to={`/#${faqElementId}`} className="footer__link">
-              Частые вопросы
-            </Link>
-          </>
-        ) : (
-          <FooterLinksToHomePage />
-        )}
-      </div>
-      <div className="footer__column">
-        <h4 className="footer__title text-l">Контакты</h4>
-        <p className="footer__link">+7 (495) 783-99-00</p>
-      </div>
-      <div></div>
     </footer>
   )
 }
