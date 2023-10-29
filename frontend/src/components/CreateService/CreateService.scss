@@ -1,0 +1,58 @@
+@import '../../assets/styles/colors.scss';
+
+.create {
+	border-radius: .8rem;
+	background-color: $background-color-secondary;
+
+	&__container {
+		padding: 2rem 0 0 0;
+	}
+
+	&__back {
+		color: $text-color-tertiary;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	&__arrow {
+		padding: 1.2rem .8rem 0 0;
+	}
+
+	&__container {
+		display: flex;
+		flex-direction: row;
+		gap: 4rem;
+	}
+
+	&__title {
+		width: 17.6rem;
+		&_size {
+			padding: 0 0 1.2rem 0;
+		}
+	}
+
+	&_parameters {
+		width: 26.3rem;
+	}
+	&__body-parameters {
+		width: 26.3rem;
+	}
+
+	&__container-inputs {
+		width: 100%;
+		display: flex;
+		gap: 1.2rem;
+	}
+
+	&__form-select {
+		width: 50%;
+	}
+
+	&__button {
+		text-align: right;
+	}	
+
+	&_photo {
+		width: 100%;
+	}
+}

@@ -1,0 +1,38 @@
+@import '../../assets/styles/colors.scss';
+
+.input-parameters {
+	display: flex;
+	flex-direction: column;
+
+	&__input {
+		padding: .8rem 1.6rem;
+		border-radius: 1.2rem;
+		border: 1px solid $border-color;
+		width: 100%;
+		&_small {
+			width: 12.6rem;
+		}
+
+		&:focus {
+			outline: none;
+			border: 1px solid $border-color-blue;
+		}
+
+		&::placeholder {
+			color: #D9D9D9;
+		}
+	}
+
+	&__body-parameters {
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__modal-unit {
+		margin-top: 1rem;
+		padding: 1.2rem 0 1.2rem 1.6rem;
+		width: 28rem;
+		height: 100%;
+	}
+
+}

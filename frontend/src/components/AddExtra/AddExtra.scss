@@ -1,0 +1,23 @@
+.add-extra {
+	display: flex;
+	padding: 2.2rem 0 0 0;
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-between;
+
+	&__item-name {
+		max-width: 23.7rem;
+	}
+
+	&__item-time {
+		max-width: 18rem;
+	}
+
+	&__item-price {
+		max-width: 16rem;
+	}
+
+	&__item-unit {
+		width: 16rem;
+	}
+}

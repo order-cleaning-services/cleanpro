@@ -1,0 +1,14 @@
+.result {
+	display: grid;
+	grid-template-columns: 30.4rem 14rem 14rem 11rem;
+	padding: 1.5rem 0 2rem 2rem;
+
+	&__item {
+		&:nth-child(1) {
+			padding: 0 0 0 2rem;
+		}
+		&:nth-child(n + 2):nth-child(-n + 4) {
+			text-align: center;
+		}
+	}
+}

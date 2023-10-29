@@ -1,0 +1,45 @@
+@import '../../assets/styles/colors.scss';
+
+.package {
+	display: flex;
+	flex-direction: column;
+	background-color: #fff;
+	border-radius: .8rem;
+	padding: 1.5rem 0 2rem 2rem;
+
+	&__close {
+		max-width: 2.4rem;
+		cursor: pointer;
+	}
+
+	&__results {
+		display: grid;
+		grid-template-columns: 30.4rem 14rem 14rem 11rem;
+	}
+	&__result {
+		&:nth-child(1) {
+			padding: 0 0 0 2rem;
+		}
+		&:nth-child(n + 2):nth-child(-n + 4) {
+			text-align: center;
+		}		
+	}
+
+	&__add-package {
+		color: $text-color-tertiary;
+		cursor: pointer;
+		font-weight: 700;
+		text-align: right;
+		padding: 2.4rem 2.4rem 1.2rem 0;
+		display: flex;
+		align-self: end;
+		justify-content: end;
+		width: 20.3rem;
+	}
+
+	&__add-button {
+		display: flex;
+		justify-content: end;
+		padding: 2rem 0 0 0;
+	}
+}

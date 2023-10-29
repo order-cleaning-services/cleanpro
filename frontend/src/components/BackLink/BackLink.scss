@@ -1,0 +1,12 @@
+@import '../../assets/styles/colors.scss';
+
+.back {
+	color: $text-color-tertiary;
+	font-weight: 700;
+	cursor: pointer;
+	display: inline;
+
+		&__arrow {
+			padding: 1.2rem .8rem 0 0;
+		}
+}

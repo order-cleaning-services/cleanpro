@@ -1,0 +1,43 @@
+@import '../../assets/styles/colors.scss';
+
+.choice {
+	background-color: $background-color-secondary;
+	margin: auto auto;
+	width: 95.8rem;
+
+	&__list {
+		height: 35.6rem;
+		overflow: auto;		
+		margin: 0 .8rem 0 0;
+		background-color: #fff;
+
+		&::-webkit-scrollbar {	
+			width: .8rem;
+			height: .8rem;
+		}
+		&::-webkit-scrollbar-track {
+			background-color: $button-color-grey;
+			border-radius: .4rem;
+			height: .8rem;
+			margin: 1.2rem .8rem;
+			width: .8rem;
+		}
+		&::-webkit-scrollbar-thumb {
+			width: .8rem;
+			border-radius: .4rem;
+			max-height: 4rem;
+			background-color: #81ACE5;
+	}
+	}
+
+	&__title {
+		padding: 4rem 0 3.2rem  0;
+	}
+
+	&__style {
+		background-color: #fff;
+		border-top-right-radius: .8rem;
+		border-top-left-radius: .8rem;
+		font-size: 1.4rem;
+	}
+}

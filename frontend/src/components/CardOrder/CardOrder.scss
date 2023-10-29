@@ -1,0 +1,37 @@
+@import '../../assets/styles/colors.scss';
+
+.card-order {
+	background-color: #fff;
+	border-radius: .8rem;
+	margin: 1.2rem 0 0 0;
+	padding: 2rem 0;
+	border: 2px solid #fff;
+	transition: all .2s ease;
+
+	&:hover {
+		transition: all .2s ease;
+		border: 2px solid $border-color-hover;
+	}
+
+	&__complete {
+		display: flex;
+	}
+
+	&__close {
+		margin: 1.2rem 0 2rem 2rem;
+		width: 2rem;
+		font-size: 25px;
+		color: $text-color-main;
+		transform: rotate(45deg);
+	}
+
+	&__cancelled-comment {
+		display: flex;
+		flex-direction: column;		
+	}
+
+	&__comment {
+		font-weight: 400;
+		padding: .4rem 0 0 0;
+	}
+}
