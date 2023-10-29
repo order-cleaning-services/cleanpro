@@ -1,8 +1,8 @@
 import './ButtonAdmin.scss'
 
-function ButtonAdmin({ text }) {
+function ButtonAdmin({ text, style, id, onSubmit }) {
   return (
-    <button type="submit" className="button-admin text-m-bold">
+    <button onSubmit={e => onSubmit(e)} id={id} type="submit" className={`button-admin ${style}  text-m-bold`}>
       {text}
     </button>
   )

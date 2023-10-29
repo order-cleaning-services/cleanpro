@@ -1,25 +1,53 @@
 import './AddExtra.scss'
 
 import InputParameters from '../InputParameters/InputParameters'
-import SelectReact from '../SelectReact/SelectReact'
-import { unit } from '../../utils/initialData'
-import { customerStylesSelectParameters } from '../../assets/styles/customerStylesSelectParameters'
+import UnitSelect from '../UnitSelect/UnitSelect'
 
 function AddExtra() {
   return (
     <div className="add-extra">
-      <div className="add-extra__item-name">
-        <InputParameters label="Название" type="text" placeholder="например, пылесосим" />
-      </div>
+      <InputParameters
+        width={'23.7rem'}
+        style="text-s"
+        name="select-name"
+        label="Название"
+        type="text"
+        placeholder="например, пылесосим"
+      />
       <div className="add-extra__item-time">
-        <InputParameters className={'add-extra__item-time'} label="Время выполнения,мин" type="number" placeholder="" />
+        <InputParameters
+          width={'18rem'}
+          style="text-s"
+          name="select-time "
+          className={'add-extra__item-time'}
+          label="Время выполнения,мин"
+          type="number"
+          placeholder=""
+        />
       </div>
       <div className="add-extra__item-price">
-        <InputParameters label="Стоимость,руб" type="number" placeholder="" />
+        <InputParameters
+          width={'12rem'}
+          style="text-s"
+          name="select-price"
+          label="Стоимость,руб"
+          type="number"
+          placeholder=""
+        />
+      </div>
+      <div className="add-extra__item-price">
+        <InputParameters
+          width={'10rem'}
+          style="text-s"
+          name="select-price"
+          label="Количество"
+          type="number"
+          placeholder=""
+        />
       </div>
       <div className="add-extra__item-unit">
-        <label className="input-parameters__label">Единица измерения</label>
-        <SelectReact style={customerStylesSelectParameters} options={unit} />
+        <label className="input-parameters__label">Единица</label>
+        <UnitSelect />
       </div>
     </div>
   )

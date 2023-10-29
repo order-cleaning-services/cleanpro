@@ -1,10 +1,17 @@
 import './InputParameters.scss'
 
-function InputParameters({ placeholder, label, type, className }) {
+function InputParameters({ placeholder, name, label, type, className, style, width, min }) {
   return (
-    <div className={`input-parameter ${className}`}>
+    <div className={`input-parameters ${className}`}>
       <label className="input-parameters__label">{label}</label>
-      <input placeholder={placeholder} type={type} className="input-parameters__input text-s" />
+      <input
+        name={name}
+        style={{ width: width }}
+        min={min}
+        placeholder={placeholder}
+        type={type}
+        className={`input-parameters__input  ${className} ${style}`}
+      />
     </div>
   )
 }

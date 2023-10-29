@@ -1,8 +1,8 @@
-import TableTitle from '../TableTitle/TableTitle'
 import { useSelector } from 'react-redux'
 import { adminSelectors } from '../../store/admin/adminSelectors'
-import TableTitleServices from '../TableTitleServices/TableTitleServices'
 
+import TableTitle from '../TableTitle/TableTitle'
+import TableTitleServices from '../TableTitleServices/TableTitleServices'
 import CardOrder from '../CardOrder/CardOrder'
 import CardService from '../CardService/CardService'
 
@@ -19,8 +19,8 @@ function Table() {
       )}
       {adminNavLink === 'services' && (
         <>
-          <TableTitleServices />
-          <CardService />
+          <TableTitleServices font="text-s" style="style  text-m" />
+          <CardService style="card-service__item" />
         </>
       )}
     </div>

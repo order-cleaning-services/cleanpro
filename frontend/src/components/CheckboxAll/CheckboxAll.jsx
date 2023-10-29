@@ -23,9 +23,9 @@ function CheckboxAll() {
       <Check name="all" value={selected.length === listOptions.length} updateValue={selectAll}>
         Все пакеты
       </Check>
-      {listOptions.map(item => {
+      {listOptions.map((item, index) => {
         return (
-          <Check key={item.id} name={item} value={selected.includes(item)} updateValue={handleSelect}>
+          <Check key={index} name={item} value={selected.includes(item)} updateValue={handleSelect}>
             {item}
           </Check>
         )

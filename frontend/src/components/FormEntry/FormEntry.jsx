@@ -1,12 +1,16 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/formEntry/formEntrySlice'
+import './FormEntry.scss'
+
+import { useEffect } from 'react'
+
+import { registration, signInUser } from '../../store/auth/authActions'
+
 import { useForm, Controller } from 'react-hook-form'
+import { useSelector, useDispatch } from 'react-redux'
+import { formEntrySelectors } from '../../store/formEntry/formEntrySelectors'
+import { handleClickEntry, handleClickRecovery, handleClickRegistration } from '../../store/formEntry/formEntrySlice'
+
 import Button from '../Button/Button'
 import InputField from '../InputField/InputField'
-import { formEntrySelectors } from '../../store/formEntry/formEntrySelectors'
-import './FormEntry.scss'
-import { registration, signInUser } from '../../store/auth/authActions'
-import { useEffect } from 'react'
 
 function FormEntry() {
   const viewForm = useSelector(formEntrySelectors.getFormView)
@@ -37,8 +41,6 @@ function FormEntry() {
   const onSubmit = (data, e) => {
     if (viewForm === 'registration') dispatch(registration(data))
     if (viewForm === 'entry') dispatch(signInUser(data))
-    //TODO action recovery
-    // if (viewForm === 'recovery')
     e.target.reset()
     reset({ email: '' }, { password: '' })
   }

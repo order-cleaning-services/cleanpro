@@ -1,0 +1,21 @@
+@import '../../assets/styles/colors.scss';
+
+.services-title {
+	margin: 2rem 0;
+	display: flex;
+	justify-content: space-between;
+
+	&__title {	
+		display: flex;
+		align-items: center;
+	}
+
+	&__name {
+		color: $text-color-main;
+	}
+
+	&__img {
+		height: 4rem;
+		align-self: end;
+	}
+}

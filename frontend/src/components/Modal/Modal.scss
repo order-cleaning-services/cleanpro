@@ -1,3 +1,5 @@
+@import '../../assets/styles/colors.scss';
+
 .modal {
 	position: fixed;
 	top: 0;
@@ -5,28 +7,113 @@
 	width: 100%;
 	height: 100%;
 	display: flex;
-	&__overlay {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		background-color: #242424;
-		opacity: .6;
+&__overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #242424;
+	opacity: .6;
+}
+
+&__choice {
+	position: relative;
+	z-index: 1;
+	width: 100rem;
+	display: flex;
+	flex-direction: column;
+	margin: auto;
+	background-color: $background-color-secondary;
+	padding: 4rem 6rem;
+	border-radius: 2rem;
+}
+
+&__choice-title {
+padding: 0 0 3.2rem 0;
+}
+
+&__choice-container {	
+	background-color: #fff;
+	border-radius: .8rem;
+	overflow: hidden;
+	margin: 0 0 2.4rem 0;
+	padding-bottom: .8rem;
+	
+}
+
+&__choice-list {
+	margin: 0 .8rem 0 0;
+	height: 35.6rem;
+	overflow: auto;
+	&::-webkit-scrollbar {
+		width: .8rem;
 	}
+	&::-webkit-scrollbar-track {
+		background-color: $button-color-grey;
+		border-radius: .4rem;
+		margin: 1.2rem 0;
+		
+	}
+	&::-webkit-scrollbar-thumb {
+		border-radius: .4rem;
+		height: .8rem;
+		background-color: #81ACE5;
+	}
+}
+
+&__choice-info {
+	margin: 0 0 2.4rem 0;
+}
+
+&__choice-info-title {
+	padding: 0 0 .8rem 0;
+}
+
+&__choice-info-items {
+	display: flex;
+	justify-content: space-between;
+	width: 34rem;
+}
+
+&__choice-info-del {
+	transform: rotate(-135deg);
+	font-size: 3.5rem;
+	width: 3rem;
+	height: 3rem;
+	cursor: pointer;
+}
+
+&__choice-buttons {
+	display: flex;
+	gap: 2rem;
+	&:nth-first-child() {
+		width: 13.2rem;
+	}
+}
+
 	&__form {
 		position: relative;
-	display: flex;	
-	margin: 0 auto;	
-	align-self: center;
-	padding: 4.8rem 6rem;
-	position: relative;
-	z-index: 2;
-	background-color: #F2F2F2;
-	border-radius: 2rem;
+		display: flex;	
+		margin: 0 auto;	
+		align-self: center;
+		padding: 4.8rem 6rem;
+		position: relative;
+		z-index: 2;
+		background-color: #F2F2F2;
+		border-radius: 2rem;
 	}
 	&__content {
 		align-self: center;
 		width: 39.2rem;
 	}
+
+	&__back {
+		text-align: center;
+    color: #163b6c;
+    font-size: 1.6rem;
+    cursor: pointer;
+    margin: 1.2rem 0 0 0;
+	}
 }
+

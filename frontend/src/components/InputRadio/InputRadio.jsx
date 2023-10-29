@@ -65,7 +65,7 @@ function InputRadio({ legend, className }) {
             type="radio"
             id="input-radio7"
             name="reason"
-            value="ужен другой тип уборки"
+            value="Нужен другой тип уборки"
           />
           <label htmlFor="input-radio7">Нужен другой тип уборки</label>
         </div>

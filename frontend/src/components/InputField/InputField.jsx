@@ -9,6 +9,7 @@ const InputField = forwardRef(
       type = 'text',
       focus = false,
       error = null,
+      style,
       label,
       name,
       onChange,
@@ -28,7 +29,7 @@ const InputField = forwardRef(
           name={name}
           className={`form-input ${size === 'small' ? 'form-input-small' : ''} ${
             type === 'password' ? 'input__password' : ''
-          } ${classNameModal} ${isValid ? '' : 'form-input__error'}`}
+          } ${classNameModal} ${isValid ? '' : 'form-input__error'} ${style}`}
           placeholder={placeholder}
           type={type}
           onFocus={e => handleFocus(e)}

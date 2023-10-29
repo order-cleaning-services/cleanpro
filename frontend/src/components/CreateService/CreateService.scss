@@ -1,9 +1,8 @@
 @import '../../assets/styles/colors.scss';
 
-.add {
+.create {
 	border-radius: .8rem;
 	background-color: $background-color-secondary;
-	padding: 3.2rem 4rem;
 
 	&__container {
 		padding: 2rem 0 0 0;
@@ -33,10 +32,27 @@
 	}
 
 	&_parameters {
-		width: 36.3rem;
+		width: 26.3rem;
+	}
+	&__body-parameters {
+		width: 26.3rem;
+	}
+
+	&__container-inputs {
+		width: 100%;
+		display: flex;
+		gap: 1.2rem;
+	}
+
+	&__form-select {
+		width: 50%;
 	}
 
 	&__button {
 		text-align: right;
 	}	
+
+	&_photo {
+		width: 100%;
+	}
 }

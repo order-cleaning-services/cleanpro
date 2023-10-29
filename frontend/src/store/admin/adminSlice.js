@@ -3,13 +3,15 @@ import { initialState } from './initialState'
 
 const adminSlice = createSlice({
   name: 'admin',
-  initialState: initialState,
+  initialState,
   reducers: {
     handleClickOrders: state => {
       state.linkView = 'orders'
+      state.tab = 'new'
     },
     handleClickServices: state => {
       state.linkView = 'services'
+      state.tab = 'services'
     },
     handleClickStaff: state => {
       state.linkView = 'staff'

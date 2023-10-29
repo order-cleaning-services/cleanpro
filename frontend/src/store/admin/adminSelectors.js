@@ -4,4 +4,10 @@ const getAdminTabCleaners = state => state.admin.tabCleaners
 const getStatusExtra = state => state.admin.extra
 const getDataClient = state => state.admin.dataClient
 
-export const adminSelectors = { getAdminNavLink, getAdminTab, getAdminTabCleaners, getStatusExtra, getDataClient }
+export const adminSelectors = {
+  getAdminNavLink,
+  getAdminTab,
+  getAdminTabCleaners,
+  getStatusExtra,
+  getDataClient,
+}
