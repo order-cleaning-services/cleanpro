@@ -5,7 +5,11 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { packageAdminSelectors } from '../../../store/packages/packageAdminSelectors'
-import { addPackage, removePackage } from '../../../store/packages/packageAdminSlice'
+import {
+  // addPackage,
+  editServiceItem,
+  updatePackage,
+} from '../../../store/packages/packageAdminSlice'
 
 import TableTitleServices from '../../TableTitleServices/TableTitleServices'
 import PackageListItem from '../../PackageListItem/PackageListItem'
@@ -18,13 +22,18 @@ function ChoiceModal({ onClick }) {
   const packages = useSelector(packageAdminSelectors.getPackages)
   const editPackage = useSelector(packageAdminSelectors.getEditPackage)
 
+  const IdServiceItem = useSelector(packageAdminSelectors.getIdServiceItem)
+
   let initialList = []
   editPackage.forEach(function (item) {
     initialList.push(item.name)
     return initialList
   })
 
+  const [newListItems, setNewListItems] = useState(editPackage)
+
   function handleToggleClick(item) {
+    dispatch(editServiceItem(item.id))
     let el = item.name
     let findEl = list.find(item => item === el)
     let findElInitial = initialList.find(item => item == el)
@@ -33,19 +42,30 @@ function ChoiceModal({ onClick }) {
     } else if (findEl !== el && findElInitial !== el) {
       list.push(el)
       setList([...list])
-      dispatch(addPackage(item))
+      setNewListItems([...newListItems, item])
+      // dispatch(addPackage(item))
     } else {
       list.pop(el)
       setList([...list])
-      dispatch(removePackage(item.id))
+      const arr = newListItems.filter(function (item) {
+        return IdServiceItem !== item.id
+      })
+      setNewListItems(arr)
+      // state.editPackage = arr
+      // console.log(arr)
+      // dispatch(updatePackage(item.id))
       return
     }
   }
   let renderList = [...list]
 
-  // function handleState(active) {
-  // 	active = !active
-  // }
+  function handleSubmit() {
+    console.log('handlesubmit')
+    // e.preventDefault()
+    console.log(newListItems)
+    dispatch(updatePackage(newListItems))
+    onClick()
+  }
 
   return (
     <div className="modal">
@@ -89,7 +109,7 @@ function ChoiceModal({ onClick }) {
           })}
         </div>
         <div className="modal__choice-buttons">
-          <ButtonAdmin text="Сохранить" />
+          <ButtonAdmin onClick={e => handleSubmit(e)} text="Сохранить" />
           <UploadButton onClick={onClick} width="width" text="Отменить" />
         </div>
       </div>

@@ -35,12 +35,9 @@ const packageAdminSlice = createSlice({
     addPackage: (state, action) => {
       state.dataPackage = [...state.dataPackage, action.payload]
     },
-    removePackage: (state, action) => {
-      state.idServiceItemEdit = action.payload
-      const arr = state.dataPackage.filter(function (item) {
-        return state.idServiceItemEdit !== item.id
-      })
-      state.dataPackage = arr
+    updatePackage: (state, action) => {
+      const newPack = action.payload
+      state.editPackage = newPack
     },
     initialUnit: (state, action) => {
       state.unit = action.payload
@@ -66,6 +63,6 @@ export const {
   modalStateToggle,
   addPackage,
   setPackageItem,
-  removePackage,
+  updatePackage,
 } = packageAdminSlice.actions
 export default packageAdminSlice.reducer
